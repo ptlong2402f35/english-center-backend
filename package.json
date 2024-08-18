@@ -26,6 +26,7 @@
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "heic-convert": "^2.1.0",
+    "http": "0.0.1-security",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
@@ -37,7 +38,8 @@
     "sequelize": "^6.37.3",
     "sequelize-paginate": "^1.1.6",
     "sharp": "^0.31.1",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "vercel": "^36.0.0"
   },
   "devDependencies": {
     "eslint": "^9.7.0",
