@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { sequelize } = require("../../models");
+const { sequelize } = require("../models");
 const User = require("../models").User;
 const { AuthService } = require("../services/auth/authService");
 const {AuthLogin} = require("../services/auth/authLogin"); 

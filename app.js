@@ -8,9 +8,6 @@ var indexRouter = require("./routes/index");
 var api = require("./routes/api");
 var cors = require("cors");
 const bodyParser = require("body-parser");
-const { TopLocationConfig } = require("./services/topLocationConfig");
-const summaryUnpaidJob = require("./services/order/summaryUnpaidJob/summaryUnpaidOrderJob");
-const summaryFinishJob = require("./services/order/summaryFinishJob/summaryFinishOrderJob");
 
 var app = express();
 app.use(cors());
@@ -65,11 +62,6 @@ var server = http.createServer(app);
 server.listen(port, HOST);
 server.on("error", onError);
 server.on("listening", onListening);
-
-new TopLocationConfig().getInstance().init();
-
-summaryUnpaidJob.start();
-summaryFinishJob.start();
 
 function normalizePort(val) {
 	var port = parseInt(val, 10);

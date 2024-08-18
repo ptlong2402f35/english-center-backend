@@ -1,13 +1,6 @@
 var express = require("express");
 const AuthController = require("../controllers/AuthController");
 const Auth = require("../services/auth/auth");
-const OrderController = require("../controllers/OrderController");
-const PartnerController = require("../controllers/PartnerController");
-const FormController = require("../controllers/FormController");
-const MapController = require("../controllers/MapController");
-const handleImage = require("../utils/uploadImages");
-const AwsServiceController = require("../controllers/AwsServiceController");
-const TransactionController = require("../controllers/TransactionController");
 const UserController = require("../controllers/UserController");
 var router = express.Router();
 
