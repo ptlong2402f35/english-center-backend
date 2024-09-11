@@ -17,6 +17,9 @@ let DB_PASSWORD = decodeURIComponent(config.password);
 
 sequelize = new Sequelize(config.database, config.username, DB_PASSWORD, {
 	...config,
+	dialectOptions: {
+		ssl: {}
+	}
 	// logging: console.log,
 });
 // console.log(`==== sequelize detail: `, util.inspect(sequelize, false, null, true));

@@ -1,9 +1,7 @@
-const OrderStatus = {
-    Pending: 1,
-    Paid: 2,
+const ClassStatus = {
+    UnOpen: 1,
+    Opening: 2,
     Finish: 3,
-    Cancel: 4,
-    Terminated: 5
 }
 
 const OrderRefundStatus = {
@@ -26,7 +24,7 @@ const TransactionStatus = {
 }
 
 module.exports = {
-    OrderStatus,
+    ClassStatus,
     OrderRefundStatus,
     FormStatus,
     TransactionStatus

@@ -13,7 +13,7 @@ const {
     PartnerNotFound,
     FormNotFound,
     OrderNotFound,
-    FormStatusInvalid,
+    ClassStatusInvalid,
     OrderStatusInvalid,
     OrderTimerInvalid,
     EmailFormatNotValid,
@@ -23,12 +23,15 @@ const {
     NotEnoughPermission,
     NotOwnerOrder,
     ExpiredResetKey,
+    UserNameEmpty,
+    UserNotActive,
 } = require("../constants/message");
 const ErrorMessage = require("../resources/translation.json").message.error;
 
 const ErrorCodeMap = new Map([
     [UpdateFailMessage, 400],
     [EmailEmpty, 422],
+    [UserNameEmpty, 422],
     [PasswordEmpty, 422],
     [PasswordNotMatch, 422],
     [ConfirmPasswordNotMatch, 422],
@@ -41,7 +44,7 @@ const ErrorCodeMap = new Map([
     [FormNotFound, 422],
     [OrderNotFound, 422],
     [OrderStatusInvalid, 403],
-    [FormStatusInvalid, 403],
+    [ClassStatusInvalid, 403],
     [OrderTimerInvalid, 403],
     [EmailFormatNotValid, 422],
     [PhoneFormatNotValid, 422],
@@ -50,6 +53,7 @@ const ErrorCodeMap = new Map([
     [NotEnoughPermission, 422],
     [NotOwnerOrder, 403],
     [ExpiredResetKey, 422],
+    [UserNotActive, 403],
 ])
 
 class ErrorService {

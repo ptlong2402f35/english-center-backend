@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 			studentId: DataTypes.INTEGER,
             parentId: DataTypes.INTEGER,
             status: DataTypes.INTEGER,
+			requestByUserId: DataTypes.INTEGER,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},

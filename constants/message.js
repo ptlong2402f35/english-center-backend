@@ -4,6 +4,7 @@ const UpdateDoneMessage = "UpdateDoneMessage";
 const UpdateFailMessage = "UpdateFailMessage";
 //Empty Info
 const EmailEmpty = "EmailEmpty";
+const UserNameEmpty = "UserNameEmpty";
 const PasswordEmpty = "PasswordEmpty";
 const PasswordNotMatch = "PasswordNotMatch";
 const ConfirmPasswordNotMatch = "ConfirmPasswordNotMatch";
@@ -17,8 +18,14 @@ const CustomerNotFound = "CustomerNotFound";
 const PartnerNotFound = "PartnerNotFound";
 const FormNotFound = "FormNotFound";
 const OrderNotFound = "OrderNotFound";
+const ParentNotFound = "ParentNotFound";
+const StudentNotFound = "StudentNotFound";
+const ClassNotFound = "ClassNotFound";
+const TeacherNotFound = "TeacherNotFound";
+const CenterNotFound = "CenterNotFound";
+
 //Validate
-const FormStatusInvalid = "FormStatusInvalid";
+const ClassStatusInvalid = "ClassStatusInvalid";
 const OrderStatusInvalid = "OrderStatusInvalid";
 const OrderTimerInvalid = "OrderTimerInvalid";
 const EmailFormatNotValid = "EmailFormatNotValid";
@@ -27,14 +34,24 @@ const AdminOrderCannotPaid = "AdminOrderCannotPaid";
 const TimeExpiredAction = "TimeExpiredAction";
 const ExpiredResetKey = "ExpiredResetKey";
 
+const NotConnectParent = "NotConnectParent";
+
 const NotEnoughPermission = "NotEnoughPermission";
 const NotOwnerOrder = "NotOwnerOrder";
 
+//active 
+const UserNotActive = "UserNotActive";
+
+//Class
+const ClassHasOpened = "ClassHasOpened";
+const ClassHasEnoughStudent = "ClassHasEnoughStudent";
+const OpenClassCreateStartAtNotValid = "OpenClassCreateStartAtNotValid";
 
 module.exports = {
     UpdateDoneMessage,
     UpdateFailMessage,
     EmailEmpty,
+    UserNameEmpty,
     PasswordEmpty,
     PasswordNotMatch,
     ConfirmPasswordNotMatch,
@@ -46,7 +63,7 @@ module.exports = {
     PartnerNotFound,
     FormNotFound,
     OrderNotFound,
-    FormStatusInvalid,
+    ClassStatusInvalid,
     OrderStatusInvalid,
     OrderTimerInvalid,
     EmailFormatNotValid,
@@ -56,4 +73,14 @@ module.exports = {
     NotEnoughPermission,
     NotOwnerOrder,
     ExpiredResetKey,
+    UserNotActive,
+    ParentNotFound,
+    StudentNotFound,
+    ClassNotFound,
+    TeacherNotFound,
+    NotConnectParent,
+    ClassHasOpened,
+    ClassHasEnoughStudent,
+    OpenClassCreateStartAtNotValid,
+    CenterNotFound
 }

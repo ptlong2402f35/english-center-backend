@@ -2,7 +2,7 @@
 const sequelizePaginate = require("sequelize-paginate");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-	class Teacher extends Model {
+	class Center extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
@@ -16,26 +16,21 @@ module.exports = (sequelize, DataTypes) => {
 
 		}
 	}
-	Teacher.init(
+	Center.init(
 		{
-			name: DataTypes.STRING,
-            gender: DataTypes.INTEGER,
-            birthday: DataTypes.DATE,
-            age: DataTypes.INTEGER,
+			name: DataTypes.TEXT,
             address: DataTypes.TEXT,
             phone: DataTypes.STRING,
-            email: DataTypes.STRING,
-            userId: DataTypes.INTEGER,
-            active: DataTypes.BOOLEAN,
-            level: DataTypes.INTEGER,
+            status: DataTypes.INTEGER,
+            images: DataTypes.JSON,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},
 		{
 			sequelize,
-			modelName: "Teacher",
+			modelName: "Center",
 		},
 	);
-	sequelizePaginate.paginate(Teacher);
-	return Teacher;
+	sequelizePaginate.paginate(Center);
+	return Center;
 };

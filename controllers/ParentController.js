@@ -1,10 +1,11 @@
 const { Op, where } = require("sequelize");
-const { UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound } = require("../constants/message");
+const { UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound, InputInfoEmpty, ExistedEmail } = require("../constants/message");
 const { UserRole } = require("../constants/roles");
 const { ErrorService } = require("../services/errorService");
 const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");
 const { StudentUpdateService } = require("../services/student/studentUpdateService");
 const { StudentQuerier } = require("../services/student/studentQuerier");
+const { ParentQuerier } = require("../services/parent/parentQuerier");
 const { AuthService } = require("../services/auth/authService");
 
 const User = require("../models").User;
@@ -12,19 +13,19 @@ const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const ParentStudent = require("../models").ParentStudent;
 
-class StudentController {
+class ParentController {
     getMyDetail = async (req, res, next) => {
         try {
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
-            let student = await Student.findOne({
+            let parent = await Parent.findOne({
                 where: {
                     userId: userId
                 }
             });
-            if(!student) throw UserNotFound;
+            if(!parent) throw UserNotFound;
 
-            return res.status(200).json(student);
+            return res.status(200).json(parent);
         }
         catch (err) {
             console.error(err);
@@ -38,13 +39,14 @@ class StudentController {
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
             let data = req.body;
-            let student = await Student.findOne({
+            let parent = await Parent.findOne({
                 where: {
                     userId: userId
                 }
             });
-            if(!student) throw UserNotFound;
-            await new StudentUpdateService().updateStudentDetail(data, student.id);
+            if(!parent) throw UserNotFound;
+            //update info
+            await new StudentUpdateService().updateStudentDetail(data, parent.id);
 
             return res.status(200).json({message: "Thành Công"});
         }
@@ -55,19 +57,19 @@ class StudentController {
         }
     }
 
-    parentGetStudentConennected = async (req, res, next) => {
+    studentGetParentConennected = async (req, res, next) => {
         try {
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
-            if(req.user.role != UserRole.Parent) throw NotEnoughPermission;
-            let parent = await Parent.findOne({
+            if(req.user.role != UserRole.Student) throw NotEnoughPermission;
+            let student = await Student.findOne({
                 where: {
                     userId: userId
                 },
                 include: [
                     {
-                        model: Student,
-                        as: "student",
+                        model: Parent,
+                        as: "parent",
                     }
                 ]
             });
@@ -84,39 +86,9 @@ class StudentController {
             //         }
             //     }
             // });
-            let students = parent.map(item => item.student).filter(val => val);
+            let parents = student.map(item => item.parent).filter(val => val);
 
-            return res.status(200).json(students);
-        }
-        catch (err) {
-            console.error(err);
-            let {code, message} = new ErrorService(req).getErrorResponse(err);
-            return res.status(code).json({message});
-        }
-    }
-
-    parentGetStudentDetail = async (req, res, next) => {
-        try {
-            let userId = req.user.userId;
-            if(!userId) throw UserNotFound;
-            if(req.user.role != UserRole.Parent) throw NotEnoughPermission;
-            let studentId = req.params.id;
-            let parent = await Parent.findOne({
-                where: {
-                    userId: userId
-                }
-            });
-            if(!parent) throw ParentNotFound;
-            await new ParentStudentService().checkConnect(parent.id, studentId);
-
-            let student = await Student.findOne({
-                where: {
-                    id: studentId
-                }
-            });
-            if(!student) throw UserNotFound;
-
-            return res.status(200).json(student);
+            return res.status(200).json(parents);
         }
         catch (err) {
             console.error(err);
@@ -125,21 +97,22 @@ class StudentController {
         }
     }
     
-    adminGetStudents = async (req, res, next) => {
+    adminGetParents = async (req, res, next) => {
         try {
-            const studentQuerier = new StudentQuerier();
+            const parentQuerier = new ParentQuerier();
             let page = req.query.page ? parseInt(req.query.page) : 1;
             let perPage = req.query.perPage ? parseInt(req.query.perPage) : 50;
             let name = req.query.name || null;
-            let age = req.query.age || null;
+            let phone = req.query.phone || null;
+            let email = req.query.email || null;
             let active = req.query.active ? (req.query.active?.trim() === "true" ? true : false) : null;
 
-            let conds = studentQuerier.buildWhere({name, age, active});
-            let attributes = studentQuerier.buildAttributes({});
-            let include = studentQuerier.buildInclude({includeParent: true});
-            let orderBy = studentQuerier.buildSort({});
+            let conds = parentQuerier.buildWhere({name, phone, email, active});
+            let attributes = parentQuerier.buildAttributes({});
+            let include = parentQuerier.buildInclude({includeStudent: true});
+            let orderBy = parentQuerier.buildSort({});
 
-            let data = await Student.paginate({
+            let data = await Parent.paginate({
                 page: page,
                 paginate: perPage,
                 where: {
@@ -152,7 +125,7 @@ class StudentController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data)
+            return res.status(200).json(data);
         }
         catch (err) {
             console.error(err);
@@ -161,20 +134,35 @@ class StudentController {
         }
     }
 
-    adminCreateStudent = async (req, res, next) => {
+    adminGetParentDetail = async (req, res, next) => {
+        try {
+            let parentId = req.params.id ? parseInt(req.params.id) : null;
+            if(!parentId) throw ParentNotFound;
+            let parent = await Parent.findByPk(parentId);
+            if(!parent) throw ParentNotFound;
+
+            return res.status(200).json(parent);
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    adminCreateParent = async (req, res, next) => {
         try {
             let data = req.body;
             const authSerivce = new AuthService();
             if(!data.userName || !data.password) throw InputInfoEmpty;
 
             if(!await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
-
             let builtData = await new StudentUpdateService().build(data, {forAdmin: true});
             
-            let resp = await authSerivce.handleCustomerSignup(
+            await authSerivce.handleCustomerSignup(
                 {
                     ...builtData,
-                    role: UserRole.Student
+                    role: UserRole.Parent
                 }
             );
 
@@ -187,28 +175,12 @@ class StudentController {
         }
     }
 
-    adminGetStudentDetail = async (req, res, next) => {
+    adminUpdateParentDetail = async (req, res, next) => {
         try {
-            let studentId = req.params.id ? parseInt(req.params.id) : null;
-            if(!studentId) throw StudentNotFound;
-            let student = await Student.findByPk(studentId);
-            if(!student) throw StudentNotFound;
-
-            return res.status(200).json(student);
-        }
-        catch (err) {
-            console.error(err);
-            let {code, message} = new ErrorService(req).getErrorResponse(err);
-            return res.status(code).json({message});
-        }
-    }
-
-    adminUpdateStudentDetail = async (req, res, next) => {
-        try {
-            let studentId = req.params.id ? parseInt(req.params.id) : null;
-            if(!studentId) throw UserNotFound;
+            let parentId = req.params.id ? parseInt(req.params.id) : null;
+            if(!parentId) throw UserNotFound;
             let data = req.body;
-            await new StudentUpdateService().updateStudentDetail(data, studentId, {forAdmin: true});
+            await new StudentUpdateService().updateStudentDetail(data, parentId, {forAdmin: true});
 
             return res.status(200).json({message: "Thành Công"});
         }
@@ -219,21 +191,21 @@ class StudentController {
         }
     }
 
-    adminDeactiveStudent = async (req, res, next) => {
+    adminDeactiveParent = async (req, res, next) => {
         try {
-            let studentId = req.params.id ? parseInt(req.params.id) : null;
-            if(!studentId) throw UserNotFound;
+            let parentId = req.params.id ? parseInt(req.params.id) : null;
+            if(!parentId) throw ParentNotFound;
             let active = req.query.active ? (req.query.active?.trim() === "true" ? true : false) : null;
             if(!active && active != false) throw InputInfoEmpty;
 
-            await Student.update(
+            await Parent.update(
                 {
                     active: active,
                     updatedAt: new Date()
                 },
                 {
                     where: {
-                        id: studentId
+                        id: parentId
                     }
                 }
             );
@@ -248,4 +220,4 @@ class StudentController {
     }
 }
 
-module.exports = new StudentController();
+module.exports = new ParentController();

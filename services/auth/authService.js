@@ -9,7 +9,7 @@ const { sequelize } = require("../../models");
 const JWT_CONFIG = require("../../config/jwt");
 const { CommunicationService } = require("../communication/communicationService");
 const { UserRole } = require("../../constants/roles");
-const { UserNotFound, UpdateFailMessage, ExpiredResetKey, UpdateDoneMessage } = require("../../constants/message");
+const { UserNotFound, UpdateFailMessage, ExpiredResetKey, UpdateDoneMessage, UserNotActive } = require("../../constants/message");
 const { CommunicationType } = require("../../constants/type");
 const DefaultPartnerPassword = process.env.DEFAULT_PARTNER_PASSWORD?.trim() || "";
 const DefaultServiceFee = process.env.DEFAULT_SERVICE_FEE ? parseFloat(process.env.DEFAULT_SERVICE_FEE) : 5.5;
@@ -25,6 +25,7 @@ class AuthService {
                     user_id: user.id,
                     userName: user.userName,
                     role: user.role,
+                    active: user.active
                 },
                 JWT_CONFIG.SECRET_KEY,
                 {
@@ -32,14 +33,63 @@ class AuthService {
                 }
             );
 
+            const refreshToken = jwt.sign(
+                {
+                    user_id: user.id,
+                    role: user.role,
+                },
+                JWT_CONFIG.REFRESH_SECRET_KEY,
+                {
+                    expiresIn: JWT_CONFIG.RefreshTokenTime
+                }
+            );
+
             return {
                 accessToken,
+                refreshToken,
                 expiredIn: JWT_CONFIG.AccessTokenTime * 1000 + new Date().getTime(),
             }
         }
         catch(err) {
             console.log(err);
             return {};
+        }
+    }
+
+    async generateTokenByRefresh(token) {
+        try {
+            const decodeJwt = jwt.verify(token, JWT_CONFIG.REFRESH_SECRET_KEY);
+            if(decodeJwt && decodeJwt.user_id) {
+                let user = await User.findByPk(decodeJwt.user_id);
+                if(!user) throw UserNotFound;
+                if(!user.active) throw UserNotActive;
+                const accessToken = jwt.sign(
+                    {
+                        user_id: user.id,
+                        userName: user.userName,
+                        role: user.role,
+                        active: user.active
+                    },
+                    JWT_CONFIG.SECRET_KEY,
+                    {
+                        expiresIn: JWT_CONFIG.AccessTokenTime
+                    }
+                );
+
+                return {
+                    accessToken, 
+                    refreshToken: token,
+                    user,
+                }
+            }
+            return  {
+                accessToken: null,
+                user: null,
+                refreshToken: token,
+            }
+        }
+        catch (err) {
+
         }
     }
 
