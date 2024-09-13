@@ -131,7 +131,7 @@ class UserController {
             let resp = await authSerivce.handleCustomerSignup(
                 {
                     ...data,
-                   
+                    
                 }
             );
 

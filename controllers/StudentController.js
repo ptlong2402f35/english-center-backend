@@ -1,5 +1,5 @@
 const { Op, where } = require("sequelize");
-const { UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound } = require("../constants/message");
+const { UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound, ExistedEmail } = require("../constants/message");
 const { UserRole } = require("../constants/roles");
 const { ErrorService } = require("../services/errorService");
 const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");

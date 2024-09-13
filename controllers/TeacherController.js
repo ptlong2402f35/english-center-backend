@@ -1,4 +1,5 @@
-const { UserNotFound } = require("../constants/message");
+const { UserNotFound, InputInfoEmpty, ExistedEmail } = require("../constants/message");
+const { AuthService } = require("../services/auth/authService");
 const { ErrorService } = require("../services/errorService");
 const { TeacherQuerier } = require("../services/teacher/teacherQuerier");
 const { TeacherUpdateService } = require("../services/teacher/teacherUpdateService");
@@ -47,7 +48,7 @@ class TeacherController {
         }
     }
 
-    getClasseDetail = async (req, res, next) => {
+    getTeacherDetail = async (req, res, next) => {
         try {
             const teacherQuerier = new TeacherQuerier();
             let teacherId = req.params.id ? parseInt(req.params.id) : null;
@@ -132,6 +133,45 @@ class TeacherController {
             await new TeacherUpdateService().updateDetail(data, teacher.id, {forAdmin: true});
 
             return res.status(200).json({message: "Thành Công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    adminCreateTeacher = async (req, res, next) => {
+        try {
+            let data = req.body;
+            if(!data.userName || !data.password || !data.role) throw InputInfoEmpty;
+            if(!await new AuthService().checkUserNameExist(data.userName)) throw ExistedEmail;
+
+            await new AuthService().handleCustomerSignup(data);
+
+            return res.status(200).json({message: "Thành Công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    adminAssignTeacherToClass = async (req, res, next) => {
+        try {
+
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    getSalaryHistory = async (req, res, next) => {
+        try {
+            
         }
         catch (err) {
             console.error(err);

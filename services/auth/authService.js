@@ -138,11 +138,6 @@ class AuthService {
                         userName: data.userName,
                         email: data.email,
                         password: passHashed,
-                        name: data.name,
-                        gender: data.gender,
-                        birthday: data.birthday,
-                        phone: data.phone,
-                        email: data.email,
                         role: data.role,
                         createdAt: new Date(),
                         updatedAt: new Date()
@@ -157,6 +152,11 @@ class AuthService {
                         {
                             userId: user.id,
                             active: true,
+                            name: data.name,
+                            gender: data.gender,
+                            birthday: data.birthday,
+                            phone: data.phone,
+                            email: data.email,
                             createdAt: new Date(),
                             updatedAt: new Date()
                         },
@@ -170,6 +170,11 @@ class AuthService {
                         {
                             userId: user.id,
                             active: true,
+                            name: data.name,
+                            gender: data.gender,
+                            birthday: data.birthday,
+                            phone: data.phone,
+                            email: data.email,
                             createdAt: new Date(),
                             updatedAt: new Date()
                         },
@@ -183,6 +188,12 @@ class AuthService {
                         {
                             userId: user.id,
                             active: true,
+                            name: data.name,
+                            gender: data.gender,
+                            birthday: data.birthday,
+                            phone: data.phone,
+                            email: data.email,
+                            level: data.level,
                             createdAt: new Date(),
                             updatedAt: new Date()
                         },

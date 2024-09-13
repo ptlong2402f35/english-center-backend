@@ -69,13 +69,58 @@ router.put("/class/:id", Auth.onlyAdmin, ClassController.updateClass);
 router.put("/class-deactive/:id", Auth.onlyAdmin, ClassController.deactiveClass);
 router.post("/register-by-student/:id", Auth.auth, ClassController.studentRegisterClass);
 router.post("/register-by-parent/:id", Auth.auth, ClassController.parentRegisterClass);
-router.post("/register-by-admin", Auth.auth, ClassController.studentRegisterClass);
+router.post("/register-by-admin", Auth.auth, ClassController.adminRegisterClass);
 
 /* Teacher Controller */
 router.get("/teacher", TeacherController.getTeachers);
-router.get("/teacher/:id", TeacherController.getClasseDetail);
+router.get("/teacher/:id", TeacherController.getTeacherDetail);
 router.get("/my-teacher-detail", Auth.auth, TeacherController.getMyDetail);
 router.put("/my-teacher-detail", Auth.auth, TeacherController.updateMyDetail);
 router.put("/teacher/:id", Auth.onlyAdmin, TeacherController.adminUpdateTeacherDetail);
+router.post("/teacher", Auth.onlyAdmin, TeacherController.adminCreateTeacher);
+router.post("/teacher-to-class", Auth.onlyAdmin, TeacherController.adminAssignTeacherToClass);
+router.post("/teacher", Auth.auth, TeacherController.getSalaryHistory);
+
+/* Request Controller */
+router.get("/request", Auth.auth, TeacherController.getTeachers);
+router.post("/request/:id", Auth.auth, TeacherController.getTeachers);
+router.put("/request/:id", Auth.auth, TeacherController.getTeachers);
+
+/* Attendance Controller */
+router.get("/attendances", Auth.auth, TeacherController.getTeachers);
+router.get("/attendance/:id", TeacherController.getTeachers);
+router.post("/attendance/:id", Auth.auth, TeacherController.getTeachers);
+router.put("/attendance/:id", Auth.auth, TeacherController.getTeachers);
+router.get("/attendances-by-admin", Auth.onlyAdmin, TeacherController.getTeachers);
+router.post("/attendance-by-admin/:id", Auth.onlyAdmin, TeacherController.getTeachers);
+router.put("/attendance-by-admin/:id", Auth.onlyAdmin, TeacherController.getTeachers);
+
+/* Program Controller */
+router.get("/programs", Auth.onlyAdmin, TeacherController.getTeachers);
+router.get("/program/:id", Auth.onlyAdmin, TeacherController.getTeachers);
+router.post("/program", Auth.onlyAdmin, TeacherController.getTeachers);
+router.put("/program/:id", Auth.onlyAdmin, TeacherController.getTeachers);
+router.post("/apply-program", Auth.onlyAdmin, TeacherController.getTeachers);
+
+/* Schedule Controller */
+router.get("/schedules", Auth.onlyAdmin, TeacherController.getTeachers);
+router.get("/schedule/:id", Auth.onlyAdmin, TeacherController.getTeachers);
+router.post("/schedule", Auth.onlyAdmin, TeacherController.getTeachers);
+router.put("/schedule/:id", Auth.onlyAdmin, TeacherController.getTeachers);
+router.post("/apply-schedule", Auth.onlyAdmin, TeacherController.getTeachers);
+
+/* Notification Controller */
+router.get("/notifications", Auth.auth, TeacherController.getTeachers);
+
+/* Transaction Controller */
+router.get("/transactions", Auth.auth, TeacherController.getTeachers);
+
+/* Cost Controller */
+router.get("/costs", Auth.onlyAdmin, TeacherController.getTeachers);
+router.get("/cost/:id", Auth.onlyAdmin, TeacherController.getTeachers);
+router.post("/cost", Auth.onlyAdmin, TeacherController.getTeachers);
+router.post("/payment-sucess", Auth.onlyAdmin, TeacherController.getTeachers);
+
+
 
 module.exports = router;
