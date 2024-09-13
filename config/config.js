@@ -10,6 +10,7 @@ module.exports = {
 		host: process.env.DEV_DB_HOST,
 		dialect: process.env.DEV_DB_DIALECT,
 		port: process.env.DEV_DB_PORT,
+		dialectModule: require('pg'),
 		logging: false,
 	},
 	staging: {
@@ -19,6 +20,7 @@ module.exports = {
 		host: process.env.DEV_DB_HOST,
 		dialect: process.env.DEV_DB_DIALECT,
 		port: process.env.DEV_DB_PORT,
+		dialectModule: require('pg'),
 		logging: false,
 	},
 	production: {
