@@ -154,6 +154,7 @@ class AuthController {
         }
     }
 
+    
     test = async (req, res, next) => {
         try {
             let data = await sequelize.query(`select * from "test"`);
