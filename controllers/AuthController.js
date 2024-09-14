@@ -12,7 +12,7 @@ const { ErrorService } = require("../services/errorService");
 const { Validation } = require("../utils/validation");
 const { TranslateService } = require("../services/translateService");
 const SuccessRespMessage = require("../resources/translation.json").message.done;
-
+const config = require("../config/config");
 class AuthController {
     login = async (req, res, next) => {
         try {
@@ -215,7 +215,11 @@ class AuthController {
 
     test = async (req, res, next) => {
         try {
-            let data = process.env.NODE_ENV;
+            let env = process.env.NODE_ENV;
+            let data = {
+                environment: env,
+                config: config[env]
+            }
             return res.status(200).json(data);
         }
         catch (err) {
