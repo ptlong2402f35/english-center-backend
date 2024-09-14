@@ -18,7 +18,7 @@ class AuthService {
 
     }
 
-    async generateToken(user) {
+    async generateToken(user, forDev) {
         try {
             const accessToken = jwt.sign(
                 {
@@ -29,7 +29,7 @@ class AuthService {
                 },
                 JWT_CONFIG.SECRET_KEY,
                 {
-                    expiresIn: JWT_CONFIG.AccessTokenTime
+                    expiresIn: forDev ? JWT_CONFIG.AccessTokenTimev2 : JWT_CONFIG.AccessTokenTime
                 }
             );
 
@@ -139,6 +139,7 @@ class AuthService {
                         email: data.email,
                         password: passHashed,
                         role: data.role,
+                        active: true,
                         createdAt: new Date(),
                         updatedAt: new Date()
                     },
@@ -154,7 +155,7 @@ class AuthService {
                             active: true,
                             name: data.name,
                             gender: data.gender,
-                            birthday: data.birthday,
+                            birthday: data.birthday || null,
                             phone: data.phone,
                             email: data.email,
                             createdAt: new Date(),
@@ -172,7 +173,7 @@ class AuthService {
                             active: true,
                             name: data.name,
                             gender: data.gender,
-                            birthday: data.birthday,
+                            birthday: data.birthday || null,
                             phone: data.phone,
                             email: data.email,
                             createdAt: new Date(),
@@ -190,7 +191,7 @@ class AuthService {
                             active: true,
                             name: data.name,
                             gender: data.gender,
-                            birthday: data.birthday,
+                            birthday: data.birthday || null,
                             phone: data.phone,
                             email: data.email,
                             level: data.level,

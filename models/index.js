@@ -7,6 +7,7 @@ const path = require("path");
 const Sequelize = require("sequelize");
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
+const endpoint = process.env.DEV_ENPOINT_ID;
 const config = require(__dirname + "/../config/config.js")[env];
 const db = {};
 
@@ -18,8 +19,11 @@ let DB_PASSWORD = decodeURIComponent(config.password);
 sequelize = new Sequelize(config.database, config.username, DB_PASSWORD, {
 	...config,
 	dialectOptions: {
-		ssl: {}
-	}
+		ssl: {
+		  require: true,
+		  rejectUnauthorized: false,
+		},
+	  },
 	// logging: console.log,
 });
 // console.log(`==== sequelize detail: `, util.inspect(sequelize, false, null, true));

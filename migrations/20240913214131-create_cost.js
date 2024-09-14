@@ -2,36 +2,48 @@
 
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
-		await queryInterface.createTable("Forms", {
+		await queryInterface.createTable("Costs", {
 			id: {
 				allowNull: false,
 				autoIncrement: true,
 				primaryKey: true,
 				type: Sequelize.INTEGER,
 			},
-			email: {
-				type: Sequelize.STRING,
+			referenceId: {
+				type: Sequelize.INTEGER,
         		allowNull: true
 			},
-			partnerInfo: {
-				type: Sequelize.JSON,
-				allowNull: true,
-			},
-      		contractInfo: {
-				type: Sequelize.JSON,
-				allowNull: true,
-			},
-      		extenalInfo: {
-				type: Sequelize.JSON,
+			type: {
+				type: Sequelize.INTEGER,
 				allowNull: true,
 			},
 			status: {
 				type: Sequelize.INTEGER,
 				allowNull: true,
 			},
-			type: {
+			totalMoney: {
+				type: Sequelize.DOUBLE,
+				allowNull: true,
+			},
+			forMonth: {
+				type: Sequelize.INTEGER,
+				allowNull: true,
+			},
+			otherType: {
 				type: Sequelize.INTEGER,
 				allowNull: false,
+			},
+			forUserId: {
+				type: Sequelize.INTEGER,
+				allowNull: true,
+			},
+			debtMoney: {
+				type: Sequelize.DOUBLE,
+				allowNull: true,
+			},
+			paidMoney: {
+				type: Sequelize.DOUBLE,
+				allowNull: true,
 			},
 			createdAt: {
 				type: Sequelize.DATE,
@@ -47,6 +59,6 @@ module.exports = {
 
 	},
 	down: async (queryInterface, Sequelize) => {
-		await queryInterface.dropTable("Forms");
+		await queryInterface.dropTable("Costs");
 	},
 };

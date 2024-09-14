@@ -21,7 +21,22 @@ module.exports = (sequelize, DataTypes) => {
 
 		static associate(models) {
 			// define association here
-            
+            User.hasOne(models.Student, {
+                foreignKey: "userId",
+                as: "student"
+            });
+            User.hasOne(models.Parent, {
+                foreignKey: "userId",
+                as: "parent"
+            });
+			User.hasOne(models.Teacher, {
+                foreignKey: "userId",
+                as: "teacher"
+            });
+            User.hasMany(models.Transaction, {
+                foreignKey: "userId",
+                as: "transactions"
+            });
 		}
 	}
 	User.init(
@@ -30,9 +45,7 @@ module.exports = (sequelize, DataTypes) => {
 			password: DataTypes.TEXT,
 			role: DataTypes.INTEGER,
             active: DataTypes.BOOLEAN,
-			totalMoney: DataTypes.DOUBLE,
 			resetKey: DataTypes.TEXT,
-			resetKeyExpiredAt: DataTypes.DATE,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},

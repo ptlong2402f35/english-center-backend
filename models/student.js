@@ -9,11 +9,11 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 
-		toJSON() {
-		}
-
 		static associate(models) {
-
+			Student.belongsTo(models.User, {
+                foreignKey: "userId",
+                as: "user"
+            });
 		}
 	}
 	Student.init(
