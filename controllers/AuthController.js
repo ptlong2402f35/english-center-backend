@@ -215,7 +215,7 @@ class AuthController {
 
     test = async (req, res, next) => {
         try {
-            let data = await sequelize.query(`select * from "test"`);
+            let data = process.env.NODE_ENV;
             return res.status(200).json(data);
         }
         catch (err) {
