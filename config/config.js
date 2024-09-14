@@ -10,7 +10,14 @@ module.exports = {
 		host: process.env.DEV_DB_HOST,
 		dialect: process.env.DEV_DB_DIALECT,
 		port: process.env.DEV_DB_PORT,
+		dialectModule: require('pg'),
 		logging: false,
+		dialectOptions: {
+			ssl: {
+			  require: true,
+			  rejectUnauthorized: false,
+			},
+		  },
 	},
 	staging: {
 		username: process.env.DEV_DB_USERNAME,
@@ -19,7 +26,14 @@ module.exports = {
 		host: process.env.DEV_DB_HOST,
 		dialect: process.env.DEV_DB_DIALECT,
 		port: process.env.DEV_DB_PORT,
+		dialectModule: require('pg'),
 		logging: false,
+		dialectOptions: {
+			ssl: {
+			  require: true,
+			  rejectUnauthorized: false,
+			},
+		  },
 	},
 	production: {
 		username: process.env.PROD_DB_USERNAME,
@@ -30,5 +44,11 @@ module.exports = {
 		port: process.env.PROD_DB_PORT,
 		logging: false,
 		pool: { max: MaxConnection },
+		dialectOptions: {
+			ssl: {
+			  require: true,
+			  rejectUnauthorized: false,
+			},
+		  },
 	},
 };

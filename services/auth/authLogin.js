@@ -10,7 +10,7 @@ class AuthLogin {
         this.authService = new AuthService();
     }
 
-    async handleLogin(data) {
+    async handleLogin(data, forDev) {
         try {
             let user = await User.findOne({
                 where: {
@@ -22,7 +22,7 @@ class AuthLogin {
             if(!checkPass) {
                 throw PasswordNotMatch;
             }
-            const {accessToken, refreshToken} = await this.authService.generateToken(user);
+            const {accessToken, refreshToken} = await this.authService.generateToken(user, forDev);
             if(accessToken && refreshToken) {
                 return {
                     action: true,

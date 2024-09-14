@@ -3,6 +3,7 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const crypto = require('crypto');
 
 var indexRouter = require("./routes/index");
 var api = require("./routes/api");
@@ -78,7 +79,7 @@ function normalizePort(val) {
 
 	return false;
 }
-
+// console.log(crypto.randomBytes(32).toString("hex"))
 function onError(error) {
 	if (error.syscall !== "listen") {
 		throw error;

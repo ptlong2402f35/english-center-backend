@@ -10,17 +10,9 @@ module.exports = {
 				primaryKey: true,
 				type: Sequelize.INTEGER,
 			},
-			fullName: {
+			userName: {
 				type: Sequelize.STRING,
-				allowNull: true,
-			},
-			phone: {
-				allowNull: true,
-				type: Sequelize.STRING,
-			},
-			email: {
-				type: Sequelize.STRING,
-				allowNull: true,
+				allowNull: false,
 			},
 			password: {
 				type: Sequelize.TEXT,
@@ -30,36 +22,8 @@ module.exports = {
 				type: Sequelize.INTEGER,
 				allowNull: false,
 			},
-			avatar: {
-				type: Sequelize.TEXT,
-				allowNull: true,
-			},
-			address: {
-				type: Sequelize.STRING,
-				allowNull: true,
-			},
-      		gender: {
-				type: Sequelize.INTEGER,
-				allowNull: true,
-			},
-			partnerId: {
-				type: Sequelize.INTEGER,
-				allowNull: true,
-			},
-			communicationId: {
-				type: Sequelize.INTEGER,
-				allowNull: true,
-			},
-			lat: {
-				type: Sequelize.DOUBLE,
-				allowNull: true,
-			},
-      		long: {
-				type: Sequelize.DOUBLE,
-				allowNull: true,
-			},
-      		coordinate: {
-				type: Sequelize.DataTypes.GEOMETRY("POINT"),
+			active: {
+				type: Sequelize.BOOLEAN,
 				allowNull: true,
 			},
       		resetKey: {

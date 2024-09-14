@@ -2,30 +2,26 @@
 
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
-		await queryInterface.createTable("Transactions", {
+		await queryInterface.createTable("StudentClasses", {
 			id: {
 				allowNull: false,
 				autoIncrement: true,
 				primaryKey: true,
 				type: Sequelize.INTEGER,
 			},
-			userId: {
+      studentId: {
 				type: Sequelize.INTEGER,
 				allowNull: true,
 			},
-			orderId: {
+      classId: {
 				type: Sequelize.INTEGER,
         		allowNull: false
 			},
-			createdByUserId: {
+      offSession: {
 				type: Sequelize.INTEGER,
-        		allowNull: false
+				allowNull: true,
 			},
-			status: {
-				type: Sequelize.INTEGER,
-        		allowNull: true
-			},
-			totalMoney: {
+      reduceFee: {
 				type: Sequelize.DOUBLE,
 				allowNull: true,
 			},
@@ -43,6 +39,6 @@ module.exports = {
 
 	},
 	down: async (queryInterface, Sequelize) => {
-		await queryInterface.dropTable("Transactions");
+		await queryInterface.dropTable("StudentClasses");
 	},
 };

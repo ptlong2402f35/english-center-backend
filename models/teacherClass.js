@@ -9,8 +9,7 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 
-		toJSON() {
-		}
+		
 
 		static associate(models) {
 
@@ -20,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			teacherId: DataTypes.INTEGER,
             classId: DataTypes.INTEGER,
-            teacherReceiveMoney: DataTypes.DOUBLE,
+            salary: DataTypes.DOUBLE,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},

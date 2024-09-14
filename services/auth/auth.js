@@ -1,13 +1,14 @@
 const jwt = require("jsonwebtoken");
-const JWT_CONFiG = require("../../config/jwt");
+const JWT_CONFIG = require("../../config/jwt");
 const { UserRole } = require("../../constants/roles");
 
 class Auth {
     async auth(req, res, next) {
         try {
             const token = req.header("Authorization").replace("Bearer", "").trim();
-            const decodeJwt = jwt.verify(token, JWT_CONFiG.SECRET_KEY);
+            const decodeJwt = jwt.verify(token, JWT_CONFIG.SECRET_KEY);
             if(decodeJwt && decodeJwt.user_id && decodeJwt.role) {
+                if(!decodeJwt?.active) return res.status(422).json({message: "Tài khoản chưa kích hoạt"});
                 req.user = {
                     userId: decodeJwt.user_id,
                     email: decodeJwt.email,
@@ -31,7 +32,7 @@ class Auth {
     async onlyAdmin(req, res, next) {
         try {
             const token = req.header("Authorization").replace("Bearer", "").trim();
-            const decodeJwt = jwt.verify(token, JWT_CONFiG.SECRET_KEY);
+            const decodeJwt = jwt.verify(token, JWT_CONFIG.SECRET_KEY);
             if(decodeJwt && decodeJwt.user_id && decodeJwt.role) {
                 req.user = {
                     userId: decodeJwt.user_id,
@@ -62,7 +63,7 @@ class Auth {
 		try {
 			if (token) {
 				token = token.replace("Bearer", "").trim();
-				const decodeJwt = jwt.verify(token, JWT_CONFiG.SECRET_KEY);
+				const decodeJwt = jwt.verify(token, JWT_CONFIG.SECRET_KEY);
 				if (decodeJwt.user_id === userId) {
 					return true;
 				}

@@ -1,7 +1,10 @@
 "use strict";
+
+const { OrderRefundStatus, OrderStatus } = require("../constants/status");
+
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
-		await queryInterface.createTable("Partners", {
+		await queryInterface.createTable("Centers", {
 			id: {
 				allowNull: false,
 				autoIncrement: true,
@@ -9,32 +12,22 @@ module.exports = {
 				type: Sequelize.INTEGER,
 			},
 			name: {
-				type: Sequelize.STRING,
+				type: Sequelize.TEXT,
 				allowNull: true,
-			},
-			active: {
-				type: Sequelize.BOOLEAN,
-			},
-			userId: {
-				type: Sequelize.INTEGER,
 			},
 			address: {
+				type: Sequelize.TEXT,
+				allowNull: true,
+			},
+			phone: {
 				type: Sequelize.STRING,
 				allowNull: true,
 			},
-			lat: {
-				type: Sequelize.DOUBLE,
+			status: {
+				type: Sequelize.INTEGER,
 				allowNull: true,
 			},
-			long: {
-				type: Sequelize.DOUBLE,
-				allowNull: true,
-			},
-			fee: {
-				type: Sequelize.DOUBLE,
-				allowNull: true,
-			},
-      		workTime: {
+			images: {
 				type: Sequelize.JSON,
 				allowNull: true,
 			},
@@ -49,8 +42,9 @@ module.exports = {
         		defaultValue: new Date()
 			},
 		});
+
 	},
 	down: async (queryInterface, Sequelize) => {
-		await queryInterface.dropTable("Partners");
+		await queryInterface.dropTable("Centers");
 	},
 };

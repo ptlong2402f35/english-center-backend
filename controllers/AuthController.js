@@ -1,9 +1,13 @@
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const User = require("../models").User;
+const Parent = require("../models").Parent;
+const Teacher = require("../models").Teacher;
+const Student = require("../models").Student;
+const util = require("util");
 const { AuthService } = require("../services/auth/authService");
 const {AuthLogin} = require("../services/auth/authLogin"); 
-const { EmailEmpty, PasswordEmpty, InputInfoEmpty, ConfirmPasswordNotMatch, ExistedEmail, ExistedPhone, UserNotFound, EmailFormatNotValid, PhoneFormatNotValid } = require("../constants/message");
+const { EmailEmpty, PasswordEmpty, InputInfoEmpty, ConfirmPasswordNotMatch, ExistedEmail, ExistedPhone, UserNotFound, EmailFormatNotValid, PhoneFormatNotValid, UserNameEmpty } = require("../constants/message");
 const { ErrorService } = require("../services/errorService");
 const { Validation } = require("../utils/validation");
 const { TranslateService } = require("../services/translateService");
@@ -15,7 +19,7 @@ class AuthController {
             let data = req.body;
             data.userName = data.userName?.trim()?.toLowerCase();
             if(!data.userName) {
-                throw EmailEmpty;
+                throw UserNameEmpty;
             }
             if(!data.password) {
                 throw PasswordEmpty;
@@ -23,14 +27,55 @@ class AuthController {
             let {action, accessToken, refreshToken, expiredIn, userId} = await new AuthLogin().handleLogin(data);
             if(action) {
                 return res.status(200).json({
-                    message: new TranslateService(req).translateMessage(SuccessRespMessage, true),
+                    message: "Đăng nhập thành công",
                     accessToken,
                     expiredIn,
                     userId,
                     refreshToken,
-                })
+                });
             }
-            throw "";
+            return res.status(403).json({
+                message: "Đăng nhập thất bại",
+                accessToken: null,
+                expiredIn: null,
+                userId: null,
+                refreshToken: null,
+            });
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    loginForDev = async (req, res, next) => {
+        try {
+            let data = req.body;
+            data.userName = data.userName?.trim()?.toLowerCase();
+            if(!data.userName) {
+                throw UserNameEmpty;
+            }
+            if(!data.password) {
+                throw PasswordEmpty;
+            }
+            let {action, accessToken, refreshToken, expiredIn, userId} = await new AuthLogin().handleLogin(data, true);
+            if(action) {
+                return res.status(200).json({
+                    message: "Đăng nhập thành công",
+                    accessToken,
+                    expiredIn,
+                    userId,
+                    refreshToken,
+                });
+            }
+            return res.status(403).json({
+                message: "Đăng nhập thất bại",
+                accessToken: null,
+                expiredIn: null,
+                userId: null,
+                refreshToken: null,
+            });
         }
         catch (err) {
             console.error(err);
@@ -61,7 +106,7 @@ class AuthController {
             let resp = await new AuthService().handleCustomerSignup(data);
 
             return res.status(200).json({
-                message: new TranslateService(req).translateMessage(SuccessRespMessage, true),
+                message: "Thành công",
                 ...resp,
             })
         }
@@ -72,12 +117,52 @@ class AuthController {
         }
     }
 
+    refresh = async (req, res, next) => {
+        try {
+            let token = req.body.refreshToken || null;
+            let {action, accessToken, refreshToken, expiredIn, userId} = await new AuthLogin().handleRefresh(token);
+            if(action) {
+                return res.status(200).json({
+                    message: new TranslateService(req).translateMessage(SuccessRespMessage, true),
+                    accessToken,
+                    expiredIn,
+                    userId,
+                    refreshToken,
+                })
+            }
+            return res.status(403).json({message: "Hết phiên đăng nhập, Vui lòng đăng nhập lại"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
     me = async (req, res, next) => {
         try {
-            let lang = req.header("lang");
             let userId = req.user.userId ? parseInt(req.user.userId) : null;
             if(!userId) throw UserNotFound;
-            let user = await User.findByPk(userId);
+            let user = await User.findOne({
+                where: {
+                    id: userId
+                },
+                include: [
+                    {
+                        model: Parent,
+                        as: "parent",
+                    },
+                    {
+                        model: Student,
+                        as: "student",
+                    },
+                    {
+                        model: Teacher,
+                        as: "teacher",
+                    }
+                ],
+            });
+
             if(!user) throw UserNotFound;
             
             return res.status(200).json(user);
@@ -97,7 +182,7 @@ class AuthController {
             if(!Validation.checkValidEmailFormat(email)) throw EmailFormatNotValid;
 
             await authService.initForgotPassword(email);
-            return res.status(200).json({message: new TranslateService(req).translateMessage(SuccessRespMessage, true)});
+            return res.status(200).json({message: "Thành công"});
         }
         catch (err) {
             console.error(err);
@@ -118,7 +203,7 @@ class AuthController {
 
             await authService.updateForgetPassword(resetKey, password);
             
-            return res.status(200).json({message: new TranslateService(req).translateMessage(SuccessRespMessage, true)});
+            return res.status(200).json({message: "Thành công"});
         }
         catch (err) {
             console.error(err);
@@ -127,6 +212,18 @@ class AuthController {
         }
     }
 
+
+    test = async (req, res, next) => {
+        try {
+            let data = await sequelize.query(`select * from "test"`);
+            return res.status(200).json(data);
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
 }
 
 module.exports = new AuthController();
