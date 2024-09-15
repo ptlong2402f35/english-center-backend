@@ -4,6 +4,7 @@ const Student = require("../../models").Student;
 const Program = require("../../models").Program;
 const Center = require("../../models").Center;
 const Class = require("../../models").Class;
+const Schedule = require("../../models").Schedule;
 
 class ClassQuerier {
     
@@ -13,7 +14,8 @@ class ClassQuerier {
             fromDate,
             toDate,
             centerId,
-            status
+            status,
+            code
         }
     ) {
         let conds = [];
@@ -32,7 +34,7 @@ class ClassQuerier {
         if(fromDate) {
             conds.push({
                 startAt: {
-                    [Op.gte]: `%${fromDate}%`
+                    [Op.gte]: fromDate
                 }
             });
         }
@@ -40,7 +42,7 @@ class ClassQuerier {
         if(toDate) {
             conds.push({
                 startAt: {
-                    [Op.lte]: `%${toDate}%`
+                    [Op.lte]: toDate
                 }
             });
         }
@@ -57,6 +59,14 @@ class ClassQuerier {
             });
         }
 
+        if(code) {
+            conds.push({
+                code: {
+                    [Op.iLike]: `%${code}%`
+                }
+            });
+        }
+
         return conds;
     }
 
@@ -68,7 +78,7 @@ class ClassQuerier {
         return ([
             "id",
             "name",
-            "fromtAge",
+            "fromAge",
             "toAge",
             "startAt",
             "endAt",
@@ -79,6 +89,7 @@ class ClassQuerier {
             "status",
             "programId",
             "centerId",
+            "code",
             "createdAt",
             "updatedAt",
         ]);
@@ -89,7 +100,8 @@ class ClassQuerier {
             includeProgram,
             includeCenter,
             includeTeacher,
-            includeStudent
+            includeStudent,
+            includeSchedule
         }
     ) {
         let include = [];
@@ -134,6 +146,18 @@ class ClassQuerier {
                     model: Student,
                     as: "student",
                     attributes: ["id", "name", "gender", "userId", "age", "address", "phone", "email", "active"] 
+                }
+            ]
+        }
+
+        if(includeSchedule) {
+            include = [
+                ...include,
+                {
+                    model: Schedule,
+                    as: "schedules",
+                    attributes: ["id", "date", "startAt", "endAt"],
+                    through: { attributes: [] } 
                 }
             ]
         }

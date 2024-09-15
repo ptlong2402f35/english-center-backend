@@ -61,7 +61,7 @@ class StudentQuerier {
     buildInclude(
         {
             includeParent,
-            includeClass
+            includeClass,
         }
     ) {
         let include = [];
@@ -82,8 +82,9 @@ class StudentQuerier {
                 ...include,
                 {
                     model: Class,
-                    as: "class",
-                    attributes: ["id", "name", "fromAge", "toAge", "startAt", "endAt", "status", "totalSession", "teachedSession", "active"] 
+                    as: "classes",
+                    attributes: ["id", "name", "fromAge", "toAge", "startAt", "endAt", "status", "totalSession", "teachedSession"],
+                    through: { attributes: [] } 
                 }
             ]
         }

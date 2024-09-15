@@ -9,15 +9,19 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 
-		
-
 		static associate(models) {
-
+			Schedule.belongsToMany(models.Class, {
+				through: "ClassSchedules",
+				foreignKey: "scheduleId",
+				// sourceKey: "id",
+				// targetKey: "id",
+				as: "classes",
+			});
 		}
 	}
 	Schedule.init(
 		{
-			date: DataTypes.STRING,
+			date: DataTypes.INTEGER,
 			startAt: DataTypes.STRING,
 			endAt: DataTypes.STRING,
 			createdAt: DataTypes.DATE,

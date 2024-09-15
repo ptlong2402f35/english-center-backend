@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { InputInfoEmpty, ClassNotFound, UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound } = require("../constants/message");
 const { ClassCreateService } = require("../services/class/classCreateService");
 const { ClassQuerier } = require("../services/class/classQuerier");
@@ -7,11 +8,14 @@ const { ErrorService } = require("../services/errorService");
 const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");
 const { StudentQuerier } = require("../services/student/studentQuerier");
 const { TeacherQuerier } = require("../services/teacher/teacherQuerier");
+const { TimeHandle } = require("../utils/timeHandle");
+const util = require("util");
 
 const Class = require("../models").Class;
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const Teacher = require("../models").Teacher;
+const StudentClass = require("../models").StudentClass;
 
 class ClassController {
     getClasses = async (req, res, next) => {
@@ -24,18 +28,21 @@ class ClassController {
             let toDate = req.query.toDate || null;
             let status = req.query.status ? parseInt(req.query.status) : null;
             let centerId = req.query.centerId || null;
+            let code = req.query.code || null;
             let includeStudent = req.query.includeStudent?.trim() === "true" || null;
             let includeProgram = req.query.includeProgram?.trim() === "true" || null;
             let includeTeacher = req.query.includeTeacher?.trim() === "true" || null;
             let includeCenter = req.query.includeCenter?.trim() === "true" || null;
+            let includeSchedule = req.query.includeSchedule?.trim() === "true" || null;
 
-            let conds = classQuerier.buildWhere({forAge, fromDate, toDate, status, centerId});
+            let conds = classQuerier.buildWhere({forAge, fromDate, toDate, status, centerId, code});
             let attributes = classQuerier.buildAttributes({});
             let include = classQuerier.buildInclude({
                 includeStudent,
                 includeCenter,
                 includeProgram,
-                includeTeacher
+                includeTeacher,
+                includeSchedule
             });
             let orderBy = classQuerier.buildSort({});
 
@@ -47,10 +54,17 @@ class ClassController {
                 },
                 attributes: attributes,
                 include: include,
-                orderBy: orderBy
+                order: orderBy,
+                // logging: true
             });
 
             data.currentPage = page;
+
+            for (let item of data.docs) {
+                for(let schedule of item.schedules) {
+                    TimeHandle.attachDayLabel(schedule);
+                }
+            }
 
             return res.status(200).json(data);
         }
@@ -102,19 +116,32 @@ class ClassController {
             const studentQuerier = new StudentQuerier();
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
+            let status = req.query.status ? parseInt(req.query.status) : null;
 
-            let include = studentQuerier.buildAttributes({});
+            let include = studentQuerier.buildInclude({
+                includeClass: true
+            });
 
-            let user = await Student.findOne({
+            let student = await Student.findOne({
                 where: {
                     userId: userId
                 },
                 include: include
             });
 
-            if(!user.class) return res.status(200).json([]);
+            // let classes = await StudentClass.findAll({
+            //     where: {
+            //         studentId: student.id
+            //     }
+            // });
 
-            return res.status(200).json(user.class);
+            // let classIds = classes.map(item => item.id);
+
+            // console.log(`==== sequelize detail: `, util.inspect(user, false, null, true));
+
+            if(!student.classes) return res.status(200).json([]);
+
+            return res.status(200).json(student.classes);
         }
         catch (err) {
             console.error(err);
@@ -129,7 +156,9 @@ class ClassController {
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
 
-            let include = teacherQuerier.buildAttributes({});
+            let include = teacherQuerier.buildInclude({
+                includeClass: true
+            });
 
             let teacher = await Teacher.findOne({
                 where: {

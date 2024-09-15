@@ -79,7 +79,7 @@ class CenterQuerier {
                     attributes: [
                         "id",
                         "name",
-                        "fromtAge",
+                        "fromAge",
                         "toAge",
                         "startAt",
                         "endAt",

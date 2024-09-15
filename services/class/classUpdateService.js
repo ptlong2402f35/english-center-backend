@@ -15,6 +15,11 @@ class classUpdateService {
                 centerId: data.centerId,
                 fromAge: data.fromAge,
                 toAge: data.toAge,
+                startAt: data.startAt,
+                endAt: data.endAt,
+                studentQuantity: data.studentQuantity,
+                maxQuantity: data.maxQuantity,
+                teachedSession: data.teachedSession,
             };
 
             let [count] = await Class.update(allowData, {

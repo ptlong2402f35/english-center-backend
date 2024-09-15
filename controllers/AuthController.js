@@ -13,6 +13,7 @@ const { Validation } = require("../utils/validation");
 const { TranslateService } = require("../services/translateService");
 const SuccessRespMessage = require("../resources/translation.json").message.done;
 const config = require("../config/config");
+const { UserService } = require("../services/user/userService");
 class AuthController {
     login = async (req, res, next) => {
         try {
@@ -161,9 +162,18 @@ class AuthController {
                         as: "teacher",
                     }
                 ],
+                attributes: [
+                    "id",
+                    "userName",
+                    "password",
+                    "role",
+                    "active",
+                    "createdAt",
+                    "updatedAt",
+                ]
             });
-
             if(!user) throw UserNotFound;
+            await new UserService().attachRoleInfo(user);
             
             return res.status(200).json(user);
         }

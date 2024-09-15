@@ -7,6 +7,7 @@ const ParentController = require("../controllers/ParentController");
 const CenterController = require("../controllers/CenterController");
 const ClassController = require("../controllers/ClassController");
 const TeacherController = require("../controllers/TeacherController");
+const ScheduleController = require("../controllers/ScheduleController");
 var router = express.Router();
 
 //test connect
@@ -32,19 +33,19 @@ router.put("/user-detail-by-admin/:id", Auth.onlyAdmin, UserController.adminUpda
 router.put("/user-deactive", Auth.onlyAdmin, UserController.adminDeactiveUser);
 
 /* Student Controller */
-router.get("/my-student-detail", Auth.auth, StudentController.getMyDetail);
-router.put("/my-student-detail", Auth.auth, StudentController.updateMyDetail);
+// router.get("/my-student-detail", Auth.auth, StudentController.getMyDetail);
+// router.put("/my-student-detail", Auth.auth, StudentController.updateMyDetail);
 router.get("/student-connected", Auth.auth, StudentController.parentGetStudentConennected);
-router.get("/student-detail-by-parent", Auth.auth, StudentController.parentGetStudentDetail);
+router.get("/student-detail-by-parent/:id", Auth.auth, StudentController.parentGetStudentDetail);
 router.get("/students", Auth.onlyAdmin, StudentController.adminGetStudents);
 router.post("/student", Auth.onlyAdmin, StudentController.adminCreateStudent);
-router.get("/student-detail-by-admin", Auth.onlyAdmin, StudentController.adminGetStudentDetail);
-router.put("/student-detail-by-admin", Auth.onlyAdmin, StudentController.adminUpdateStudentDetail);
+router.get("/student-detail-by-admin/:id", Auth.onlyAdmin, StudentController.adminGetStudentDetail);
+router.put("/student-detail-by-admin/:id", Auth.onlyAdmin, StudentController.adminUpdateStudentDetail);
 router.put("/student-deactive", Auth.onlyAdmin, StudentController.adminDeactiveStudent);
 
 /* Parent Controller */
-router.get("/my-parent-detail", Auth.auth, ParentController.getMyDetail);
-router.put("/my-parent-detail", Auth.auth, ParentController.updateMyDetail);
+// router.get("/my-parent-detail", Auth.auth, ParentController.getMyDetail);
+// router.put("/my-parent-detail", Auth.auth, ParentController.updateMyDetail);
 router.get("/parent-connected", Auth.auth, ParentController.studentGetParentConennected);
 router.get("/parents", Auth.onlyAdmin, ParentController.adminGetParents);
 router.get("/parent-detail-by-admin", Auth.onlyAdmin, ParentController.adminGetParentDetail);
@@ -54,7 +55,7 @@ router.put("/parent-deactive", Auth.onlyAdmin, ParentController.adminDeactivePar
 
 /* Center Controller */
 router.get("/centers", CenterController.getCenter);
-router.get("/center-detail/:id", CenterController.getCenterDetail);
+router.get("/center/:id", CenterController.getCenterDetail);
 router.post("/center", Auth.onlyAdmin, CenterController.createCenter);
 router.put("/center/:id", Auth.onlyAdmin, CenterController.updateCenter);
 
@@ -86,6 +87,7 @@ router.post("/teacher", Auth.auth, TeacherController.getSalaryHistory);
 router.get("/request", Auth.auth, TeacherController.getTeachers);
 router.post("/request/:id", Auth.auth, TeacherController.getTeachers);
 router.put("/request/:id", Auth.auth, TeacherController.getTeachers);
+router.post("/request-remove", Auth.auth, TeacherController.getTeachers);
 
 /* Attendance Controller */
 router.get("/attendances", Auth.auth, TeacherController.getTeachers);
@@ -104,11 +106,12 @@ router.put("/program/:id", Auth.onlyAdmin, TeacherController.getTeachers);
 router.post("/apply-program", Auth.onlyAdmin, TeacherController.getTeachers);
 
 /* Schedule Controller */
-router.get("/schedules", Auth.onlyAdmin, TeacherController.getTeachers);
-router.get("/schedule/:id", Auth.onlyAdmin, TeacherController.getTeachers);
-router.post("/schedule", Auth.onlyAdmin, TeacherController.getTeachers);
-router.put("/schedule/:id", Auth.onlyAdmin, TeacherController.getTeachers);
-router.post("/apply-schedule", Auth.onlyAdmin, TeacherController.getTeachers);
+router.get("/schedules", Auth.onlyAdmin, ScheduleController.getSchedule);
+router.get("/schedule/:id", Auth.onlyAdmin, ScheduleController.getScheduleDetail);
+router.post("/schedule", Auth.onlyAdmin, ScheduleController.createSchedule);
+router.put("/schedule/:id", Auth.onlyAdmin, ScheduleController.updateSchedule);
+router.post("/apply-schedule", Auth.onlyAdmin, ScheduleController.applyScheduleToClass);
+router.post("/remove-schedule", Auth.onlyAdmin, ScheduleController.removeScheduleFromClass);
 
 /* Notification Controller */
 router.get("/notifications", Auth.auth, TeacherController.getTeachers);

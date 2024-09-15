@@ -8,6 +8,45 @@ class UserService {
 
     }
 
+    async attachRoleInfo(user) {
+        try {
+            if(!user) return user;
+            let student = user?.student;
+            let parent = user?.parent;
+            let teacher = user?.teacher;
+            
+            let name = student?.name || parent?.name || teacher?.name || null;
+            let gender = student?.gender || parent?.gender || teacher?.gender || null;
+            let birthday = student?.birthday || parent?.birthday || teacher?.birthday || null;
+            let age = student?.age || parent?.age || teacher?.age || null;
+            let address = student?.address || parent?.address || teacher?.address || null;
+            let phone = student?.phone || parent?.phone || teacher?.phone || null;
+            let email = student?.email || parent?.email || teacher?.email || null;
+            let roleActive = student?.active || parent?.active || teacher?.active || null;
+            
+            user.name = name;
+            user?.setDataValue("name", name);
+            user.gender = gender;
+            user?.setDataValue("gender", gender);
+            user.birthday = birthday;
+            user?.setDataValue("birthday", birthday);
+            user.age = age;
+            user?.setDataValue("age", age);
+            user.address = address;
+            user?.setDataValue("address", address);
+            user.phone = phone;
+            user?.setDataValue("phone", phone);
+            user.email = email;
+            user?.setDataValue("email", email);
+            user.roleActive = roleActive;
+            user?.setDataValue("roleActive", roleActive);
+        }
+        catch (err) {
+            console.error(err);
+            return user;
+        }
+    }
+
     async updateDetail(data, userId) {
         try {
             let allowData = {

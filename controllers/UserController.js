@@ -33,9 +33,9 @@ class UserController {
             if(!userId) throw UserNotFound;
 
             let user = await User.findByPk();
-            if(!user) throw UserNotFound
+            if(!user) throw UserNotFound;
 
-            await new UserService().updateDetail(data, userId);
+            await new UserUpdateService().updateDetail(data, userId);
 
             return res.status(200).json({message: "DONE"});
         }
@@ -90,7 +90,7 @@ class UserController {
                 },
                 attributes: attributes,
                 include: include,
-                orderBy: orderBy
+                order: orderBy
             });
 
             data.currentPage = page;

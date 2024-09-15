@@ -18,12 +18,15 @@ class ClassRegisterService {
             //update class register
             let transaction = await sequelize.transaction();
             try {
-                await this.updateStudentClass({
-                    classId,
-                    studentId
-                });
+                await this.updateStudentClass(
+                    {
+                        classId,
+                        studentId
+                    },
+                    transaction
+                );
 
-                await this.updateClass(data, classId);
+                await this.updateClass(data, classId, transaction);
 
                 await transaction.commit();
             }
@@ -90,7 +93,7 @@ class ClassRegisterService {
         }
     }
 
-    async updateClass(data, classId) {
+    async updateClass(data, classId, transaction) {
         let initTrans = false;
         if(!transaction) {
             transaction = await sequelize.transaction();

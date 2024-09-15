@@ -1,5 +1,5 @@
 const { Op, where } = require("sequelize");
-const { UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound, ExistedEmail } = require("../constants/message");
+const { UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound, ExistedEmail, InputInfoEmpty } = require("../constants/message");
 const { UserRole } = require("../constants/roles");
 const { ErrorService } = require("../services/errorService");
 const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");
@@ -147,7 +147,7 @@ class StudentController {
                 },
                 attributes: attributes,
                 include: include,
-                orderBy: orderBy
+                order: orderBy
             });
 
             data.currentPage = page;
@@ -223,7 +223,7 @@ class StudentController {
         try {
             let studentId = req.params.id ? parseInt(req.params.id) : null;
             if(!studentId) throw UserNotFound;
-            let active = req.query.active ? (req.query.active?.trim() === "true" ? true : false) : null;
+            let active = req.body.active || null;
             if(!active && active != false) throw InputInfoEmpty;
 
             await Student.update(

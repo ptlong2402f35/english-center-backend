@@ -12,7 +12,14 @@ module.exports = (sequelize, DataTypes) => {
 		
 
 		static associate(models) {
-
+			ClassSchedule.belongsTo(models.Class, {
+                foreignKey: "classId",
+                as: "class"
+            });
+			ClassSchedule.belongsTo(models.Schedule, {
+                foreignKey: "scheduleId",
+                as: "schedule"
+            });
 		}
 	}
 	ClassSchedule.init(

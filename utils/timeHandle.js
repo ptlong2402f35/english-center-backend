@@ -1,3 +1,4 @@
+const { DayLabelsMap } = require("../constants/timeFormat");
 
 class TimeHandle {
     constructor() {}
@@ -15,6 +16,15 @@ class TimeHandle {
         return new Date(year, month, 0).getDate();
     }
 
+    static getDayLabelByIdConfig(dayId) {
+        return DayLabelsMap.get(dayId);
+    }
+
+    static attachDayLabel(data) {
+        let label = this.getDayLabelByIdConfig(data.date) || "";
+        data.dayLabel = label;
+        data?.setDataValue("dayLabel", label);
+    }
 }
 
 module.exports = {
