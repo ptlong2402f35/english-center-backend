@@ -10,6 +10,7 @@ const { StudentQuerier } = require("../services/student/studentQuerier");
 const { TeacherQuerier } = require("../services/teacher/teacherQuerier");
 const { TimeHandle } = require("../utils/timeHandle");
 const util = require("util");
+const { UserRole } = require("../constants/roles");
 
 const Class = require("../models").Class;
 const Student = require("../models").Student;
@@ -105,6 +106,10 @@ class ClassController {
                 }
             );
             if(!data) throw ClassNotFound;
+
+            for(let schedule of (data?.schedules || [])) {
+                TimeHandle.attachDayLabel(schedule);
+            }
             
             return res.status(200).json(data);
         }
@@ -306,7 +311,7 @@ class ClassController {
         try {
             let studentId = req.body.studentId;
             if(!studentId) throw UserNotFound;
-
+            if(req.user.role != UserRole.Parent) return res.status(403).json({message: "Chức năng này chỉ dành cho phụ huynh"});
             let parent = await Parent.findOne({
                 where: {
                     userId: req.user.userId
@@ -317,7 +322,7 @@ class ClassController {
 
             if(!await new ParentStudentService().checkConnect(parent.id, studentId)) throw NotEnoughPermission;
 
-            let classId = req.body.id;
+            let classId = req.body.classId;
             if(!classId) throw ClassNotFound;
             let student = await Student.findOne({
                 where: {
@@ -420,6 +425,7 @@ class ClassController {
         try {
             let studentId = req.body.studentId;
             if(!studentId) throw UserNotFound;
+            if(req.user.role != UserRole.Parent) return res.status(403).json({message: "Chức năng này chỉ dành cho phụ huynh"});
 
             let parent = await Parent.findOne({
                 where: {
@@ -431,7 +437,7 @@ class ClassController {
 
             if(!await new ParentStudentService().checkConnect(parent.id, studentId)) throw NotEnoughPermission;
 
-            let classId = req.body.id;
+            let classId = req.body.classId;
             if(!classId) throw ClassNotFound;
             let student = await Student.findOne({
                 where: {

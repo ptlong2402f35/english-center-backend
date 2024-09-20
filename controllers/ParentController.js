@@ -70,11 +70,11 @@ class ParentController {
                 include: [
                     {
                         model: Parent,
-                        as: "parent",
+                        as: "parents",
                     }
                 ]
             });
-            if(!parent) throw ParentNotFound;
+            if(!student) throw StudentNotFound;
             // let connect = await ParentStudent.findAll({
             //     where: {
             //         parentId: parent.id
@@ -87,9 +87,8 @@ class ParentController {
             //         }
             //     }
             // });
-            let parents = student.map(item => item.parent).filter(val => val);
 
-            return res.status(200).json(parents);
+            return res.status(200).json(student.parents);
         }
         catch (err) {
             console.error(err);

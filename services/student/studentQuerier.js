@@ -71,7 +71,7 @@ class StudentQuerier {
                 ...include,
                 {
                     model: Parent,
-                    as: "parent",
+                    as: "parents",
                     attributes: ["id", "name", "gender", "userId", "age", "address", "phone", "email", "active"] 
                 }
             ]

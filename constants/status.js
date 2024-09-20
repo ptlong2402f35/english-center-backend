@@ -18,7 +18,8 @@ const ObjectStatus = {
 const RequestStatus = {
     Pending: 1,
     Accept: 2,
-    Denied: 3
+    Denied: 3,
+    Terminated: 4
 }
 
 const CostStatus = {

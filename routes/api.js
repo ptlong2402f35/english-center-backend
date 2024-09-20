@@ -77,14 +77,13 @@ router.post("/class", Auth.onlyAdmin, ClassController.createClass);
 router.put("/class/:id", Auth.onlyAdmin, ClassController.updateClass);
 router.put("/class-deactive/:id", Auth.onlyAdmin, ClassController.deactiveClass);
 router.post("/register-by-student/:id", Auth.auth, ClassController.studentRegisterClass);
-router.post("/register-by-parent/:id", Auth.auth, ClassController.parentRegisterClass);
-router.post("/register-by-admin", Auth.auth, ClassController.adminRegisterClass);
+router.post("/register-by-parent", Auth.auth, ClassController.parentRegisterClass);
+router.post("/register-by-admin", Auth.onlyAdmin, ClassController.adminRegisterClass);
 
 //unregist
 router.post("/unregister-by-student/:id", Auth.auth, ClassController.studentUnRegisterClass);
-router.post("/unregister-by-parent/:id", Auth.auth, ClassController.studentUnRegisterClass);
-router.post("/unregister-by-admin/:id", Auth.auth, ClassController.studentUnRegisterClass);
-
+router.post("/unregister-by-parent", Auth.auth, ClassController.studentUnRegisterClass);
+router.post("/unregister-by-admin", Auth.onlyAdmin, ClassController.adminUnRegisterClass);
 
 /* Teacher Controller */
 router.get("/teacher", TeacherController.getTeachers);
@@ -103,7 +102,7 @@ router.get("/request", Auth.auth, RequestController.getMyRequest);
 router.get("/request/:id", Auth.auth, RequestController.getRequestDetail);
 router.post("/request", Auth.auth, RequestController.createConnect);
 router.put("/request/:id", Auth.auth, RequestController.updateRequestStatus);
-router.post("/request-remove", Auth.auth, RequestController.removeConnect);
+router.post("/request-remove/:id", Auth.auth, RequestController.removeConnect);
 router.get("/request-by-admin", Auth.onlyAdmin, RequestController.adminGetRequest);
 router.post("/admin-create-connect", Auth.onlyAdmin, RequestController.adminCreateConnect);
 router.post("/admin-remove-connect", Auth.onlyAdmin, RequestController.adminRemoveConnect);

@@ -91,6 +91,7 @@ class ClassQuerier {
             "programId",
             "centerId",
             "code",
+            "fee",
             "createdAt",
             "updatedAt",
         ]);

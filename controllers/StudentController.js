@@ -67,7 +67,7 @@ class StudentController {
                 include: [
                     {
                         model: Student,
-                        as: "student",
+                        as: "childs",
                     }
                 ]
             });
@@ -84,9 +84,8 @@ class StudentController {
             //         }
             //     }
             // });
-            let students = parent.map(item => item.student).filter(val => val);
 
-            return res.status(200).json(students);
+            return res.status(200).json(parent?.childs || []);
         }
         catch (err) {
             console.error(err);
@@ -136,7 +135,7 @@ class StudentController {
 
             let conds = studentQuerier.buildWhere({name, age, active});
             let attributes = studentQuerier.buildAttributes({});
-            let include = studentQuerier.buildInclude({includeParent: true});
+            let include = studentQuerier.buildInclude({includeParent: true, includeClass: true});
             let orderBy = studentQuerier.buildSort({});
 
             let data = await Student.paginate({
@@ -173,6 +172,8 @@ class StudentController {
             
             let resp = await authSerivce.handleCustomerSignup(
                 {
+                    userName: data.userName,
+                    password: data.password,
                     ...builtData,
                     role: UserRole.Student
                 }

@@ -98,6 +98,7 @@ class TeacherQuerier {
                         "maxQuantity",
                         "totalSession",
                         "teachedSession",
+                        "fee",
                         "status",
                         "programId",
                         "centerId",

@@ -3,6 +3,7 @@ const { UserNotFound, NotEnoughPermission, InputInfoEmpty, AdminOnly } = require
 const { UserRole } = require("../constants/roles");
 const { RequestStatus } = require("../constants/status");
 const { ConnectionService } = require("../services/connection/connectionService");
+const { ErrorService } = require("../services/errorService");
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const Request = require("../models").Request;
@@ -30,7 +31,8 @@ class RequestController {
                             ...(status ? {
                                 status: status
                             } : {})
-                        }
+                        },
+                        order: [["id", "desc"]]
                     }
                 );
 
@@ -51,7 +53,9 @@ class RequestController {
                             ...(status ? {
                                 status: status
                             } : {})
-                        }
+                        },
+                        order: [["id", "desc"]]
+
                     }
                 );
 
@@ -130,15 +134,38 @@ class RequestController {
                 let roleObj = await Parent.findOne(
                     {
                         where: {
-                            userId: user.id,
+                            userId: user.userId,
                         }
                     }
                 );
-                let count = await Request.create(
+                let request = await Request.findOne(
+                    {
+                        where: {
+                            studentId: targetId,
+                            parentId: roleObj.id,
+                            status: {
+                                [Op.in]: [RequestStatus.Pending]
+                            }
+                        }
+                    }
+                );
+                if(request) return res.status(403).json({message: "Yêu cầu này đã tồn tại"});
+                let connect = await ParentStudent.findOne(
+                    {
+                        where: {
+                            studentId: targetId,
+                            parentId: roleObj.id
+                        }
+                    }
+                );
+                if(connect) return res.status(403).json({message: "Liên kết đã tồn tại"});
+
+                await Request.create(
                     {
                         studentId: targetId,
                         parentId: roleObj.id,
-                        status: RequestStatus.Pending
+                        status: RequestStatus.Pending,
+                        requestByRoleId: UserRole.Parent
                     }
                 );
 
@@ -148,22 +175,44 @@ class RequestController {
                 let roleObj = await Student.findOne(
                     {
                         where: {
-                            userId: user.id,
+                            userId: user.userId,
                         }
                     }
                 );
-                let count = await Request.create(
+                let request = await Request.findOne(
+                    {
+                        where: {
+                            studentId: roleObj.id,
+                            parentId: targetId,
+                            status: {
+                                [Op.in]: [RequestStatus.Pending]
+                            }
+                        }
+                    }
+                );
+                if(request) return res.status(403).json({message: "Yêu cầu này đã tồn tại"});
+                let connect = await ParentStudent.findOne(
+                    {
+                        where: {
+                            studentId: roleObj.id,
+                            parentId: targetId
+                        }
+                    }
+                );
+                if(connect) return res.status(403).json({message: "Liên kết đã tồn tại"});
+                await Request.create(
                     {
                         studentId: roleObj.id,
                         parentId: targetId,
-                        status: RequestStatus.Pending
+                        status: RequestStatus.Pending,
+                        requestByRoleId: UserRole.Student
                     }
                 );
 
                 return res.status(200).json({message: "Thành công"})
             }
 
-            return res.status(403).json({message: "Chức năng chỉ dành cho học sinh và phụ huynh"})
+            return res.status(403).json({message: "Chức năng chỉ dành cho học sinh và phụ huynh"});
         }
         catch (err) {
             console.error(err);
@@ -179,23 +228,26 @@ class RequestController {
             if(!requestId || !status) throw InputInfoEmpty;
             let user = req.user
             if(user.role === UserRole.Parent) {
-                roleObj = await Parent.findOne(
+                let roleObj = await Parent.findOne(
                     {
                         where: {
                             userId: user.userId,
                         }
                     }
                 );
-                let request = await Request.update(
-                    {
-                        status: status,
-                        createdAt: new Date()
-                    },
+                let request = await Request.findOne(
                     {
                         where: {
                             parentId: roleObj.id,
                             id: requestId
                         }
+                    }
+                );
+                if(!request) return res.status(403).json({message: "Yêu cầu không tồn tại"});
+                await request.update(
+                    {
+                        status: status,
+                        createdAt: new Date()
                     }
                 );
 
@@ -213,26 +265,28 @@ class RequestController {
                 return res.status(200).json({message: "Thành công"});
             }
             if(user.role === UserRole.Student) {
-                roleObj = await Student.findOne(
+                let roleObj = await Student.findOne(
                     {
                         where: {
                             userId: user.userId,
                         }
                     }
                 );
-                let request = await Request.update(
-                    {
-                        status: status,
-                        createdAt: new Date()
-                    },
+                let request = await Request.findOne(
                     {
                         where: {
-                            parentId: roleObj.id,
+                            studentId: roleObj.id,
                             id: requestId
                         }
                     }
                 );
-
+                if(!request) return res.status(403).json({message: "Yêu cầu không tồn tại"});
+                await request.update(
+                    {
+                        status: status,
+                        createdAt: new Date()
+                    }
+                );
                 if(status === RequestStatus.Accept) {
                     if(!await new ConnectionService().checkStudentParentConnect(roleObj.id, request.parentId)) {
                         await ParentStudent.create(
@@ -262,7 +316,7 @@ class RequestController {
             let user = req.user;
             if(!connectId) throw InputInfoEmpty;
             if(user.role === UserRole.Parent) {
-                roleObj = await Parent.findOne(
+                let roleObj = await Parent.findOne(
                     {
                         where: {
                             userId: user.userId,
@@ -281,7 +335,7 @@ class RequestController {
                 return res.status(200).json({message: "Thành công"});
             }
             if(user.role === UserRole.Student) {
-                roleObj = await Student.findOne(
+                let roleObj = await Student.findOne(
                     {
                         where: {
                             userId: user.userId,
@@ -337,7 +391,9 @@ class RequestController {
                 order: [["id", "desc"]]
             });
 
-            return res.status(200).json({message: "Thành công"});
+            data.currentPage = page;
+
+            return res.status(200).json(data);
         }
         catch (err) {
             console.error(err);
@@ -358,7 +414,8 @@ class RequestController {
                 {
                     studentId,
                     parentId,
-                    status: RequestStatus.Accept
+                    status: RequestStatus.Accept,
+                    requestByRoleId: UserRole.Admin
                 }
             );
 
