@@ -17,8 +17,16 @@ const CommunicationType = {
     Viber: 6
 }
 
+const CostType = {
+    TeacherSalary: 1,
+    StudentFee: 2,
+    ElecFee: 3,
+    WaterFee: 4
+}
+
 module.exports = {
     FormType,
     CommunicationType,
-    PaymentMethod
+    PaymentMethod,
+    CostType
 }

@@ -25,6 +25,11 @@ const {
     ExpiredResetKey,
     UserNameEmpty,
     UserNotActive,
+    TeacherNotActive,
+    ClassNotActive,
+    AdminOnly,
+    CostNotFound,
+    TransactionNotFound,
 } = require("../constants/message");
 const ErrorMessage = require("../resources/translation.json").message.error;
 
@@ -54,6 +59,11 @@ const ErrorCodeMap = new Map([
     [NotOwnerOrder, 403],
     [ExpiredResetKey, 422],
     [UserNotActive, 403],
+    [TeacherNotActive, 403],
+    [ClassNotActive, 403],
+    [AdminOnly, 403],
+    [CostNotFound, 403],
+    [TransactionNotFound, 403],
 ])
 
 class ErrorService {

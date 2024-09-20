@@ -23,6 +23,9 @@ const StudentNotFound = "StudentNotFound";
 const ClassNotFound = "ClassNotFound";
 const TeacherNotFound = "TeacherNotFound";
 const CenterNotFound = "CenterNotFound";
+const CostNotFound = "CostNotFound";
+const TransactionNotFound = "TransactionNotFound";
+const ProgramNotFound = "ProgramNotFound";
 
 //Validate
 const ClassStatusInvalid = "ClassStatusInvalid";
@@ -34,18 +37,25 @@ const AdminOrderCannotPaid = "AdminOrderCannotPaid";
 const TimeExpiredAction = "TimeExpiredAction";
 const ExpiredResetKey = "ExpiredResetKey";
 
+
 const NotConnectParent = "NotConnectParent";
 
 const NotEnoughPermission = "NotEnoughPermission";
 const NotOwnerOrder = "NotOwnerOrder";
+const AdminOnly = "AdminOnly";
 
 //active 
 const UserNotActive = "UserNotActive";
+const TeacherNotActive = "TeacherNotActive";
+const ClassNotActive = "ClassNotActive";
 
 //Class
 const ClassHasOpened = "ClassHasOpened";
 const ClassHasEnoughStudent = "ClassHasEnoughStudent";
 const OpenClassCreateStartAtNotValid = "OpenClassCreateStartAtNotValid";
+
+//Trans
+const TotalMoneyIsOver = "TotalMoneyIsOver";
 
 module.exports = {
     UpdateDoneMessage,
@@ -82,5 +92,12 @@ module.exports = {
     ClassHasOpened,
     ClassHasEnoughStudent,
     OpenClassCreateStartAtNotValid,
-    CenterNotFound
+    CenterNotFound,
+    TeacherNotActive,
+    ClassNotActive,
+    AdminOnly,
+    CostNotFound,
+    TransactionNotFound,
+    TotalMoneyIsOver,
+    ProgramNotFound
 }

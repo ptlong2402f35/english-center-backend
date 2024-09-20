@@ -57,7 +57,7 @@ class CenterQuerier {
             "address",
             "phone",
             "images",
-            "active",
+            "status",
             "createdAt",
             "updatedAt",
         ]);
@@ -75,24 +75,7 @@ class CenterQuerier {
                 ...include,
                 {
                     model: Class,
-                    as: "class",
-                    attributes: [
-                        "id",
-                        "name",
-                        "fromAge",
-                        "toAge",
-                        "startAt",
-                        "endAt",
-                        "studentQuantity",
-                        "maxQuantity",
-                        "totalSession",
-                        "teachedSession",
-                        "status",
-                        "programId",
-                        "centerId",
-                        "createdAt",
-                        "updatedAt",
-                    ] 
+                    as: "classes",
                 }
             ]
         }

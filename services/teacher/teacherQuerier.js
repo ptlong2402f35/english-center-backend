@@ -69,7 +69,8 @@ class TeacherQuerier {
             "createdAt",
             "updatedAt",
             "userId",
-            "active"
+            "active",
+            "level"
         ]);
     }
 
@@ -85,7 +86,7 @@ class TeacherQuerier {
                 ...include,
                 {
                     model: Class,
-                    as: "class",
+                    as: "classes",
                     attributes: [
                         "id",
                         "name",

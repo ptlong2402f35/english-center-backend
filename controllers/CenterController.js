@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { InputInfoEmpty, CenterNotFound } = require("../constants/message");
 const { CenterStatus } = require("../constants/status");
 const { CenterQuerier } = require("../services/center/centerQuerier");

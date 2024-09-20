@@ -15,7 +15,7 @@ module.exports = {
 			},
 			type: {
 				type: Sequelize.INTEGER,
-        		allowNull: false
+        		allowNull: true
 			},
       toUserId: {
 				type: Sequelize.INTEGER,
@@ -23,7 +23,7 @@ module.exports = {
 			},
 			title: {
 				type: Sequelize.TEXT,
-        		allowNull: false
+        		allowNull: true
 			},
       seen: {
 				type: Sequelize.BOOLEAN,
@@ -31,7 +31,7 @@ module.exports = {
 			},
 			seenAt: {
 				type: Sequelize.DATE,
-        		allowNull: false
+        		allowNull: true
 			},
       actionType: {
 				type: Sequelize.INTEGER,

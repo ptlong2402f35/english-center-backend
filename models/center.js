@@ -12,7 +12,10 @@ module.exports = (sequelize, DataTypes) => {
 		
 
 		static associate(models) {
-
+			Center.hasMany(models.Class, {
+				foreignKey: "centerId",
+				as: "classes",
+			});
 		}
 	}
 	Center.init(

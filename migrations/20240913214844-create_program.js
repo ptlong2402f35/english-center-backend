@@ -15,7 +15,7 @@ module.exports = {
 			},
 			reduceValue: {
 				type: Sequelize.DOUBLE,
-        		allowNull: false
+        		allowNull: true
 			},
       startAt: {
 				type: Sequelize.DATE,
@@ -23,7 +23,7 @@ module.exports = {
 			},
 			endAt: {
 				type: Sequelize.DATE,
-        		allowNull: false
+        		allowNull: true
 			},
       status: {
 				type: Sequelize.INTEGER,

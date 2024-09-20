@@ -52,8 +52,8 @@ class UserController {
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
 
-            if(!data.oldPassword || !data.password || !data.confirmPassword) throw InputInfoEmpty;
-            if(data.password != data.confirmPassword) throw ConfirmPasswordNotMatch;
+            if(!data.password || !data.confirmPassword) throw InputInfoEmpty;
+            // if(data.password != data.confirmPassword) throw ConfirmPasswordNotMatch;
 
             await new UserService().updatePassword(data, userId);
 
@@ -126,7 +126,7 @@ class UserController {
             const authSerivce = new AuthService();
             if(!data.userName || !data.password) throw InputInfoEmpty;
 
-            if(!await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
+            if(await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
 
             let resp = await authSerivce.handleCustomerSignup(
                 {
@@ -164,7 +164,7 @@ class UserController {
         try {
             let userId = req.params.id ? parseInt(req.params.id) : null;
             if(!userId) throw UserNotFound;
-            let active = req.query.active ? (req.query.active?.trim() === "true" ? true : false) : null;
+            let active = req.body.active;
             if(!active && active != false) throw InputInfoEmpty;
 
             await User.update(

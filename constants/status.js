@@ -15,6 +15,23 @@ const ObjectStatus = {
     Disable: 2
 }
 
+const RequestStatus = {
+    Pending: 1,
+    Accept: 2,
+    Denied: 3
+}
+
+const CostStatus = {
+    Pending: 1,
+    Done: 2,
+    Debt: 3
+}
+
+const ProgramStatus = {
+    Active: 1,
+    Disable: 2
+}
+
 const TransactionStatus = {
     Pending: 1,
     Done: 2,
@@ -25,5 +42,8 @@ module.exports = {
     ClassStatus,
     CenterStatus,
     ObjectStatus,
-    TransactionStatus
+    TransactionStatus,
+    RequestStatus,
+    CostStatus,
+    ProgramStatus
 }

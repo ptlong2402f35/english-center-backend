@@ -21,6 +21,13 @@ module.exports = (sequelize, DataTypes) => {
 				// targetKey: "id",
 				as: "classes",
 			});
+			Student.belongsToMany(models.Parent, {
+				through: "ParentStudents",
+				foreignKey: "studentId",
+				// sourceKey: "id",
+				// targetKey: "id",
+				as: "parents",
+			});
 		}
 	}
 	Student.init(

@@ -167,7 +167,7 @@ class StudentController {
             const authSerivce = new AuthService();
             if(!data.userName || !data.password) throw InputInfoEmpty;
 
-            if(!await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
+            if(await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
 
             let builtData = await new StudentUpdateService().build(data, {forAdmin: true});
             

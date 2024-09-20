@@ -4,6 +4,7 @@ const Student = require("../../models").Student;
 const Program = require("../../models").Program;
 const Center = require("../../models").Center;
 const Class = require("../../models").Class;
+const Teacher = require("../../models").Teacher;
 const Schedule = require("../../models").Schedule;
 
 class ClassQuerier {
@@ -112,7 +113,6 @@ class ClassQuerier {
                 {
                     model: Program,
                     as: "program",
-                    attributes: ["id", "reducePercent", "reduceValue", "startAt", "endAt", "createdAt", "updatedAt", "status"] 
                 }
             ]
         }
@@ -123,7 +123,6 @@ class ClassQuerier {
                 {
                     model: Center,
                     as: "center",
-                    attributes: ["id", "name", "address", "phone", "email", "active", "images"] 
                 }
             ]
         }
@@ -133,7 +132,7 @@ class ClassQuerier {
                 ...include,
                 {
                     model: Teacher,
-                    as: "teacher",
+                    as: "teachers",
                     attributes: ["id", "name", "gender", "userId", "age", "address", "phone", "email", "active", "level"] 
                 }
             ]
@@ -144,7 +143,7 @@ class ClassQuerier {
                 ...include,
                 {
                     model: Student,
-                    as: "student",
+                    as: "students",
                     attributes: ["id", "name", "gender", "userId", "age", "address", "phone", "email", "active"] 
                 }
             ]

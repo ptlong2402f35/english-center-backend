@@ -24,6 +24,21 @@ module.exports = (sequelize, DataTypes) => {
 				// targetKey: "id",
 				as: "students",
 			});
+			Class.belongsToMany(models.Teacher, {
+				through: "TeacherClasses",
+				foreignKey: "classId",
+				// sourceKey: "id",
+				// targetKey: "id",
+				as: "teachers",
+			});
+			Class.belongsTo(models.Program, {
+				foreignKey: "programId",
+				as: "program",
+			});
+			Class.belongsTo(models.Center, {
+				foreignKey: "centerId",
+				as: "center",
+			});
 		}
 	}
 	Class.init(

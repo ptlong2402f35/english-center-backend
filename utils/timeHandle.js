@@ -25,6 +25,15 @@ class TimeHandle {
         data.dayLabel = label;
         data?.setDataValue("dayLabel", label);
     }
+
+    static getStartAndEndDayOfMonth(m, y) {
+        var first = new Date(y, m - 1, 1);
+        var last = new Date(y, m, 0);
+        return {
+            first,
+            last
+        };
+    }
 }
 
 module.exports = {
