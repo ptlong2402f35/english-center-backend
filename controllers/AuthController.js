@@ -12,7 +12,8 @@ const { ErrorService } = require("../services/errorService");
 const { Validation } = require("../utils/validation");
 const { TranslateService } = require("../services/translateService");
 const SuccessRespMessage = require("../resources/translation.json").message.done;
-
+const config = require("../config/config");
+const { UserService } = require("../services/user/userService");
 class AuthController {
     login = async (req, res, next) => {
         try {
@@ -161,9 +162,18 @@ class AuthController {
                         as: "teacher",
                     }
                 ],
+                attributes: [
+                    "id",
+                    "userName",
+                    "password",
+                    "role",
+                    "active",
+                    "createdAt",
+                    "updatedAt",
+                ]
             });
-
             if(!user) throw UserNotFound;
+            await new UserService().attachRoleInfo(user);
             
             return res.status(200).json(user);
         }
@@ -215,7 +225,11 @@ class AuthController {
 
     test = async (req, res, next) => {
         try {
-            let data = await sequelize.query(`select * from "test"`);
+            let env = process.env.NODE_ENV;
+            let data = {
+                environment: env,
+                config: config[env]
+            }
             return res.status(200).json(data);
         }
         catch (err) {

@@ -31,7 +31,7 @@ module.exports = {
 			},
 			otherType: {
 				type: Sequelize.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
 			forUserId: {
 				type: Sequelize.INTEGER,

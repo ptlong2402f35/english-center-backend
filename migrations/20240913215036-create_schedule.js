@@ -10,16 +10,16 @@ module.exports = {
 				type: Sequelize.INTEGER,
 			},
 			date: {
-				type: Sequelize.STRING,
+				type: Sequelize.INTEGER,
 				allowNull: true,
 			},
 			startAt: {
 				type: Sequelize.STRING,
-        		allowNull: false
+        		allowNull: true
 			},
-      endAt: {
+      		endAt: {
 				type: Sequelize.STRING,
-        		allowNull: false
+        		allowNull: true
 			},
 			createdAt: {
 				type: Sequelize.DATE,

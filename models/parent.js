@@ -9,10 +9,15 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 
-		
-
+	
 		static associate(models) {
-
+			Parent.belongsToMany(models.Student, {
+				through: "ParentStudents",
+				foreignKey: "parentId",
+				// sourceKey: "id",
+				// targetKey: "id",
+				as: "childs",
+			});
 		}
 	}
 	Parent.init(

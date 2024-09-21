@@ -12,7 +12,13 @@ module.exports = (sequelize, DataTypes) => {
 		
 
 		static associate(models) {
-
+			Teacher.belongsToMany(models.Class, {
+				through: "TeacherClasses",
+				foreignKey: "teacherId",
+				// sourceKey: "id",
+				// targetKey: "id",
+				as: "classes",
+			});
 		}
 	}
 	Teacher.init(

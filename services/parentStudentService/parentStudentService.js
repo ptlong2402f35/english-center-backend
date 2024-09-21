@@ -17,7 +17,8 @@ class ParentStudentService {
                     }
                 }
             );
-            if(!check) throw NotConnectParent;
+            if(!check) return false;
+            return check;
         }
         catch (err) {
             console.error(err)

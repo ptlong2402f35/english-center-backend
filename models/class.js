@@ -9,10 +9,36 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 
-		
-
 		static associate(models) {
-
+			Class.belongsToMany(models.Schedule, {
+				through: "ClassSchedules",
+				foreignKey: "classId",
+				// sourceKey: "id",
+				// targetKey: "id",
+				as: "schedules",
+			});
+			Class.belongsToMany(models.Student, {
+				through: "StudentClasses",
+				foreignKey: "classId",
+				// sourceKey: "id",
+				// targetKey: "id",
+				as: "students",
+			});
+			Class.belongsToMany(models.Teacher, {
+				through: "TeacherClasses",
+				foreignKey: "classId",
+				// sourceKey: "id",
+				// targetKey: "id",
+				as: "teachers",
+			});
+			Class.belongsTo(models.Program, {
+				foreignKey: "programId",
+				as: "program",
+			});
+			Class.belongsTo(models.Center, {
+				foreignKey: "centerId",
+				as: "center",
+			});
 		}
 	}
 	Class.init(
@@ -31,7 +57,8 @@ module.exports = (sequelize, DataTypes) => {
             programId: DataTypes.INTEGER,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
-			centerId: DataTypes.INTEGER
+			centerId: DataTypes.INTEGER,
+			code: DataTypes.TEXT
 		},
 		{
 			sequelize,

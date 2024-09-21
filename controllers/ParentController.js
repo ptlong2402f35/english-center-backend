@@ -7,6 +7,7 @@ const { StudentUpdateService } = require("../services/student/studentUpdateServi
 const { StudentQuerier } = require("../services/student/studentQuerier");
 const { ParentQuerier } = require("../services/parent/parentQuerier");
 const { AuthService } = require("../services/auth/authService");
+const { parentUpdateService } = require("../services/parent/parentUpdateService");
 
 const User = require("../models").User;
 const Student = require("../models").Student;
@@ -69,11 +70,11 @@ class ParentController {
                 include: [
                     {
                         model: Parent,
-                        as: "parent",
+                        as: "parents",
                     }
                 ]
             });
-            if(!parent) throw ParentNotFound;
+            if(!student) throw StudentNotFound;
             // let connect = await ParentStudent.findAll({
             //     where: {
             //         parentId: parent.id
@@ -86,9 +87,8 @@ class ParentController {
             //         }
             //     }
             // });
-            let parents = student.map(item => item.parent).filter(val => val);
 
-            return res.status(200).json(parents);
+            return res.status(200).json(student.parents);
         }
         catch (err) {
             console.error(err);
@@ -120,7 +120,7 @@ class ParentController {
                 },
                 attributes: attributes,
                 include: include,
-                orderBy: orderBy
+                order: orderBy
             });
 
             data.currentPage = page;
@@ -138,7 +138,13 @@ class ParentController {
         try {
             let parentId = req.params.id ? parseInt(req.params.id) : null;
             if(!parentId) throw ParentNotFound;
-            let parent = await Parent.findByPk(parentId);
+            let include = new ParentQuerier().buildInclude({includeStudent: true});
+            let parent = await Parent.findByPk(
+                parentId,
+                {
+                    include
+                }
+            );
             if(!parent) throw ParentNotFound;
 
             return res.status(200).json(parent);
@@ -156,11 +162,13 @@ class ParentController {
             const authSerivce = new AuthService();
             if(!data.userName || !data.password) throw InputInfoEmpty;
 
-            if(!await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
+            if(await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
             let builtData = await new StudentUpdateService().build(data, {forAdmin: true});
             
             await authSerivce.handleCustomerSignup(
                 {
+                    userName: data.userName,
+                    password: data.password,
                     ...builtData,
                     role: UserRole.Parent
                 }
@@ -180,7 +188,7 @@ class ParentController {
             let parentId = req.params.id ? parseInt(req.params.id) : null;
             if(!parentId) throw UserNotFound;
             let data = req.body;
-            await new StudentUpdateService().updateStudentDetail(data, parentId, {forAdmin: true});
+            await new parentUpdateService().updateParentDetail(data, parentId, {forAdmin: true});
 
             return res.status(200).json({message: "Thành Công"});
         }

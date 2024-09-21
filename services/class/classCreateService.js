@@ -12,11 +12,11 @@ class ClassCreateService {
     async createClass(data) {
         try {
             if(!await this.validate(data)) return;
-
+            let builtData = await this.build(data);
             //update class register
             let transaction = await sequelize.transaction();
             try {
-                await this.createClassInstance(data);
+                await this.createClassInstance(builtData);
                 await transaction.rollback();
             }
             catch (err1) {
@@ -63,6 +63,32 @@ class ClassCreateService {
             if(initTrans) {
                 await transaction.rollback();
             }
+            throw err;
+        }
+    }
+
+    async build(data) {
+        try {
+            return (
+                {
+                    name: data.name,
+                    fromAge: data.fromAge,
+                    toAge: data.toAge,
+                    startAt: data.startAt,
+                    endAt: data.endAt,
+                    studentQuantity: data.studentQuantity,
+                    maxQuantity: data.maxQuantity,
+                    fee: data.fee,
+                    totalSession: data.totalSession,
+                    teachedSession: data.teachedSession,
+                    status: data.status,
+                    programId: data.programId,
+                    centerId: data.centerId,
+                    code: data.code
+                }
+            );
+        }
+        catch (err) {
             throw err;
         }
     }

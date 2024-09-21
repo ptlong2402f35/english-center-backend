@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
 			forUserId: DataTypes.INTEGER,
 			debtMoney: DataTypes.DOUBLE,
 			paidMoney: DataTypes.DOUBLE,
+			forYear: DataTypes.INTEGER,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},

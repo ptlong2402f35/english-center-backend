@@ -1,9 +1,13 @@
-const { UserNotFound, InputInfoEmpty, ExistedEmail } = require("../constants/message");
+const { Op } = require("sequelize");
+const { UserNotFound, InputInfoEmpty, ExistedEmail, TeacherNotFound, TeacherNotActive, ClassStatusInvalid } = require("../constants/message");
 const { AuthService } = require("../services/auth/authService");
 const { ErrorService } = require("../services/errorService");
 const { TeacherQuerier } = require("../services/teacher/teacherQuerier");
 const { TeacherUpdateService } = require("../services/teacher/teacherUpdateService");
+const { UserRole } = require("../constants/roles");
+const { ClassStatus } = require("../constants/status");
 const Teacher = require("../models").Teacher;
+const TeacherClass = require("../models").TeacherClass;
 
 class TeacherController {
     getTeachers = async (req, res, next) => {
@@ -34,7 +38,7 @@ class TeacherController {
                 },
                 attributes: attributes,
                 include: include,
-                orderBy: orderBy
+                order: orderBy
             });
 
             data.currentPage = page;
@@ -144,10 +148,15 @@ class TeacherController {
     adminCreateTeacher = async (req, res, next) => {
         try {
             let data = req.body;
-            if(!data.userName || !data.password || !data.role) throw InputInfoEmpty;
-            if(!await new AuthService().checkUserNameExist(data.userName)) throw ExistedEmail;
+            if(!data.userName || !data.password) throw InputInfoEmpty;
+            if(await new AuthService().checkUserNameExist(data.userName)) throw ExistedEmail;
 
-            await new AuthService().handleCustomerSignup(data);
+            await new AuthService().handleCustomerSignup(
+                {
+                    ...data,
+                    role: UserRole.Teacher
+                }
+            );
 
             return res.status(200).json({message: "Thành Công"});
         }
@@ -160,7 +169,21 @@ class TeacherController {
 
     adminAssignTeacherToClass = async (req, res, next) => {
         try {
+            let data = req.body;
+            if(!data.teacherId || !data.classId || !data.salary) throw InputInfoEmpty;
 
+            let teacher = await Teacher.findByPk(data.teacherId);
+            if(!teacher.active) throw TeacherNotActive;
+            let curClass = await Class.findByPk(data.classId);
+            if([ClassStatus.Disable, ClassStatus.Finish].includes(curClass.status)) throw ClassStatusInvalid;
+
+            await TeacherClass.create(
+                {
+                    ...data
+                }
+            );
+
+            return res.status(200).json({message: "Thành công"});
         }
         catch (err) {
             console.error(err);
@@ -171,7 +194,7 @@ class TeacherController {
 
     getSalaryHistory = async (req, res, next) => {
         try {
-            
+            //get from costs table
         }
         catch (err) {
             console.error(err);

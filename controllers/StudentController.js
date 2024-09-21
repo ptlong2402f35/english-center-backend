@@ -1,5 +1,5 @@
 const { Op, where } = require("sequelize");
-const { UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound, ExistedEmail } = require("../constants/message");
+const { UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound, ExistedEmail, InputInfoEmpty } = require("../constants/message");
 const { UserRole } = require("../constants/roles");
 const { ErrorService } = require("../services/errorService");
 const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");
@@ -67,7 +67,7 @@ class StudentController {
                 include: [
                     {
                         model: Student,
-                        as: "student",
+                        as: "childs",
                     }
                 ]
             });
@@ -84,9 +84,8 @@ class StudentController {
             //         }
             //     }
             // });
-            let students = parent.map(item => item.student).filter(val => val);
 
-            return res.status(200).json(students);
+            return res.status(200).json(parent?.childs || []);
         }
         catch (err) {
             console.error(err);
@@ -136,7 +135,7 @@ class StudentController {
 
             let conds = studentQuerier.buildWhere({name, age, active});
             let attributes = studentQuerier.buildAttributes({});
-            let include = studentQuerier.buildInclude({includeParent: true});
+            let include = studentQuerier.buildInclude({includeParent: true, includeClass: true});
             let orderBy = studentQuerier.buildSort({});
 
             let data = await Student.paginate({
@@ -147,7 +146,7 @@ class StudentController {
                 },
                 attributes: attributes,
                 include: include,
-                orderBy: orderBy
+                order: orderBy
             });
 
             data.currentPage = page;
@@ -167,12 +166,14 @@ class StudentController {
             const authSerivce = new AuthService();
             if(!data.userName || !data.password) throw InputInfoEmpty;
 
-            if(!await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
+            if(await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
 
             let builtData = await new StudentUpdateService().build(data, {forAdmin: true});
             
             let resp = await authSerivce.handleCustomerSignup(
                 {
+                    userName: data.userName,
+                    password: data.password,
                     ...builtData,
                     role: UserRole.Student
                 }
@@ -223,7 +224,7 @@ class StudentController {
         try {
             let studentId = req.params.id ? parseInt(req.params.id) : null;
             if(!studentId) throw UserNotFound;
-            let active = req.query.active ? (req.query.active?.trim() === "true" ? true : false) : null;
+            let active = req.body.active || null;
             if(!active && active != false) throw InputInfoEmpty;
 
             await Student.update(

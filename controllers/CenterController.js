@@ -1,4 +1,6 @@
+const { Op } = require("sequelize");
 const { InputInfoEmpty, CenterNotFound } = require("../constants/message");
+const { CenterStatus } = require("../constants/status");
 const { CenterQuerier } = require("../services/center/centerQuerier");
 const { CenterUpdateService } = require("../services/center/centerUpdateService");
 const { ErrorService } = require("../services/errorService");
@@ -40,7 +42,7 @@ class CenterController {
                 },
                 attributes: attributes,
                 include: include,
-                orderBy: orderBy
+                order: orderBy
             });
 
             data.currentPage = page;
@@ -89,7 +91,10 @@ class CenterController {
             let data = req.body;
 
             let builtData = await new CenterUpdateService().build(data);
-            await Center.create(builtData);
+            await Center.create({
+                ...builtData,
+                status: CenterStatus.Active
+            });
 
             return res.status(200).json({message: "Thành công"});
 

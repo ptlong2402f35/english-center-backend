@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { InputInfoEmpty, ClassNotFound, UserNotFound, ParentNotFound, NotEnoughPermission, StudentNotFound } = require("../constants/message");
 const { ClassCreateService } = require("../services/class/classCreateService");
 const { ClassQuerier } = require("../services/class/classQuerier");
@@ -7,11 +8,17 @@ const { ErrorService } = require("../services/errorService");
 const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");
 const { StudentQuerier } = require("../services/student/studentQuerier");
 const { TeacherQuerier } = require("../services/teacher/teacherQuerier");
+const { TimeHandle } = require("../utils/timeHandle");
+const util = require("util");
+const { UserRole } = require("../constants/roles");
 
 const Class = require("../models").Class;
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const Teacher = require("../models").Teacher;
+const StudentClass = require("../models").StudentClass;
+const TeacherClass = require("../models").TeacherClass;
+const Schedule = require("../models").Schedule;
 
 class ClassController {
     getClasses = async (req, res, next) => {
@@ -24,18 +31,21 @@ class ClassController {
             let toDate = req.query.toDate || null;
             let status = req.query.status ? parseInt(req.query.status) : null;
             let centerId = req.query.centerId || null;
+            let code = req.query.code || null;
             let includeStudent = req.query.includeStudent?.trim() === "true" || null;
             let includeProgram = req.query.includeProgram?.trim() === "true" || null;
             let includeTeacher = req.query.includeTeacher?.trim() === "true" || null;
             let includeCenter = req.query.includeCenter?.trim() === "true" || null;
+            let includeSchedule = req.query.includeSchedule?.trim() === "true" || null;
 
-            let conds = classQuerier.buildWhere({forAge, fromDate, toDate, status, centerId});
+            let conds = classQuerier.buildWhere({forAge, fromDate, toDate, status, centerId, code});
             let attributes = classQuerier.buildAttributes({});
             let include = classQuerier.buildInclude({
                 includeStudent,
                 includeCenter,
                 includeProgram,
-                includeTeacher
+                includeTeacher,
+                includeSchedule
             });
             let orderBy = classQuerier.buildSort({});
 
@@ -47,10 +57,17 @@ class ClassController {
                 },
                 attributes: attributes,
                 include: include,
-                orderBy: orderBy
+                order: orderBy,
+                // logging: true
             });
 
             data.currentPage = page;
+
+            for (let item of data.docs) {
+                for(let schedule of (item?.schedules || [])) {
+                    TimeHandle.attachDayLabel(schedule);
+                }
+            }
 
             return res.status(200).json(data);
         }
@@ -71,13 +88,15 @@ class ClassController {
             let includeProgram = req.query.includeProgram?.trim() === "true" || null;
             let includeTeacher = req.query.includeTeacher?.trim() === "true" || null;
             let includeCenter = req.query.includeCenter?.trim() === "true" || null;
+            let includeSchedule = req.query.includeSchedule?.trim() === "true" || null;
 
             let attributes = classQuerier.buildAttributes({});
             let include = classQuerier.buildInclude({
                 includeStudent,
                 includeCenter,
                 includeProgram,
-                includeTeacher
+                includeTeacher,
+                includeSchedule
             });
 
             let data = await Class.findByPk(classId,
@@ -87,6 +106,10 @@ class ClassController {
                 }
             );
             if(!data) throw ClassNotFound;
+
+            for(let schedule of (data?.schedules || [])) {
+                TimeHandle.attachDayLabel(schedule);
+            }
             
             return res.status(200).json(data);
         }
@@ -102,19 +125,32 @@ class ClassController {
             const studentQuerier = new StudentQuerier();
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
+            let status = req.query.status ? parseInt(req.query.status) : null;
 
-            let include = studentQuerier.buildAttributes({});
+            let include = studentQuerier.buildInclude({
+                includeClass: true
+            });
 
-            let user = await Student.findOne({
+            let student = await Student.findOne({
                 where: {
                     userId: userId
                 },
                 include: include
             });
 
-            if(!user.class) return res.status(200).json([]);
+            // let classes = await StudentClass.findAll({
+            //     where: {
+            //         studentId: student.id
+            //     }
+            // });
 
-            return res.status(200).json(user.class);
+            // let classIds = classes.map(item => item.id);
+
+            // console.log(`==== sequelize detail: `, util.inspect(user, false, null, true));
+
+            if(!student.classes) return res.status(200).json([]);
+
+            return res.status(200).json(student.classes);
         }
         catch (err) {
             console.error(err);
@@ -129,18 +165,27 @@ class ClassController {
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
 
-            let include = teacherQuerier.buildAttributes({});
-
             let teacher = await Teacher.findOne({
                 where: {
                     userId: userId
                 },
-                include: include
+                include: [
+                    {
+                        model: Class,
+                        as: "classes",
+                        include: [
+                            {
+                                model: Schedule,
+                                as: "schedules"
+                            }
+                        ]
+                    }
+                ]
             });
 
-            if(!teacher.class) return res.status(200).json([]);
+            if(!teacher.classes) return res.status(200).json([]);
 
-            return res.status(200).json(teacher.class);
+            return res.status(200).json(teacher.classes);
         }
         catch (err) {
             console.error(err);
@@ -176,9 +221,9 @@ class ClassController {
                 include: include
             });
 
-            if(!user.class) return res.status(200).json([]);
+            if(!user.classes) return res.status(200).json([]);
 
-            return res.status(200).json(user.class);
+            return res.status(200).json(user.classes);
         }
         catch (err) {
             console.error(err);
@@ -240,6 +285,15 @@ class ClassController {
                     userId: userId
                 }
             });
+            let studentClass = await StudentClass.findOne(
+                {
+                    where: {
+                        studentId: student.id,
+                        classId: classId
+                    }
+                }
+            );
+            if(studentClass) return res.status(403).json({message: "Bạn đã đăng kí lớp này"});
             if(!student) throw StudentNotFound;
 
             await new ClassRegisterService().register(classId, student.id);
@@ -257,7 +311,7 @@ class ClassController {
         try {
             let studentId = req.body.studentId;
             if(!studentId) throw UserNotFound;
-
+            if(req.user.role != UserRole.Parent) return res.status(403).json({message: "Chức năng này chỉ dành cho phụ huynh"});
             let parent = await Parent.findOne({
                 where: {
                     userId: req.user.userId
@@ -268,13 +322,24 @@ class ClassController {
 
             if(!await new ParentStudentService().checkConnect(parent.id, studentId)) throw NotEnoughPermission;
 
-            let classId = req.params.id ? parseInt(req.params.id) : null;
+            let classId = req.body.classId;
             if(!classId) throw ClassNotFound;
             let student = await Student.findOne({
                 where: {
                     userId: userId
                 }
             });
+            if(!student) throw StudentNotFound;
+
+            let studentClass = await StudentClass.findOne(
+                {
+                    where: {
+                        studentId: student.id,
+                        classId: classId
+                    }
+                }
+            );
+            if(studentClass) return res.status(403).json({message: "Con bạn đã đăng kí lớp này"});
             if(!student) throw StudentNotFound;
 
             await new ClassRegisterService().register(classId, student.id);
@@ -301,7 +366,133 @@ class ClassController {
             });
             if(!student) throw StudentNotFound;
 
+            let studentClass = await StudentClass.findOne(
+                {
+                    where: {
+                        studentId: student.id,
+                        classId: classId
+                    }
+                }
+            );
+            if(studentClass) return res.status(403).json({message: "Học sinh đã đăng kí lớp này"});
+            if(!student) throw StudentNotFound;
+
             await new ClassRegisterService().register(classId, student.id);
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    studentUnRegisterClass = async (req, res, next) => {
+        try {
+            let userId = req.user.userId;
+            let classId = req.params.id ? parseInt(req.params.id) : null;
+            if(!userId) throw UserNotFound;
+            if(!classId) throw ClassNotFound;
+            let student = await Student.findOne({
+                where: {
+                    userId: userId
+                }
+            });
+            let studentClass = await StudentClass.findOne(
+                {
+                    where: {
+                        studentId: student.id,
+                        classId: classId
+                    }
+                }
+            );
+            if(!studentClass) return res.status(403).json({message: "Bạn chưa đăng kí lớp này"});
+            if(!student) throw StudentNotFound;
+
+            await new ClassRegisterService().unRegister(classId, student.id);
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    parentUnRegisterClass = async (req, res, next) => {
+        try {
+            let studentId = req.body.studentId;
+            if(!studentId) throw UserNotFound;
+            if(req.user.role != UserRole.Parent) return res.status(403).json({message: "Chức năng này chỉ dành cho phụ huynh"});
+
+            let parent = await Parent.findOne({
+                where: {
+                    userId: req.user.userId
+                }
+            });
+
+            if(!parent) throw ParentNotFound;
+
+            if(!await new ParentStudentService().checkConnect(parent.id, studentId)) throw NotEnoughPermission;
+
+            let classId = req.body.classId;
+            if(!classId) throw ClassNotFound;
+            let student = await Student.findOne({
+                where: {
+                    userId: userId
+                }
+            });
+            if(!student) throw StudentNotFound;
+
+            let studentClass = await StudentClass.findOne(
+                {
+                    where: {
+                        studentId: student.id,
+                        classId: classId
+                    }
+                }
+            );
+            if(!studentClass) return res.status(403).json({message: "Con bạn chưa đăng kí lớp này"});
+            if(!student) throw StudentNotFound;
+
+            await new ClassRegisterService().unRegister(classId, student.id);
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    adminUnRegisterClass = async (req, res, next) => {
+        try {
+            let studentId = req.body.studentId ? parseInt(req.body.studentId) : null;
+            let classId = req.body.classId ? parseInt(req.body.classId) : null;
+            if(!studentId) throw StudentNotFound;
+            if(!classId) throw ClassNotFound;
+            let student = await Student.findOne({
+                where: {
+                    id: studentId
+                }
+            });
+            if(!student) throw StudentNotFound;
+
+            let studentClass = await StudentClass.findOne(
+                {
+                    where: {
+                        studentId: student.id,
+                        classId: classId
+                    }
+                }
+            );
+            if(!studentClass) return res.status(403).json({message: "Học sinh chưa đăng kí lớp này"});
+            if(!student) throw StudentNotFound;
+
+            await new ClassRegisterService().unRegister(classId, student.id);
 
             return res.status(200).json({message: "Thành công"});
         }
