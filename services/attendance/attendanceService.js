@@ -14,7 +14,7 @@ class AttendanceService {
                 let teacher = await Teacher.findOne(
                     {
                         where: {
-                            userId: user.id
+                            userId: user.userId
                         }
                     }
                 );

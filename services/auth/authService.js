@@ -156,6 +156,7 @@ class AuthService {
                             name: data.name,
                             gender: data.gender,
                             birthday: data.birthday || null,
+                            age: data.age,
                             phone: data.phone,
                             email: data.email,
                             createdAt: new Date(),
@@ -175,6 +176,7 @@ class AuthService {
                             gender: data.gender,
                             birthday: data.birthday || null,
                             phone: data.phone,
+                            age: data.age,
                             email: data.email,
                             createdAt: new Date(),
                             updatedAt: new Date()
@@ -193,6 +195,7 @@ class AuthService {
                             gender: data.gender,
                             birthday: data.birthday || null,
                             phone: data.phone,
+                            age: data.age,
                             email: data.email,
                             level: data.level,
                             createdAt: new Date(),

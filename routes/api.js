@@ -14,6 +14,7 @@ const ProgramController = require("../controllers/ProgramController");
 const NotificationController= require("../controllers/NotificationController");
 const TransactionController = require("../controllers/TransactionController");
 const CostController = require("../controllers/CostController");
+const SearchController = require("../controllers/SearchController");
 var router = express.Router();
 
 //test connect
@@ -79,6 +80,8 @@ router.put("/class-deactive/:id", Auth.onlyAdmin, ClassController.deactiveClass)
 router.post("/register-by-student/:id", Auth.auth, ClassController.studentRegisterClass);
 router.post("/register-by-parent", Auth.auth, ClassController.parentRegisterClass);
 router.post("/register-by-admin", Auth.onlyAdmin, ClassController.adminRegisterClass);
+router.get("/registed-checker", ClassController.studentCheckRegisted);
+router.get("/registed-checker-by-parent", ClassController.parentCheckStudentsRegisted);
 
 //unregist
 router.post("/unregister-by-student/:id", Auth.auth, ClassController.studentUnRegisterClass);
@@ -114,7 +117,7 @@ router.post("/attendance", Auth.auth, AttendanceController.createAttendance);
 router.put("/attendance/:id", Auth.auth, AttendanceController.updateAttendance);
 router.delete("/attendance/:id", Auth.auth, AttendanceController.removeAttendance);
 //need update
-router.get("/my-attendances", AttendanceController.getAttendanceDetail);
+router.get("/my-schedule", Auth.auth, AttendanceController.getMyScheduleAttendace);
 
 /* Program Controller */
 router.get("/programs", Auth.onlyAdmin, ProgramController.getProgram);
@@ -153,6 +156,11 @@ router.post("/cost-other", Auth.onlyAdmin, CostController.createOtherCost);
 router.put("/cost/:id", Auth.onlyAdmin, CostController.updateCost);
 router.put("/cost-status/:id", Auth.onlyAdmin, CostController.adminUpdateCostStatus);
 
-
+/*Search */
+router.get("/search-student", SearchController.searchStudent);
+router.get("/search-parent", SearchController.searchParent);
+router.get("/search-teacher", SearchController.searchTeacher);
+router.get("/search-class", SearchController.searchClass);
+router.get("/search-center", SearchController.searchCenter);
 
 module.exports = router;

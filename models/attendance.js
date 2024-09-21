@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
 	}
 	Attendance.init(
 		{
-			studentId: DataTypes.INTEGER,
+			studentIds: DataTypes.ARRAY(DataTypes.INTEGER),
             classId: DataTypes.INTEGER,
             date: DataTypes.DATE,
             status: DataTypes.INTEGER,

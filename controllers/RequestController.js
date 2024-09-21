@@ -4,6 +4,7 @@ const { UserRole } = require("../constants/roles");
 const { RequestStatus } = require("../constants/status");
 const { ConnectionService } = require("../services/connection/connectionService");
 const { ErrorService } = require("../services/errorService");
+const { RequestService } = require("../services/request/requestService");
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const Request = require("../models").Request;
@@ -32,9 +33,21 @@ class RequestController {
                                 status: status
                             } : {})
                         },
-                        order: [["id", "desc"]]
+                        order: [["id", "desc"]],
+                        include: [
+                            {
+                                model: Student,
+                                as: "requestByStudent"
+                            },
+                            {
+                                model: Parent,
+                                as: "requestByParent"
+                            }
+                        ]
                     }
                 );
+
+                await new RequestService().attachRequestUser(requests);
 
                 return res.status(200).json(requests);
             }
@@ -54,10 +67,22 @@ class RequestController {
                                 status: status
                             } : {})
                         },
-                        order: [["id", "desc"]]
+                        order: [["id", "desc"]],
+                        include: [
+                            {
+                                model: Student,
+                                as: "requestByStudent"
+                            },
+                            {
+                                model: Parent,
+                                as: "requestByParent"
+                            }
+                        ]
 
                     }
                 );
+
+                await new RequestService().attachRequestUser(requests);
 
                 return res.status(200).json(requests);
             }
@@ -138,6 +163,8 @@ class RequestController {
                         }
                     }
                 );
+                let student = await Student.findByPk(targetId);
+                if(!student) return res.status(403).json({message: "Học sinh không tồn tại"});
                 let request = await Request.findOne(
                     {
                         where: {
@@ -179,6 +206,8 @@ class RequestController {
                         }
                     }
                 );
+                let parent = await Parent.findByPk(targetId);
+                if(!parent) return res.status(403).json({message: "Phụ huynh không tồn tại"});
                 let request = await Request.findOne(
                     {
                         where: {
@@ -244,6 +273,7 @@ class RequestController {
                     }
                 );
                 if(!request) return res.status(403).json({message: "Yêu cầu không tồn tại"});
+                if(request.requestByRoleId === user.role) return res.status(403).json({message: "Bạn là người đưa ra yêu cầu"});
                 await request.update(
                     {
                         status: status,
@@ -281,6 +311,7 @@ class RequestController {
                     }
                 );
                 if(!request) return res.status(403).json({message: "Yêu cầu không tồn tại"});
+                if(request.requestByRoleId === user.role) return res.status(403).json({message: "Bạn là người đưa ra yêu cầu"});
                 await request.update(
                     {
                         status: status,

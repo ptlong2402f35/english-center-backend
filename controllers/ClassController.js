@@ -326,7 +326,7 @@ class ClassController {
             if(!classId) throw ClassNotFound;
             let student = await Student.findOne({
                 where: {
-                    userId: userId
+                    id: studentId
                 }
             });
             if(!student) throw StudentNotFound;
@@ -495,6 +495,63 @@ class ClassController {
             await new ClassRegisterService().unRegister(classId, student.id);
 
             return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    studentCheckRegisted = async (req, res, next) => {
+        try {
+            let studentId = req.query.studentId ? parseInt(req.query.studentId) : null;
+            let classId = req.query.classId ? parseInt(req.query.classId) : null;
+            if(!studentId || !classId) throw InputInfoEmpty;
+
+            let checker = await StudentClass.findOne(
+                {
+                    where: {
+                        studentId,
+                        classId
+                    }
+                }
+            );
+            let resp = {
+                isRegisted: checker ? true : false
+            }
+            return res.status(200).json(resp);
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    parentCheckStudentsRegisted = async (req, res, next) => {
+        try {
+            let studentId = req.query.studentId.split(";").map(item => parseInt(item)) || [];
+            let classId = req.query.classId ? parseInt(req.query.classId) : null;
+            if(!studentId.length || !classId) throw InputInfoEmpty;
+
+            let checker = await StudentClass.findAll(
+                {
+                    where: {
+                        studentId: {
+                            [Op.in]: studentId
+                        },
+                        classId
+                    }
+                }
+            );
+
+            let registedId = checker.map(item => item.studentId).filter(val => val);
+            return res.status(200).json(
+                {
+                    registedId: registedId
+                }
+            );
         }
         catch (err) {
             console.error(err);

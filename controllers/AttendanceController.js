@@ -1,21 +1,47 @@
+const { Op, where } = require("sequelize");
 const { InputInfoEmpty } = require("../constants/message");
 const { AttendanceService } = require("../services/attendance/attendanceService");
 const { ErrorService } = require("../services/errorService");
+const { ClassStatus } = require("../constants/status");
+const { TimeHandle } = require("../utils/timeHandle");
 const Attendance = require("../models").Attendance;
+const StudentClass = require("../models").StudentClass;
+const Class = require("../models").Class;
+const Student = require("../models").Student;
+const Schedule = require("../models").Schedule;
+const Center = require("../models").Center;
 
 class AttendanceController {
     getAttendance = async(req, res, next) => {
         try {
             let classId = req.query.classId ? parseInt(req.query.classId) : null;
-            let date = req.query.date || null;
+            let fromDate = req.query.fromDate || null;
+            let toDate = req.query.toDate || null;
             let user = req.user;
-            if(!classId || !date) throw InputInfoEmpty;
+            if(!classId) throw InputInfoEmpty;
             if(!await new AttendanceService().permissionChecker(user, classId)) return res.status(403).json({message: "Bạn không là giáo viên của lớp này"});
+            let conds = [];
+            if(fromDate) {
+                conds.push({
+                    date: {
+                        [Op.gte]: fromDate
+                    }
+                })
+            }
+            if(toDate) {
+                conds.push({
+                    date: {
+                        [Op.lte]: toDate
+                    }
+                })
+            }
             let data = await Attendance.findAll(
                 {
                     where: {
-                        classId,
-                        date
+                        [Op.and]: [
+                            {classId: classId},
+                            ...conds
+                        ]
                     }
                 }
             );
@@ -56,7 +82,7 @@ class AttendanceController {
             let convertData = {
                 classId: data.classId,
                 date: data.date,
-                staffIds: data.staffIds,
+                studentIds: data.studentIds || [],
             }
 
             await Attendance.create(convertData);
@@ -72,14 +98,16 @@ class AttendanceController {
 
     updateAttendance = async (req, res, next) => {
         try {
-            let attendanceId = req.query.id ? parseInt(req.query.id) : null;
+            let attendanceId = req.params.id ? parseInt(req.params.id) : null;
             let data = req.body;
             let user = req.user;
-            if(!await new AttendanceService().permissionChecker(user, attendanceId)) return res.status(403).json({message: "Bạn không là giáo viên của lớp này"});
+            let attendance = await Attendance.findByPk(attendanceId);
+            if(!attendance) return res.status(403).json({message: "Buổi điểm danh không tồn tại"});
+            if(!await new AttendanceService().permissionChecker(user, attendance.classId)) return res.status(403).json({message: "Bạn không là giáo viên của lớp này"});
 
             let convertData = {
                 date: data.date,
-                staffIds: data.staffIds,
+                studentIds: data.studentIds,
             }
 
             await Attendance.update(
@@ -104,7 +132,9 @@ class AttendanceController {
         try {
             let attendanceId = req.query.id ? parseInt(req.query.id) : null;
             let user = req.user;
-            if(!await new AttendanceService().permissionChecker(user, attendanceId)) return res.status(403).json({message: "Bạn không là giáo viên của lớp này"});
+            let attendance = await Attendance.findByPk(attendanceId);
+            if(!attendance) return res.status(403).json({message: "Buổi điểm danh không tồn tại"});
+            if(!await new AttendanceService().permissionChecker(user, attendance.classId)) return res.status(403).json({message: "Bạn không là giáo viên của lớp này"});
 
             await Attendance.destroy(
                 {
@@ -125,10 +155,71 @@ class AttendanceController {
 
     getMyScheduleAttendace = async (req, res, next) => {
         try {
-            let attendanceId = req.query.id ? parseInt(req.query.id) : null;
-            
+            let user = req.user;
 
-            return res.status(200).json({message: "Thành công"});
+            let student = await Student.findOne(
+                {
+                    where: {
+                        userId: user.userId
+                    }
+                }
+            );
+            if(!student) return res.status(403).json({message: "Học sinh không tồn tại"});
+            let studenClass = await StudentClass.findAll({
+                where: {
+                    studentId: student.id
+                }
+            });
+
+            let classIds = [...new Set(studenClass.map(item => item.classId).filter(val => val))];
+            let classes = await Class.findAll(
+                {
+                    where: {
+                        id: {
+                            [Op.in]: classIds
+                        },
+                        status: {
+                            [Op.notIn]: [ClassStatus.Finish, ClassStatus.Disable]
+                        }
+                    },
+                    include: [
+                        {
+                            model: Schedule,
+                            as: "schedules"
+                        },
+                        {
+                            model: Center,
+                            as: "center"
+                        }
+                    ]
+                }
+            );
+            
+            let ret =[];
+            for(let item of classes) {
+                if(!item.schedules?.length) continue;
+                let scheduleData = TimeHandle.getAllScheduleDayOfClass(item.startAt, item.endAt, item.totalSession, item.schedules, item);
+                for(let item of scheduleData) {
+                    let fItem = ret.find(key => key.key === item.key);
+                    if(fItem) {
+                        fItem.value = [...fItem.value, ...item.value];
+                    }
+                    else {
+                        ret.push({
+                            key: item.key,
+                            value: [...item.value]
+                        })
+                    }
+                }
+            }
+
+            ret.sort((a,b) => (new Date(a.key) < new Date(b.key) ? -1 : 1));
+
+            let resp = ret.map(item => ({
+                [item.key]: item.value
+            }));
+
+            return res.status(200).json(resp);
         }
         catch (err) {
             console.error(err);

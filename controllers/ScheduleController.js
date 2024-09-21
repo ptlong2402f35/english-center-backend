@@ -68,7 +68,26 @@ class ScheduleController {
     }
 
     updateSchedule = async (req, res, next) => {
+        try {
+            let data = req.body;
+            let scheduleId = req.params.id ? parseInt(req.params.id) : null;
+            if(!data.date || !data.startAt || !data.endAt || !scheduleId) throw InputInfoEmpty;
 
+            await Schedule.update(data,
+                {
+                    where: {
+                        id: scheduleId
+                    }
+                }
+            );
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
     }
 
     deactiveSchedule = async (req, res, next) => {
