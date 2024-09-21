@@ -96,7 +96,7 @@ router.post("/add-teacher-to-class", Auth.onlyAdmin, TeacherController.adminAssi
 //need update
 router.get("/teacher-salary", Auth.auth, TeacherController.getSalaryHistory);
 router.get("/teacher-salary/:id", Auth.auth, TeacherController.getSalaryHistory);
-
+ 
 /* Request Controller */
 router.get("/request", Auth.auth, RequestController.getMyRequest);
 router.get("/request/:id", Auth.auth, RequestController.getRequestDetail);
