@@ -83,7 +83,6 @@ class StudentQuerier {
                 {
                     model: Class,
                     as: "classes",
-                    attributes: ["id", "name", "fromAge", "toAge", "startAt", "endAt", "status", "totalSession", "teachedSession"],
                     through: { attributes: [] } 
                 }
             ]

@@ -8,6 +8,7 @@ const { UserRole } = require("../constants/roles");
 const { ClassStatus } = require("../constants/status");
 const Teacher = require("../models").Teacher;
 const TeacherClass = require("../models").TeacherClass;
+const Class = require("../models").Class;
 
 class TeacherController {
     getTeachers = async (req, res, next) => {

@@ -1,6 +1,7 @@
 "use strict";
 const sequelizePaginate = require("sequelize-paginate");
 const { Model } = require("sequelize");
+const { UserRole } = require("../constants/roles");
 module.exports = (sequelize, DataTypes) => {
 	class Request extends Model {
 		/**
@@ -12,7 +13,14 @@ module.exports = (sequelize, DataTypes) => {
 		
 
 		static associate(models) {
-
+			Request.belongsTo(models.Student, {
+				foreignKey: "studentId",
+				as: 'requestByStudent',
+			});
+			Request.belongsTo(models.Parent, {
+				foreignKey: "parentId",
+				as: 'requestByParent',
+			});
 		}
 	}
 	Request.init(
