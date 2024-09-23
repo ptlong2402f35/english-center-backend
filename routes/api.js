@@ -15,6 +15,7 @@ const NotificationController= require("../controllers/NotificationController");
 const TransactionController = require("../controllers/TransactionController");
 const CostController = require("../controllers/CostController");
 const SearchController = require("../controllers/SearchController");
+const ReviewController = require("../controllers/ReviewController");
 var router = express.Router();
 
 //test connect
@@ -156,11 +157,20 @@ router.post("/cost-other", Auth.onlyAdmin, CostController.createOtherCost);
 router.put("/cost/:id", Auth.onlyAdmin, CostController.updateCost);
 router.put("/cost-status/:id", Auth.onlyAdmin, CostController.adminUpdateCostStatus);
 
-/*Search */
+/* Search */
 router.get("/search-student", SearchController.searchStudent);
 router.get("/search-parent", SearchController.searchParent);
 router.get("/search-teacher", SearchController.searchTeacher);
 router.get("/search-class", SearchController.searchClass);
 router.get("/search-center", SearchController.searchCenter);
+
+/* Review */
+router.get("/review-by-admin", Auth.onlyAdmin, ReviewController.getAttendanceReviews);
+router.get("/review-by-teacher", Auth.auth, ReviewController.teacherGetAttendanceReviews);
+router.get("/review-by-parent", Auth.auth, ReviewController.parentGetAttendanceReviews);
+router.get("/review-by-student", Auth.auth, ReviewController.studentGetAttendanceReviews);
+router.post("/review", Auth.auth, ReviewController.createReviews);
+router.put("/review", Auth.auth, ReviewController.updateReviews);
+router.delete("/review/:id", Auth.auth, ReviewController.deleteReviews);
 
 module.exports = router;

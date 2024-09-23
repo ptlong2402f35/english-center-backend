@@ -21,12 +21,26 @@ const CostType = {
     TeacherSalary: 1,
     StudentFee: 2,
     ElecFee: 3,
-    WaterFee: 4
+    WaterFee: 4,
+    OtherFee: 5
+}
+
+const NotificationType = {
+    Request: 1,
+    Transaction: 2,
+    Review: 3
+}
+
+const ReviewType = {
+    General: 1,
+    StudentSpecific: 2
 }
 
 module.exports = {
     FormType,
     CommunicationType,
     PaymentMethod,
-    CostType
+    CostType,
+    NotificationType,
+    ReviewType
 }
