@@ -2,7 +2,7 @@
 const sequelizePaginate = require("sequelize-paginate");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-	class Attendance extends Model {
+	class Review extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
@@ -12,26 +12,30 @@ module.exports = (sequelize, DataTypes) => {
 		
 
 		static associate(models) {
-			Attendance.hasMany(models.Review, {
-				foreignKey: "attendanceId",
-				as: "reviews",
+			Review.belongsTo(models.Attendance, {
+				foreignKey: "classId",
+				as: "attendance",
 			});
 		}
 	}
-	Attendance.init(
+	Review.init(
 		{
-			studentIds: DataTypes.ARRAY(DataTypes.INTEGER),
+			generalContent: DataTypes.TEXT,
+            specificContent: DataTypes.TEXT,
+			sessionContent: DataTypes.TEXT,
+            type: DataTypes.INTEGER,
+            referenceId: DataTypes.INTEGER,
+            title: DataTypes.TEXT,
+            attendanceId: DataTypes.INTEGER,
             classId: DataTypes.INTEGER,
-            date: DataTypes.DATE,
-            status: DataTypes.INTEGER,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},
 		{
 			sequelize,
-			modelName: "Attendance",
+			modelName: "Review",
 		},
 	);
-	sequelizePaginate.paginate(Attendance);
-	return Attendance;
+	sequelizePaginate.paginate(Review);
+	return Review;
 };

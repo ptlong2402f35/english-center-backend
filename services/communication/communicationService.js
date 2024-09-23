@@ -7,13 +7,16 @@ class CommunicationService {
         this.emailService = new EmailService();
     }
 
-    async sendNotificationToUserId(userId, title, content, {actionType} = {}) {
+    async sendNotificationToUserId(userId, title, content, type, {actionType} = {}) {
         try {
             await Notification.create({
                 toUserId: userId,
+                type: type,
                 title,
                 content,
-                ...(actionType ? {actionType: actionType} : {})
+                ...(actionType ? {actionType: actionType} : {}),
+                seen: false,
+                seenAt: null
             });
         }
         catch (err) {
