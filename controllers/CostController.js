@@ -1,15 +1,17 @@
 const { Op, where } = require("sequelize");
 const { ErrorService } = require("../services/errorService");
 const { UserRole } = require("../constants/roles");
-const { NotEnoughPermission, InputInfoEmpty } = require("../constants/message");
+const { NotEnoughPermission, InputInfoEmpty, CostNotFound } = require("../constants/message");
 const { CostCreateService } = require("../services/cost/costCreateService");
 const { CostTeacherCreateService } = require("../services/cost/costTeacherCreateService");
 const { CostOtherService } = require("../services/cost/costOtherService");
 const { CostStatus } = require("../constants/status");
 const { sequelize } = require("../models");
 const { TransactionService } = require("../services/transaction/transactionService");
+const { CostType } = require("../constants/type");
 const Transaction = require("../models").Transaction;
 const Cost = require("../models").Cost;
+const User = require("../models").User;
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const ParentStudent = require("../models").ParentStudent;
@@ -90,9 +92,9 @@ class CostController {
     createClassCost = async (req, res, next) => {
         try {
             let data = req.body;
-            if(!data.classId || !data.month || !data.year) throw InputInfoEmpty;
+            if(!data.classId || !data.month || !data.year || !data.name) throw InputInfoEmpty;
 
-            await new CostCreateService().createCostByClass(data.classId, data.month, data.year);
+            await new CostCreateService().createCostByClass(data.classId, data.month, data.year, data.name);
 
             return res.status(200).json({message: "Thành công"});
         }
@@ -106,9 +108,9 @@ class CostController {
     createTeacherSalary = async (req, res, next) => {
         try {
             let data = req.body;
-            if(!data.teacherId || !data.month || !data.year) throw InputInfoEmpty;
+            if(!data.teacherId || !data.month || !data.year || !data.name) throw InputInfoEmpty;
 
-            await new CostTeacherCreateService().createCost(data.teacherId, data.month, data.year);
+            await new CostTeacherCreateService().createCost(data.teacherId, data.month, data.year, data.name);
 
             return res.status(200).json({message: "Thành công"});
         }
@@ -122,8 +124,8 @@ class CostController {
     createOtherCost = async (req, res, next) => {
         try {
             let data = req.body;
-            if(!data.month || !data.year || !data.totalMoney) throw InputInfoEmpty;
-
+            if(!data.month || !data.year || !data.totalMoney || !data.type) throw InputInfoEmpty;
+            if(![CostType.ElecFee, CostType.OtherFee, CostType.WaterFee].includes(data.type)) return res.status(403).json({message: "Loại hóa đơn không hợp lệ"});
             await new CostOtherService().createCost(data);
 
             return res.status(200).json({message: "Thành công"});
@@ -141,21 +143,47 @@ class CostController {
             if(!id) throw InputInfoEmpty;
             let data = req.body;
 
-            let cost = await Cost.findByPk(id);
-            if(!cost) return res.status(422).json({message: "Hóa đơn không tồn tai"});
-            let debt = cost.totalMoney - (data?.paidMoney || 0);
-            await Cost.update(
+            let cost = await Cost.findByPk(
+                id,
                 {
-                    ...data,
-                    ...(data.paidMoney === cost.totalMoney ? {
-                        status: CostStatus.Done
-                    } : {}),
-                    ...(data.paidMoney < cost.totalMoney ? {
-                        status: CostStatus.Debt
-                    } : {}),
-                    ...(debt ? {debtMoney: debt} : {})
+                    include: [
+                        {
+                            model: User,
+                            as: "user"
+                        }
+                    ]
                 }
             );
+            if(![CostType.ElecFee, CostType.OtherFee, CostType.WaterFee].includes(cost.type)) return res.status(403).json({message: "Loại hóa đơn không hợp lệ"});
+            if(!cost) return res.status(422).json({message: "Hóa đơn không tồn tai"});
+            await cost.update(
+                {
+                    ...data,
+                }
+            );
+
+            let existTrans = await Transaction.findOne({
+                where: {
+                    forUserId: cost.user.id,
+                    createdByUserId: 1,
+                    totalMoney: cost.totalMoney,
+                    costId: id,
+                    costType: cost.type
+                }
+            });
+
+            if(!existTrans) {
+                let trans = await Transaction.create(
+                    {
+                        forUserId: cost.user.id,
+                        createdByUserId: 1,
+                        content: `Giao dịch thanh toán hóa đơn ${id}`,
+                        totalMoney: cost.totalMoney,
+                        costId: id,
+                        costType: cost.type
+                    }
+                );
+            }
         }
         catch (err) {
             console.error(err);
@@ -170,7 +198,17 @@ class CostController {
             let status = req.body.status;
             if(!id || !status) throw InputInfoEmpty;
 
-            let cost = await Cost.findByPk(id);
+            let cost = await Cost.findByPk(
+                id,
+                {
+                    include: [
+                        {
+                            model: User,
+                            as: "user"
+                        }
+                    ]
+                }
+            );
             if(!cost) throw CostNotFound;
 
             if(status === CostStatus.Done) {
@@ -188,19 +226,31 @@ class CostController {
                         }
                     );
 
-                    let trans = await Transaction.create(
-                        {
+                    let existTrans = await Transaction.findOne({
+                        where: {
                             forUserId: cost.user.id,
                             createdByUserId: 1,
-                            content: `Giao dịch thanh toán hóa đơn ${id}`,
                             totalMoney: cost.totalMoney,
                             costId: id,
                             costType: cost.type
-                        },
-                        {
-                            transaction: transaction
                         }
-                    );
+                    });
+
+                    if(!existTrans) {
+                        let trans = await Transaction.create(
+                            {
+                                forUserId: cost.user.id,
+                                createdByUserId: 1,
+                                content: `Giao dịch thanh toán hóa đơn ${id}`,
+                                totalMoney: cost.totalMoney,
+                                costId: id,
+                                costType: cost.type
+                            },
+                            {
+                                transaction: transaction
+                            }
+                        );
+                    }
 
                     await transaction.commit();
                 }

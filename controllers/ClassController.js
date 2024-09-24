@@ -11,6 +11,7 @@ const { TeacherQuerier } = require("../services/teacher/teacherQuerier");
 const { TimeHandle } = require("../utils/timeHandle");
 const util = require("util");
 const { UserRole } = require("../constants/roles");
+const { TeacherService } = require("../services/teacher/teacherService");
 
 const Class = require("../models").Class;
 const Student = require("../models").Student;
@@ -19,6 +20,8 @@ const Teacher = require("../models").Teacher;
 const StudentClass = require("../models").StudentClass;
 const TeacherClass = require("../models").TeacherClass;
 const Schedule = require("../models").Schedule;
+const Attendance = require("../models").Attendance;
+const Center = require("../models").Center;
 
 class ClassController {
     getClasses = async (req, res, next) => {
@@ -177,6 +180,18 @@ class ClassController {
                             {
                                 model: Schedule,
                                 as: "schedules"
+                            },
+                            {
+                                model: Student,
+                                as: "students"
+                            },
+                            {
+                                model: Attendance,
+                                as: "attendances"
+                            },
+                            {
+                                model: Center,
+                                as: "center"
                             }
                         ]
                     }
@@ -184,6 +199,8 @@ class ClassController {
             });
 
             if(!teacher.classes) return res.status(200).json([]);
+
+            await new TeacherService().attachTeacherSalary(teacher.classes, teacher.id);
 
             return res.status(200).json(teacher.classes);
         }

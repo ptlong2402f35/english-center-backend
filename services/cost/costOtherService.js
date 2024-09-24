@@ -9,7 +9,7 @@ class CostOtherService {
         try {
             let bData = {
                 referenceId: 0,
-                type: CostType.OtherFee,
+                type: data.type,
                 status: CostStatus.Pending,
                 totalMoney: data.totalMoney,
                 forMonth: data.month,

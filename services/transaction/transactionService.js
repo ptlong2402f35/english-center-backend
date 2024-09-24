@@ -51,12 +51,14 @@ class TransactionService {
             let debt = cost.debtMoney - trans.totalMoney;
             let paid = cost.paidMoney + trans.totalMoney;
             let status = debt === 0 ? CostStatus.Done : CostStatus.Debt;
+            let paidAt = status === CostStatus.Done ? new Date() : null;
 
             await cost.update(
                 {
                     debtMoney: debt,
                     paidMoney: paid,
-                    status: status
+                    status: status,
+                    paidAt: paidAt
                 },
                 {
                     transaction: transaction

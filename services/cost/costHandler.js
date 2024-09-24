@@ -16,14 +16,15 @@ class CostHandler {
                     studentId: item,
                     count: 1,
                     fee: 0,
-                    userId: fStudent?.student?.userId || 0
+                    userId: fStudent?.student?.userId || 0,
+                    classId: fStudent.classId
                 });
             }
         }
 
         for (let item of studentData) {
             let fItem = studentClasses.find(student => student.studentId === item.studentId);
-            if(fItem) continue;
+            if(!fItem) continue;
             let totalFee = (fee - fItem?.reduceFee) * item.count;
             item.fee = totalFee;
         }
@@ -46,7 +47,7 @@ class CostHandler {
                     count: 1,
                     fee: tc.salary
                 }
-            )
+            );
         }
 
         let totalMoney = 0;

@@ -32,7 +32,7 @@ class UserController {
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
 
-            let user = await User.findByPk();
+            let user = await User.findByPk(userId);
             if(!user) throw UserNotFound;
 
             await new UserUpdateService().updateDetail(data, userId);

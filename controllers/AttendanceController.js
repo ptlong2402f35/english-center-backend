@@ -4,10 +4,13 @@ const { AttendanceService } = require("../services/attendance/attendanceService"
 const { ErrorService } = require("../services/errorService");
 const { ClassStatus } = require("../constants/status");
 const { TimeHandle } = require("../utils/timeHandle");
+const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");
+const { UserRole } = require("../constants/roles");
 const Attendance = require("../models").Attendance;
 const StudentClass = require("../models").StudentClass;
 const Class = require("../models").Class;
 const Student = require("../models").Student;
+const Parent = require("../models").Parent;
 const Schedule = require("../models").Schedule;
 const Center = require("../models").Center;
 
@@ -220,6 +223,124 @@ class AttendanceController {
             }));
 
             return res.status(200).json(resp);
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    getAttendanceByStudent = async(req, res, next) => {
+        try {
+            let classId = req.query.classId ? parseInt(req.query.classId) : null;
+            let fromDate = req.query.fromDate || null;
+            let toDate = req.query.toDate || null;
+            let isJoin = req.query.isJoin?.trim() === "true" ? true : false;
+            let user = req.user;
+            if(!classId) throw InputInfoEmpty;
+            let student = await Student.findOne({where: {userId: user.userId}});
+            if(!student) return res.status(403).json({message: "Học sinh không tồn tại"});
+            let conds = [];
+            if(fromDate) {
+                conds.push({
+                    date: {
+                        [Op.gte]: fromDate
+                    }
+                })
+            }
+            if(toDate) {
+                conds.push({
+                    date: {
+                        [Op.lte]: toDate
+                    }
+                })
+            }
+            let studentClass = await StudentClass.findOne({
+                where: {
+                    studentId: student.id,
+                    classId: classId
+                }
+            });
+            if(!studentClass) return res.status(403).json({message: "Bạn không phải học sinh lớp này"});
+            if(user.role != UserRole.Student) return res.status(403).json({message: "Chức năng chỉ dành cho học sinh"});
+            if(isJoin) {
+                conds.push({
+                    studentIds: {
+                        [Op.contains]: [student.id]
+                    }
+                })
+            }
+            let data = await Attendance.findAll(
+                {
+                    where: {
+                        [Op.and]: [
+                            {classId: classId},
+                            ...conds
+                        ]
+                    },
+                    order: [["date", "asc"]]
+                }
+            );
+
+            return res.status(200).json(data);
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    getAttendanceByParent = async(req, res, next) => {
+        try {
+            let classId = req.query.classId ? parseInt(req.query.classId) : null;
+            let studentId = req.query.studentId ? parseInt(req.query.studentId) : null;
+            let fromDate = req.query.fromDate || null;
+            let toDate = req.query.toDate || null;
+            let isJoin = req.query.isJoin?.trim() === "true" ? true : false;
+            let user = req.user;
+            if(!classId || !studentId) throw InputInfoEmpty;
+            let parent = await Parent.findOne({where: {userId: user.userId}});
+            let student = await Student.findByPk(studentId);
+            if(!parent) return res.status(403).json({message: "Phụ huynh không tồn tại"})
+            if(!student) return res.status(403).json({message: "Học sinh không tồn tại"})
+            if(!await new ParentStudentService().checkConnect(parent.id, studentId)) return res.status(403).json({message: "Đây không phải con của bạn"});
+            let conds = [];
+            if(fromDate) {
+                conds.push({
+                    date: {
+                        [Op.gte]: fromDate
+                    }
+                })
+            }
+            if(toDate) {
+                conds.push({
+                    date: {
+                        [Op.lte]: toDate
+                    }
+                })
+            }
+            if(isJoin) {
+                conds.push({
+                    studentIds: {
+                        [Op.contains]: [studentId]
+                    }
+                })
+            }
+            let data = await Attendance.findAll(
+                {
+                    where: {
+                        [Op.and]: [
+                            {classId: classId},
+                            ...conds
+                        ],
+                    },
+                    order: [["date", "asc"]]
+                }
+            );
+
+            return res.status(200).json(data);
         }
         catch (err) {
             console.error(err);

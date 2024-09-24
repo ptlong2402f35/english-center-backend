@@ -14,7 +14,7 @@ class CostTeacherCreateService {
     constructor() {
         this.costHandler = new CostHandler();
     }
-    async createCost(teacherId, month, year) {
+    async createCost(teacherId, month, year, name) {
         try {
             let {
                 teacher,
@@ -29,8 +29,11 @@ class CostTeacherCreateService {
                     userId: 1
                 },
                 month, 
-                year);
-            await this.createCostInstances(builtData);
+                year,
+                name
+            );
+            console.log(builtData);
+            // await this.createCostInstances(builtData);
 
             return;
         }
@@ -61,7 +64,7 @@ class CostTeacherCreateService {
 
             let classIds = [... new Set(teacherClass.map(item => item.classId).filter(val => val))];
 
-            let sessions = await Attendance.findAll(
+            let attendances = await Attendance.findAll(
                 {
                     where: {
                         classId: {
@@ -80,7 +83,7 @@ class CostTeacherCreateService {
             return {
                 teacher,
                 teacherClass,
-                sessions
+                attendances
             }
         }
         catch (err) {
@@ -99,9 +102,10 @@ class CostTeacherCreateService {
         }
     }
 
-    async build(data, month, year) {
+    async build(data, month, year, name) {
         try {
             return ({
+                name: name,
                 referenceId: data.teacherId,
                 type: CostType.TeacherSalary,
                 status: CostStatus.Pending,

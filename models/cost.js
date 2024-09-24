@@ -12,7 +12,10 @@ module.exports = (sequelize, DataTypes) => {
 		
 
 		static associate(models) {
-
+			Cost.belongsTo(models.User, {
+                foreignKey: "forUserId",
+                as: "user"
+            });
 		}
 	}
 	Cost.init(
@@ -27,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
 			debtMoney: DataTypes.DOUBLE,
 			paidMoney: DataTypes.DOUBLE,
 			forYear: DataTypes.INTEGER,
+			paidAt: DataTypes.DATE,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},
