@@ -10,11 +10,11 @@ class ClassRegisterService {
     constructor () {}
     
     
-    async register(classId, studentId) {
+    async register(classId, studentId, {forAdmin} = {}) {
         try {
             let data = await this.fetch(classId);
             if(!data) throw ClassNotFound;
-            if(!await this.validate(data)) return;
+            if(!await this.validate(data, forAdmin)) return;
 
             //update class register
             let transaction = await sequelize.transaction();
@@ -43,7 +43,7 @@ class ClassRegisterService {
         }
     }
 
-    async unRegister(classId, studentId) {
+    async unRegister(classId, studentId, {forAdmin} = {}) {
         try {
             let data = await this.fetch(classId);
             if(!data) throw ClassNotFound;
@@ -100,8 +100,9 @@ class ClassRegisterService {
         }
     }
 
-    async validate(data) {
+    async validate(data, forAdmin) {
         try {
+            if(forAdmin) return true;
             if(data.status != ClassStatus.UnOpen) throw ClassStatusInvalid;
             if(data.startAt < new Date()) throw ClassHasOpened;
             if(data.studentQuantity >= data.maxQuantity) throw ClassHasEnoughStudent;

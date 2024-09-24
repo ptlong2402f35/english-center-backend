@@ -14,7 +14,7 @@ class CostCreateService {
     constructor() {
         this.costHandler = new CostHandler();
     }
-    async createCostByClass(classId, month, year) {
+    async createCostByClass(classId, month, year, name) {
         try {
             let {
                 classInfo,
@@ -22,8 +22,9 @@ class CostCreateService {
                 attendances
             } = await this.prepare(classId, year, month);
             let convertData = await this.costHandler.handleGetStudentAttendance(attendances, studentClasses, classInfo.fee);
-            let builtData = await this.build(convertData, month, year);
-            await this.createCostInstances(builtData);
+            let builtData = await this.build(convertData, month, year, name);
+            console.log(builtData);
+            // await this.createCostInstances(builtData);
 
             return;
         }
@@ -94,9 +95,10 @@ class CostCreateService {
         }
     }
 
-    async build(data, month, year) {
+    async build(data, month, year, name) {
         try {
             return data.map(item => ({
+                name: name,
                 referenceId: item.classId,
                 type: CostType.StudentFee,
                 status: CostStatus.Pending,

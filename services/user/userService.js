@@ -75,23 +75,19 @@ class UserService {
         try {
             let user = await this.fetchUser(userId);
             if(!user) throw UserNotFound;
-            let checkPass = bcrypt.compareSync(data.password, user.password);
-            if(checkPass) {
-                let passHashed = bcrypt.hashSync(data.password, 10);
-                let [count] = await User.update(
-                    {
-                        password: passHashed,
-                        updatedAt: new Date()
-                    },
-                    {
-                        where: {
-                            id: userId
-                        }
+            let passHashed = bcrypt.hashSync(data.password, 10);
+            let [count] = await User.update(
+                {
+                    password: passHashed,
+                    updatedAt: new Date()
+                },
+                {
+                    where: {
+                        id: userId
                     }
-                );
-                if(!count) throw UpdateFailMessage;
-            }
-            throw PasswordNotMatch;
+                }
+            );
+            if(!count) throw UpdateFailMessage;
         }
         catch (err) {
             throw err;

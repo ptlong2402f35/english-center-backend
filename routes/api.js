@@ -119,6 +119,8 @@ router.put("/attendance/:id", Auth.auth, AttendanceController.updateAttendance);
 router.delete("/attendance/:id", Auth.auth, AttendanceController.removeAttendance);
 //need update
 router.get("/my-schedule", Auth.auth, AttendanceController.getMyScheduleAttendace);
+router.get("/attendances-by-student", Auth.auth, AttendanceController.getAttendanceByStudent);
+router.get("/attendances-by-parent", Auth.auth, AttendanceController.getAttendanceByParent);
 
 /* Program Controller */
 router.get("/programs", Auth.onlyAdmin, ProgramController.getProgram);
