@@ -9,11 +9,13 @@ const { UserRole } = require("../constants/roles");
 const { sequelize } = require("../models");
 const Attendance = require("../models").Attendance;
 const StudentClass = require("../models").StudentClass;
+const TeacherClass = require("../models").TeacherClass;
 const Class = require("../models").Class;
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const Schedule = require("../models").Schedule;
 const Center = require("../models").Center;
+const Teacher = require("../models").Teacher;
 
 class AttendanceController {
     getAttendance = async(req, res, next) => {
@@ -156,17 +158,24 @@ class AttendanceController {
 
     removeAttendance = async (req, res, next) => {
         try {
-            let attendanceId = req.query.id ? parseInt(req.query.id) : null;
+            let attendanceId = req.params.id ? parseInt(req.params.id) : null;
             let user = req.user;
             let attendance = await Attendance.findByPk(attendanceId);
             if(!attendance) return res.status(403).json({message: "Buổi điểm danh không tồn tại"});
             if(!await new AttendanceService().permissionChecker(user, attendance.classId)) return res.status(403).json({message: "Bạn không là giáo viên của lớp này"});
-
+            let infoClass = await Class.findOne({where: {id: attendance.classId}});
             await Attendance.destroy(
                 {
                     where: {
                         id: attendanceId
                     }
+                }
+            );
+
+            await infoClass.update(
+                {
+                    teachedSession: infoClass.teachedSession - 1,
+                    updatedAt: new Date()
                 }
             );
 
@@ -198,6 +207,81 @@ class AttendanceController {
             });
 
             let classIds = [...new Set(studenClass.map(item => item.classId).filter(val => val))];
+            let classes = await Class.findAll(
+                {
+                    where: {
+                        id: {
+                            [Op.in]: classIds
+                        },
+                        status: {
+                            [Op.notIn]: [ClassStatus.Finish, ClassStatus.Disable]
+                        }
+                    },
+                    include: [
+                        {
+                            model: Schedule,
+                            as: "schedules"
+                        },
+                        {
+                            model: Center,
+                            as: "center"
+                        }
+                    ]
+                }
+            );
+            
+            let ret =[];
+            for(let item of classes) {
+                if(!item.schedules?.length) continue;
+                let scheduleData = TimeHandle.getAllScheduleDayOfClass(item.startAt, item.endAt, item.totalSession, item.schedules, item);
+                for(let item of scheduleData) {
+                    let fItem = ret.find(key => key.key === item.key);
+                    if(fItem) {
+                        fItem.value = [...fItem.value, ...item.value];
+                    }
+                    else {
+                        ret.push({
+                            key: item.key,
+                            value: [...item.value]
+                        })
+                    }
+                }
+            }
+
+            ret.sort((a,b) => (new Date(a.key) < new Date(b.key) ? -1 : 1));
+
+            let resp = ret.map(item => ({
+                [item.key]: item.value
+            }));
+
+            return res.status(200).json(resp);
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    teacherGetMyScheduleAttendace = async (req, res, next) => {
+        try {
+            let user = req.user;
+            if(user.role != UserRole.Teacher) return res.status(403).json({message: "Chức năng chỉ dành cho giáo viên"});
+            let teacher = await Teacher.findOne(
+                {
+                    where: {
+                        userId: user.userId
+                    }
+                }
+            );
+            if(!teacher) return res.status(403).json({message: "giao vien không tồn tại"});
+            let teacherClass = await TeacherClass.findAll({
+                where: {
+                    teacherId: teacher.id
+                }
+            });
+
+            let classIds = [...new Set(teacherClass.map(item => item.classId).filter(val => val))];
             let classes = await Class.findAll(
                 {
                     where: {

@@ -135,13 +135,9 @@ class ClassRegisterService {
                 return;
             }
             let reduceFee = 0;
-            console.log("conds1", data?.program?.reduceValue);
-            console.log("conds2", data?.program?.reducePercent);
-            console.log("conds3", data?.fee);
             if(data?.program?.startAt <= new Date() && data?.program?.endAt >= new Date()) {
                 reduceFee = data?.program?.reduceValue || (data?.program?.reducePercent * data?.fee / 100) || 0
             }
-            console.log("reduce", reduceFee);
             await StudentClass.create(
                 {
                     studentId: data?.studentId,
@@ -167,14 +163,12 @@ class ClassRegisterService {
     }
 
     async updateClass(data, classId, transaction, {isRemove} = {}) {
-        console.log("data", data);
         let initTrans = false;
         if(!transaction) {
             transaction = await sequelize.transaction();
             initTrans = true;
         }
         try {
-            console.log("quantity", data.studentQuantity)
             await Class.update(
                 {
                     studentQuantity: isRemove ? data.studentQuantity - 1 : data.studentQuantity + 1,

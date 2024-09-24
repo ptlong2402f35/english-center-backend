@@ -105,7 +105,7 @@ router.get("/request", Auth.auth, RequestController.getMyRequest);
 router.get("/request/:id", Auth.auth, RequestController.getRequestDetail);
 router.post("/request", Auth.auth, RequestController.createConnect);
 router.put("/request/:id", Auth.auth, RequestController.updateRequestStatus);
-router.post("/request-remove/:id", Auth.auth, RequestController.removeConnect);
+router.post("/request-remove", Auth.auth, RequestController.removeConnect);
 router.get("/request-by-admin", Auth.onlyAdmin, RequestController.adminGetRequest);
 router.post("/admin-create-connect", Auth.onlyAdmin, RequestController.adminCreateConnect);
 router.post("/admin-remove-connect", Auth.onlyAdmin, RequestController.adminRemoveConnect);
@@ -116,8 +116,8 @@ router.get("/attendance/:id", AttendanceController.getAttendanceDetail);
 router.post("/attendance", Auth.auth, AttendanceController.createAttendance);
 router.put("/attendance/:id", Auth.auth, AttendanceController.updateAttendance);
 router.delete("/attendance/:id", Auth.auth, AttendanceController.removeAttendance);
-//need update
 router.get("/my-schedule", Auth.auth, AttendanceController.getMyScheduleAttendace);
+router.get("/my-schedule-by-teacher", Auth.auth, AttendanceController.teacherGetMyScheduleAttendace);
 router.get("/attendances-by-student", Auth.auth, AttendanceController.getAttendanceByStudent);
 router.get("/attendances-by-parent", Auth.auth, AttendanceController.getAttendanceByParent);
 
