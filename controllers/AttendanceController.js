@@ -6,6 +6,7 @@ const { ClassStatus } = require("../constants/status");
 const { TimeHandle } = require("../utils/timeHandle");
 const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");
 const { UserRole } = require("../constants/roles");
+const { sequelize } = require("../models");
 const Attendance = require("../models").Attendance;
 const StudentClass = require("../models").StudentClass;
 const Class = require("../models").Class;
@@ -82,13 +83,35 @@ class AttendanceController {
             if(!data.date || !data.classId) throw InputInfoEmpty;
             if(!await new AttendanceService().permissionChecker(user, data.classId)) return res.status(403).json({message: "Bạn không là giáo viên của lớp này"});
 
+            let infoClass = await Class.findOne({
+                where: {
+                    id: data.classId
+                }
+            });
+            if(!infoClass) return res.status(403).json({message: "Lớp này không tồn tại"});
             let convertData = {
                 classId: data.classId,
                 date: data.date,
                 studentIds: data.studentIds || [],
             }
-
-            await Attendance.create(convertData);
+            let trans = await sequelize.transaction();
+            try {
+                await Attendance.create(convertData, {transaction: trans});
+                await infoClass.update(
+                    {
+                        teachedSession: infoClass.teachedSession + 1,
+                        updatedAt: new Date()
+                    },
+                    {
+                        transaction: trans
+                    }
+                );
+                await trans.commit();
+            }
+            catch (err1) {
+                await trans.rollback();
+                console.error(err1);
+            }
 
             return res.status(200).json({message: "Thành công"});
         }

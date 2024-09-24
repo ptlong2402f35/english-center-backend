@@ -17,7 +17,7 @@ class ClassCreateService {
             let transaction = await sequelize.transaction();
             try {
                 await this.createClassInstance(builtData);
-                await transaction.rollback();
+                await transaction.commit();
             }
             catch (err1) {
                 await transaction.rollback();

@@ -65,6 +65,8 @@ class AttendanceService {
                 logging: true
             });
 
+            classIds = [...new Set(attendances.map(item => item.classId))];
+
             return {
                 attendances,
                 classIds
@@ -82,16 +84,16 @@ class AttendanceService {
             for(let info of classes) {
                 let fAtt = attendances.filter(att => att.classId === info.id);
                 if(!fAtt) {
-                    info.classes = [];
-                    info.setDataValue("classes", []);
-                    info.teachedSession = 0;
-                    info.setDataValue("teachedSession", 0);
+                    info.attendances = [];
+                    info.setDataValue("attendances", []);
+                    info.teachedCount = 0;
+                    info.setDataValue("teachedCount", 0);
                     continue;
                 }
-                info.classes = fAtt;
-                info.setDataValue("classes", fAtt);
-                info.teachedSession = fAtt.length;
-                info.setDataValue("teachedSession", fAtt.length);
+                info.attendances = fAtt;
+                info.setDataValue("attendances", fAtt);
+                info.teachedCount = fAtt.length;
+                info.setDataValue("teachedCount", fAtt.length);
             }
         }
         catch (err) {
