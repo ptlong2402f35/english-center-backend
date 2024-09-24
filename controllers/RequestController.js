@@ -297,7 +297,7 @@ class RequestController {
                 });
                 if(!student) return res.status(403).json({message: "Học sinh không tồn tại"});
                 if(!request) return res.status(403).json({message: "Yêu cầu không tồn tại"});
-                if(request.requestByRoleId === user.role) return res.status(403).json({message: "Bạn là người đưa ra yêu cầu"});
+                if(request.requestByRoleId === user.role) return res.status(403).json({message: "Bạn là người đưa ra yêu cầu, không thể thay đổi trạng thái"});
                 await request.update(
                     {
                         status: status,
@@ -385,9 +385,9 @@ class RequestController {
 
     removeConnect = async (req, res, next) => {
         try {
-            let connectId = req.params.id ? parseInt(req.params.id) : null;
+            let targetId = req.body.targetId;
             let user = req.user;
-            if(!connectId) throw InputInfoEmpty;
+            if(!targetId) throw InputInfoEmpty;
             if(user.role === UserRole.Parent) {
                 let roleObj = await Parent.findOne(
                     {
@@ -396,11 +396,13 @@ class RequestController {
                         }
                     }
                 );
+                let student = await Student.findByPk(targetId);
+                if(!student) return res.status(200).json({message: "Học sinh không tồn tại"});
                 await ParentStudent.destroy(
                     {
                         where: {
                             parentId: roleObj.id,
-                            id: connectId
+                            studentId: student.id
                         }
                     }
                 );
@@ -415,11 +417,13 @@ class RequestController {
                         }
                     }
                 );
+                let parent = await Parent.findByPk(targetId);
+                if(!parent) return res.status(200).json({message: "Phụ huynh không tồn tại"});
                 await ParentStudent.destroy(
                     {
                         where: {
                             studentId: roleObj.id,
-                            id: connectId
+                            parentd: targetId
                         }
                     }
                 );
@@ -530,16 +534,18 @@ class RequestController {
 
     adminRemoveConnect = async (req, res, next) => {
         try {
-            let id = req.params.id ? parseInt(req.params.id) : null;
-            if(!id) throw InputInfoEmpty
+            let studentId = req.body.studentId || null;
+            let parentId = req.body.parentId || null;
+            if(!studentId || !parentId) throw InputInfoEmpty;
 
             let count = await ParentStudent.destroy(
                 {
                     where: {
-                        id : id
+                        studentId,
+                        parentId
                     }
                 }
-            )
+            );
 
             return res.status(200).json({message: "Thành công"})
         }
