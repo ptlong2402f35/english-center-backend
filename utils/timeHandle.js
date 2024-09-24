@@ -28,8 +28,6 @@ class TimeHandle {
     }
 
     static getStartAndEndDayOfMonth(m, y) {
-        console.log("date", y);
-        console.log("date", m-1);
         var first = new Date(y, m - 1, 1);
         var last = new Date(y, m, 0);
         return {
