@@ -6,9 +6,12 @@ const { TeacherQuerier } = require("../services/teacher/teacherQuerier");
 const { TeacherUpdateService } = require("../services/teacher/teacherUpdateService");
 const { UserRole } = require("../constants/roles");
 const { ClassStatus } = require("../constants/status");
+const { AttendanceService } = require("../services/attendance/attendanceService");
+const { TeacherService } = require("../services/teacher/teacherService");
 const Teacher = require("../models").Teacher;
 const TeacherClass = require("../models").TeacherClass;
 const Class = require("../models").Class;
+const Attendance = require("../models").Attendance;
 
 class TeacherController {
     getTeachers = async (req, res, next) => {
@@ -193,9 +196,32 @@ class TeacherController {
         }
     }
 
-    getSalaryHistory = async (req, res, next) => {
+    getTeachedSessionInTime = async (req, res, next) => {
         try {
-            //get from costs table
+            let userId = req.user.userId;
+            let forMonth =req.query.forMonth ? parseInt(req.query.forMonth) : null;
+            let forYear =req.query.forYear ? parseInt(req.query.forYear) : null;
+            if(!forMonth || !forYear) throw InputInfoEmpty;
+            if(req.user.role != UserRole.Teacher && req.user.role != UserRole.Admin) {
+                return res.status(403).json({message: "Chức năng chỉ dành cho giáo viên"});
+            }
+            let teacher = await Teacher.findOne({
+                where: {userId: userId},
+            });
+            if(!teacher) return res.status(403).json({message: "Giáo viên không tồn tại"});
+
+            let {classIds, attendances} = await new AttendanceService().getTeacherAttendanceDependOnTime(teacher.id, forMonth, forYear);
+            let classes = await Class.findAll({
+                where: {
+                    id: {
+                        [Op.in]: classIds
+                    }
+                }
+            });
+            await new TeacherService().attachTeacherSalary(classes, teacher.id);
+            await new AttendanceService().groupAttendanceByClass(attendances, classes);
+
+            return res.status(200).json(classes);
         }
         catch (err) {
             console.error(err);

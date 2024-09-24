@@ -78,15 +78,15 @@ router.get("/class-by-parent/:studentId", Auth.auth, ClassController.parentGetSt
 router.post("/class", Auth.onlyAdmin, ClassController.createClass);
 router.put("/class/:id", Auth.onlyAdmin, ClassController.updateClass);
 router.put("/class-deactive/:id", Auth.onlyAdmin, ClassController.deactiveClass);
-router.post("/register-by-student/:id", Auth.auth, ClassController.studentRegisterClass);
+router.post("/register-by-student", Auth.auth, ClassController.studentRegisterClass);
 router.post("/register-by-parent", Auth.auth, ClassController.parentRegisterClass);
 router.post("/register-by-admin", Auth.onlyAdmin, ClassController.adminRegisterClass);
 router.get("/registed-checker", ClassController.studentCheckRegisted);
 router.get("/registed-checker-by-parent", ClassController.parentCheckStudentsRegisted);
 
 //unregist
-router.post("/unregister-by-student/:id", Auth.auth, ClassController.studentUnRegisterClass);
-router.post("/unregister-by-parent", Auth.auth, ClassController.studentUnRegisterClass);
+router.post("/unregister-by-student", Auth.auth, ClassController.studentUnRegisterClass);
+router.post("/unregister-by-parent", Auth.auth, ClassController.parentUnRegisterClass);
 router.post("/unregister-by-admin", Auth.onlyAdmin, ClassController.adminUnRegisterClass);
 
 /* Teacher Controller */
@@ -98,8 +98,7 @@ router.put("/teacher/:id", Auth.onlyAdmin, TeacherController.adminUpdateTeacherD
 router.post("/teacher", Auth.onlyAdmin, TeacherController.adminCreateTeacher);
 router.post("/add-teacher-to-class", Auth.onlyAdmin, TeacherController.adminAssignTeacherToClass);
 //need update
-router.get("/teacher-salary", Auth.auth, TeacherController.getSalaryHistory);
-router.get("/teacher-salary/:id", Auth.auth, TeacherController.getSalaryHistory);
+router.get("/teached-session", Auth.auth, TeacherController.getTeachedSessionInTime);
  
 /* Request Controller */
 router.get("/request", Auth.auth, RequestController.getMyRequest);

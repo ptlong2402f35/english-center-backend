@@ -294,7 +294,7 @@ class ClassController {
     studentRegisterClass = async (req, res, next) => {
         try {
             let userId = req.user.userId;
-            let classId = req.params.id ? parseInt(req.params.id) : null;
+            let classId = req.body.classId ? parseInt(req.body.classId) : null;
             if(!userId) throw UserNotFound;
             if(!classId) throw ClassNotFound;
             let student = await Student.findOne({
@@ -408,7 +408,7 @@ class ClassController {
     studentUnRegisterClass = async (req, res, next) => {
         try {
             let userId = req.user.userId;
-            let classId = req.params.id ? parseInt(req.params.id) : null;
+            let classId = req.body.classId ? parseInt(req.body.classId) : null;
             if(!userId) throw UserNotFound;
             if(!classId) throw ClassNotFound;
             let student = await Student.findOne({
@@ -443,7 +443,7 @@ class ClassController {
             let studentId = req.body.studentId;
             if(!studentId) throw UserNotFound;
             if(req.user.role != UserRole.Parent) return res.status(403).json({message: "Chức năng này chỉ dành cho phụ huynh"});
-
+            let userId = req.user.userId;
             let parent = await Parent.findOne({
                 where: {
                     userId: req.user.userId
@@ -458,7 +458,7 @@ class ClassController {
             if(!classId) throw ClassNotFound;
             let student = await Student.findOne({
                 where: {
-                    userId: userId
+                    id: studentId
                 }
             });
             if(!student) throw StudentNotFound;

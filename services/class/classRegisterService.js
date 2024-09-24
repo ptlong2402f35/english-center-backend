@@ -167,15 +167,17 @@ class ClassRegisterService {
     }
 
     async updateClass(data, classId, transaction, {isRemove} = {}) {
+        console.log("data", data);
         let initTrans = false;
         if(!transaction) {
             transaction = await sequelize.transaction();
             initTrans = true;
         }
         try {
+            console.log("quantity", data.studentQuantity)
             await Class.update(
                 {
-                    studentQuantity: isRemove ? data.studentQuantity -1 : data.studentQuantity + 1,
+                    studentQuantity: isRemove ? data.studentQuantity - 1 : data.studentQuantity + 1,
                     updatedAt: new Date()
                 },
                 {

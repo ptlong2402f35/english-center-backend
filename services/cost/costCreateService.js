@@ -35,7 +35,7 @@ class CostCreateService {
 
     async prepare(classId, year, month) {
         try {
-            let {first, last} = TimeHandle.getStartAndEndDayOfMonth(year, month);
+            let {first, last} = TimeHandle.getStartAndEndDayOfMonth(month, year);
             let [classInfo, studentClasses, attendances] = await Promise.all([
                 Class.findOne(
                     {
@@ -62,7 +62,7 @@ class CostCreateService {
                     {
                         where: {
                             classId: classId,
-                            day: {
+                            date: {
                                 [Op.gte]: first
                             },
                             date: {
