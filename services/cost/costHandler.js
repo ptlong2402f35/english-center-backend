@@ -25,7 +25,7 @@ class CostHandler {
         for (let item of studentData) {
             let fItem = studentClasses.find(student => student.studentId === item.studentId);
             if(!fItem) continue;
-            let totalFee = (fee - fItem?.reduceFee) * item.count;
+            let totalFee = (fee - (fItem?.reduceFee || 0)) * item.count;
             item.fee = totalFee;
         }
 
@@ -51,6 +51,7 @@ class CostHandler {
         }
 
         let totalMoney = 0;
+        console.log(ret);
         for(let item of ret) {
             totalMoney += item.count * item.fee;
         }

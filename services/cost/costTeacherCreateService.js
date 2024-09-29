@@ -21,6 +21,9 @@ class CostTeacherCreateService {
                 teacherClass, 
                 attendances
             } = await this.prepare(teacherId, year, month);
+            if(!attendances || !attendances.length) return {
+                create: false
+            }
             let salary = await this.costHandler.handleProcessTeacherSalary(teacherClass, attendances);
             let builtData = await this.build(
                 {
@@ -33,9 +36,11 @@ class CostTeacherCreateService {
                 name
             );
             console.log(builtData);
-            // await this.createCostInstances(builtData);
+            await this.createCostInstances(builtData);
 
-            return;
+            return {
+                create: true
+            };
         }
         catch (err) {
             throw err;
@@ -67,15 +72,17 @@ class CostTeacherCreateService {
             let attendances = await Attendance.findAll(
                 {
                     where: {
-                        classId: {
-                            [Op.in]: classIds
-                        },
-                        date: {
-                            [Op.gte]: first
-                        },
-                        date: {
-                            [Op.lte]: last
-                        }
+                        [Op.and]: [
+                            {classId: {
+                                [Op.in]: classIds
+                            }},
+                            {date: {
+                                [Op.gte]: first
+                            }},
+                            {date: {
+                                [Op.lte]: last
+                            }}
+                        ]
                     }
                 }
             );
@@ -104,6 +111,7 @@ class CostTeacherCreateService {
 
     async build(data, month, year, name) {
         try {
+            let timerTime = new Date(year, month - 1, 1);
             return ({
                 name: name,
                 referenceId: data.teacherId,
@@ -113,8 +121,9 @@ class CostTeacherCreateService {
                 forMonth: month,
                 forYear: year,
                 forUserId: data.userId,
-                debtMoney: 0,
-                paidMoney: 0
+                debtMoney: data.salary,
+                paidMoney: 0,
+                timerTime: timerTime
             });
         }
         catch (err) {

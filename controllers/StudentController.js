@@ -6,6 +6,7 @@ const { ParentStudentService } = require("../services/parentStudentService/paren
 const { StudentUpdateService } = require("../services/student/studentUpdateService");
 const { StudentQuerier } = require("../services/student/studentQuerier");
 const { AuthService } = require("../services/auth/authService");
+const { StudentService } = require("../services/student/studentService");
 
 const User = require("../models").User;
 const Student = require("../models").Student;
@@ -135,7 +136,7 @@ class StudentController {
 
             let conds = studentQuerier.buildWhere({name, age, active});
             let attributes = studentQuerier.buildAttributes({});
-            let include = studentQuerier.buildInclude({includeParent: true, includeClass: true});
+            let include = studentQuerier.buildInclude({includeParent: true, includeClass: true, includeUser: true});
             let orderBy = studentQuerier.buildSort({});
 
             let data = await Student.paginate({
@@ -150,6 +151,11 @@ class StudentController {
             });
 
             data.currentPage = page;
+
+            for(let student of data.docs) {
+                new StudentService().attachUnJoinClassCount(student.classes, student.id);
+            }
+
 
             return res.status(200).json(data)
         }

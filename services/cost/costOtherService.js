@@ -7,7 +7,9 @@ class CostOtherService {
 
     async createCost(data) {
         try {
+            let timerTime = new Date(data.year, data.month - 1, 1);
             let bData = {
+                name: data.name,
                 referenceId: 0,
                 type: data.type,
                 status: CostStatus.Pending,
@@ -15,9 +17,10 @@ class CostOtherService {
                 forMonth: data.month,
                 forYear: data.year,
                 forUserId: 1,
-                debtMoney: 0,
+                debtMoney: data.totalMoney,
                 paidMoney: 0,
-                otherType: data.otherType
+                otherType: data.otherType,
+                timerTime: timerTime
             }
             await Cost.create(bData);
 
