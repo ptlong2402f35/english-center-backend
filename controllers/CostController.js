@@ -9,11 +9,13 @@ const { CostStatus } = require("../constants/status");
 const { sequelize } = require("../models");
 const { TransactionService } = require("../services/transaction/transactionService");
 const { CostType } = require("../constants/type");
+const { CostService } = require("../services/cost/costService");
 const Transaction = require("../models").Transaction;
 const Cost = require("../models").Cost;
 const User = require("../models").User;
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
+const Teacher = require("../models").Teacher;
 const ParentStudent = require("../models").ParentStudent;
 
 class CostController {
@@ -39,14 +41,14 @@ class CostController {
             }
             if(fromDate) {
                 conds.push({
-                    fromDate: {
+                    timerTime: {
                         [Op.gte]: fromDate
                     }
                 });
             }
             if(toDate) {
                 conds.push({
-                    toDate: {
+                    timerTime: {
                         [Op.lte]: toDate
                     }
                 });
@@ -59,6 +61,12 @@ class CostController {
                     where: {
                         [Op.and]: conds
                     },
+                    include: [
+                        {
+                            model: Transaction,
+                            as: "transactions"
+                        }
+                    ],
                     order: [["id", "desc"]]
                 }
             );
@@ -75,7 +83,6 @@ class CostController {
 
     getCostDetail = async (req, res, next) => {
         try {
-            let user = req.user;
             let id = req.params.id ? parseInt(req.params.id) : null;
             if(!id) throw InputInfoEmpty;
             let data = await Cost.findByPk(id);
@@ -89,12 +96,202 @@ class CostController {
         }
     }
 
+    parentGetCosts = async (req, res, next) => {
+        try {
+            let user = req.user;
+            if(user.role != UserRole.Parent) return res.status(403).json({message: "Chức năng chỉ dành cho phụ huynh"});
+            let page = req.query.page ? parseInt(req.query.page) : 1;
+            let perPage = req.query.perPage ? parseInt(req.query.perPage) : 50;
+            let forUserId = req.query.forUserId ? parseInt(req.query.forUserId) : null;
+            let type = req.query.type ? parseInt(req.query.type) : null;
+            let referenceId = req.query.referenceId ? parseInt(req.query.referenceId) : null;
+            let fromDate = req.query.fromDate || null;
+            let toDate = req.query.toDate || null;
+
+            let conds = [];
+            if(forUserId) {
+                conds.push({forUserId: forUserId});
+            }
+            if(type) {
+                conds.push({type: type});
+            }
+            if(referenceId) {
+                conds.push({referenceId: referenceId});
+            }
+            if(fromDate) {
+                conds.push({
+                    timerTime: {
+                        [Op.gte]: fromDate
+                    }
+                });
+            }
+            if(toDate) {
+                conds.push({
+                    timerTime: {
+                        [Op.lte]: toDate
+                    }
+                });
+            }
+
+            let parent = await Parent.findOne({
+                where: {
+                    userId: user.userId
+                },
+                include: [
+                    {
+                        model: Student,
+                        as: "childs"
+                    }
+                ]
+            });
+            if(!parent) return res.status(403).json({message: "Phụ huynh không tồn tại"});
+            let childUserIds = (parent?.childs || [])?.map(item => item.userId).filter(val => val);
+
+            let data = await Cost.paginate(
+                {
+                    page: page,
+                    paginate: perPage,
+                    where: {
+                        [Op.and]: [
+                            ...conds,
+                            {
+                                forUserId: {
+                                    [Op.in]: childUserIds
+                                }
+                            },
+                            {
+                                type: CostType.StudentFee
+                            }
+                        ]
+                    },
+                    include: [
+                        {
+                            model: Transaction,
+                            as: "transactions"
+                        },
+                        {
+                            model: User,
+                            as: "user",
+                            attributes: ["id", "role"],
+                            include: [
+                                {
+                                    model: Student,
+                                    as: "student"
+                                }
+                            ]
+                        }
+                    ],
+                    order: [["id", "desc"]]
+                }
+            );
+
+            data.currentPage = page;
+            return res.status(200).json(data);
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    teacherGetCosts = async (req, res, next) => {
+        try {
+            let user = req.user;
+            if(user.role != UserRole.Teacher) return res.status(403).json({message: "Chức năng chỉ dành cho giáo viên"});
+            let page = req.query.page ? parseInt(req.query.page) : 1;
+            let perPage = req.query.perPage ? parseInt(req.query.perPage) : 50;
+            let forUserId = req.query.forUserId ? parseInt(req.query.forUserId) : null;
+            let type = req.query.type ? parseInt(req.query.type) : null;
+            let referenceId = req.query.referenceId ? parseInt(req.query.referenceId) : null;
+            let fromDate = req.query.fromDate || null;
+            let toDate = req.query.toDate || null;
+
+            let conds = [];
+            if(forUserId) {
+                conds.push({forUserId: forUserId});
+            }
+            if(type) {
+                conds.push({type: type});
+            }
+            if(referenceId) {
+                conds.push({referenceId: referenceId});
+            }
+            if(fromDate) {
+                conds.push({
+                    timerTime: {
+                        [Op.gte]: fromDate
+                    }
+                });
+            }
+            if(toDate) {
+                conds.push({
+                    timerTime: {
+                        [Op.lte]: toDate
+                    }
+                });
+            }
+
+            let teacher = await Teacher.findOne({
+                where: {
+                    userId: user.userId
+                }
+            })
+
+            let data = await Cost.paginate(
+                {
+                    page: page,
+                    paginate: perPage,
+                    where: {
+                        [Op.and]: [
+                            ...conds,
+                            {
+                                referenceId: teacher.id
+                            },
+                            {
+                                type: CostType.TeacherSalary
+                            }
+                        ]
+                    },
+                    include: [
+                        {
+                            model: Transaction,
+                            as: "transactions"
+                        }
+                    ],
+                    order: [["id", "desc"]]
+                }
+            );
+
+            data.currentPage = page;
+            return res.status(200).json(data);
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
     createClassCost = async (req, res, next) => {
         try {
             let data = req.body;
             if(!data.classId || !data.month || !data.year || !data.name) throw InputInfoEmpty;
 
-            await new CostCreateService().createCostByClass(data.classId, data.month, data.year, data.name);
+            let costs = await Cost.findOne({
+                where: {
+                    name: data.name,
+                    forMonth: data.month,
+                    forYear: data.year,
+                    referenceId: data.classId,
+                    type: CostType.StudentFee
+                }
+            });
+            if(costs) return res.status(422).json({message: "Hóa đơn này đã tồn tại"});
+
+            let {userIds} = await new CostCreateService().createCostByClass(data.classId, data.month, data.year, data.name);
+
+            new CostService().createNewCostNoti(userIds, data.month, data.year);
 
             return res.status(200).json({message: "Thành công"});
         }
@@ -109,8 +306,21 @@ class CostController {
         try {
             let data = req.body;
             if(!data.teacherId || !data.month || !data.year || !data.name) throw InputInfoEmpty;
-
-            await new CostTeacherCreateService().createCost(data.teacherId, data.month, data.year, data.name);
+            let costs = await Cost.findOne({
+                where: {
+                    name: data.name,
+                    forMonth: data.month,
+                    forYear: data.year,
+                    referenceId: data.teacherId,
+                    type: CostType.TeacherSalary
+                }
+            });
+            if(costs) return res.status(422).json({message: "Hóa đơn này đã tồn tại"});
+            let {create} = await new CostTeacherCreateService().createCost(data.teacherId, data.month, data.year, data.name);
+            if(!create) {
+                return res.status(403).json({message: "Giáo viên chưa dạy buổi học nào"});
+            }
+            new CostService().onCreateNotiTransToTeacher(data.teacherId, data.month, data.year);
 
             return res.status(200).json({message: "Thành công"});
         }
@@ -154,6 +364,7 @@ class CostController {
                     ]
                 }
             );
+            if(!cost) return res.status(403).json({message: "Hóa đơn không tồn tại"})
             if(![CostType.ElecFee, CostType.OtherFee, CostType.WaterFee].includes(cost.type)) return res.status(403).json({message: "Loại hóa đơn không hợp lệ"});
             if(!cost) return res.status(422).json({message: "Hóa đơn không tồn tai"});
             await cost.update(
@@ -162,28 +373,7 @@ class CostController {
                 }
             );
 
-            let existTrans = await Transaction.findOne({
-                where: {
-                    forUserId: cost.user.id,
-                    createdByUserId: 1,
-                    totalMoney: cost.totalMoney,
-                    costId: id,
-                    costType: cost.type
-                }
-            });
-
-            if(!existTrans) {
-                let trans = await Transaction.create(
-                    {
-                        forUserId: cost.user.id,
-                        createdByUserId: 1,
-                        content: `Giao dịch thanh toán hóa đơn ${id}`,
-                        totalMoney: cost.totalMoney,
-                        costId: id,
-                        costType: cost.type
-                    }
-                );
-            }
+            return res.status(200).json({message: "Thành công"});
         }
         catch (err) {
             console.error(err);
@@ -210,7 +400,7 @@ class CostController {
                 }
             );
             if(!cost) throw CostNotFound;
-
+            console.log("cost", cost);
             if(status === CostStatus.Done) {
                 let transaction = await sequelize.transaction();
                 try {
@@ -225,23 +415,34 @@ class CostController {
                             transaction: transaction
                         }
                     );
+                    let targetId = 0;
+                    if(cost.type === CostType.StudentFee) {
+                        targetId = cost.user.id;
+                    }
+                    if(cost.type === CostType.TeacherSalary) {
+                        let teacherId = cost.referenceId;
+                        let teacher = await Teacher.findByPk(teacherId);
+                        if(!teacher) return res.status(403).json({message: "Giáo viên không tồn tại"});
+                        targetId = teacher.userId;
+                    }
 
                     let existTrans = await Transaction.findOne({
                         where: {
-                            forUserId: cost.user.id,
+                            forUserId: targetId,
                             createdByUserId: 1,
                             totalMoney: cost.totalMoney,
                             costId: id,
                             costType: cost.type
-                        }
+                        },
+                        logging: true
                     });
 
                     if(!existTrans) {
                         let trans = await Transaction.create(
                             {
-                                forUserId: cost.user.id,
+                                forUserId: targetId,
                                 createdByUserId: 1,
-                                content: `Giao dịch thanh toán hóa đơn ${id}`,
+                                content: `Giao dịch thanh toán hóa đơn ${cost.name || id}`,
                                 totalMoney: cost.totalMoney,
                                 costId: id,
                                 costType: cost.type
@@ -253,6 +454,8 @@ class CostController {
                     }
 
                     await transaction.commit();
+
+
                 }
                 catch (err1) {
                     await transaction.rollback();
@@ -267,6 +470,26 @@ class CostController {
                         paidMoney: 0,
                     }
                 );
+                let targetId = 0;
+                if(cost.type === CostType.StudentFee) {
+                    targetId = cost.user.id;
+                }
+                if(cost.type === CostType.TeacherSalary) {
+                    let teacherId = cost.referenceId;
+                    let teacher = await Teacher.findByPk(teacherId);
+                    if(!teacher) return res.status(403).json({message: "Giáo viên không tồn tại"});
+                    targetId = teacher.userId;
+                }
+                await Transaction.destroy({
+                    where: {
+                        forUserId: targetId,
+                        createdByUserId: 1,
+                        totalMoney: cost.totalMoney,
+                        costId: id,
+                        costType: cost.type
+                    }
+                });
+                new CostService().onCreateNotiTransToUser(cost);
             }
 
             return res.status(200).json({message: "Thành công"});

@@ -40,6 +40,7 @@ router.post("/user", Auth.onlyAdmin, UserController.adminCreateUser);
 router.get("/user-detail/:id", Auth.onlyAdmin, UserController.adminGetUserDetail);
 router.put("/user-detail-by-admin/:id", Auth.onlyAdmin, UserController.adminUpdateUserDetail);
 router.put("/user-deactive/:id", Auth.onlyAdmin, UserController.adminDeactiveUser);
+router.put("/user-password-by-admin/:id", Auth.onlyAdmin, UserController.adminUpdateUserPassword);
 
 /* Student Controller */
 // router.get("/my-student-detail", Auth.auth, StudentController.getMyDetail);
@@ -151,6 +152,8 @@ router.get("/payment-success", Auth.auth, TransactionController.paymentSuccess);
 
 /* Cost Controller */
 router.get("/costs", Auth.onlyAdmin, CostController.getCosts);
+router.get("/costs-by-parent", Auth.auth, CostController.parentGetCosts);
+router.get("/costs-by-teacher", Auth.auth, CostController.teacherGetCosts);
 router.get("/cost/:id", Auth.onlyAdmin, CostController.getCostDetail);
 router.post("/cost-class", Auth.onlyAdmin, CostController.createClassCost);
 router.post("/cost-teacher", Auth.onlyAdmin, CostController.createTeacherSalary);

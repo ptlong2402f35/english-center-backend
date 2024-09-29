@@ -23,6 +23,25 @@ class CommunicationService {
             console.error(err);
         }
     }
+
+    async sendBulkNotificationToUserId(userIds, title, content, type, {actionType} = {}) {
+        try {
+            await Notification.bulkCreate(userIds.map(item => (
+                {
+                    toUserId: item,
+                    type: type,
+                    title,
+                    content,
+                    ...(actionType ? {actionType: actionType} : {}),
+                    seen: false,
+                    seenAt: null
+                }
+            )));
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
     
     //one signal
     async sendMobileNotification() {

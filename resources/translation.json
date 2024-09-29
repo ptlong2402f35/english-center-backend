@@ -122,6 +122,10 @@
             "NotOwnerOrder": {
                 "vi": "Bạn không sở hữu đơn hàng này",
                 "en": "This is not your order"
+            },
+            "TotalMoneyIsOver": {
+                "vi": "Giao dịch không được lớn hơn số tiền còn nợ / chưa trả",
+                "en": "Total money is more than debt money"
             }
         }
     }

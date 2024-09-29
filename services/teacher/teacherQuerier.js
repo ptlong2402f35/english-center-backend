@@ -87,24 +87,7 @@ class TeacherQuerier {
                 {
                     model: Class,
                     as: "classes",
-                    attributes: [
-                        "id",
-                        "name",
-                        "fromAge",
-                        "toAge",
-                        "startAt",
-                        "endAt",
-                        "studentQuantity",
-                        "maxQuantity",
-                        "totalSession",
-                        "teachedSession",
-                        "fee",
-                        "status",
-                        "programId",
-                        "centerId",
-                        "createdAt",
-                        "updatedAt",
-                    ] 
+                    through: { attributes: ["classId", "teacherId", "salary"] } 
                 }
             ]
         }

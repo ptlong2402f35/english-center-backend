@@ -134,7 +134,7 @@ class ClassQuerier {
                 {
                     model: Teacher,
                     as: "teachers",
-                    attributes: ["id", "name", "gender", "userId", "age", "address", "phone", "email", "active", "level"] 
+                    through: { attributes: ["classId", "teacherId", "salary"] } 
                 }
             ]
         }
@@ -145,7 +145,6 @@ class ClassQuerier {
                 {
                     model: Student,
                     as: "students",
-                    attributes: ["id", "name", "gender", "userId", "age", "address", "phone", "email", "active"] 
                 }
             ]
         }
@@ -156,7 +155,6 @@ class ClassQuerier {
                 {
                     model: Schedule,
                     as: "schedules",
-                    attributes: ["id", "date", "startAt", "endAt"],
                     through: { attributes: [] } 
                 }
             ]

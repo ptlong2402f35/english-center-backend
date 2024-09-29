@@ -30,6 +30,7 @@ const {
     AdminOnly,
     CostNotFound,
     TransactionNotFound,
+    TotalMoneyIsOver
 } = require("../constants/message");
 const ErrorMessage = require("../resources/translation.json").message.error;
 
@@ -64,6 +65,7 @@ const ErrorCodeMap = new Map([
     [AdminOnly, 403],
     [CostNotFound, 403],
     [TransactionNotFound, 403],
+    [TotalMoneyIsOver, 403],
 ])
 
 class ErrorService {

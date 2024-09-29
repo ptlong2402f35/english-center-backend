@@ -14,7 +14,12 @@ module.exports = (sequelize, DataTypes) => {
 		static associate(models) {
 			Cost.belongsTo(models.User, {
                 foreignKey: "forUserId",
-                as: "user"
+                as: "user",
+				attributes: ["id", "role"]
+            });
+			Cost.hasMany(models.Transaction, {
+                foreignKey: "costId",
+                as: "transactions"
             });
 		}
 	}
@@ -31,8 +36,10 @@ module.exports = (sequelize, DataTypes) => {
 			paidMoney: DataTypes.DOUBLE,
 			forYear: DataTypes.INTEGER,
 			paidAt: DataTypes.DATE,
+			name: DataTypes.TEXT,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
+			timerTime: DataTypes.DATE,
 		},
 		{
 			sequelize,

@@ -23,10 +23,12 @@ class CostCreateService {
             } = await this.prepare(classId, year, month);
             let convertData = await this.costHandler.handleGetStudentAttendance(attendances, studentClasses, classInfo.fee);
             let builtData = await this.build(convertData, month, year, name);
-            console.log(builtData);
-            // await this.createCostInstances(builtData);
+            console.log("==== cost data create:",builtData);
+            await this.createCostInstances(builtData);
 
-            return;
+            return {
+                userIds: builtData.map(item => item.forUserId).filter(val => val)
+            };
         }
         catch (err) {
             throw err;
@@ -61,14 +63,17 @@ class CostCreateService {
                 Attendance.findAll(
                     {
                         where: {
-                            classId: classId,
-                            date: {
-                                [Op.gte]: first
-                            },
-                            date: {
-                                [Op.lte]: last
-                            }
-                        }
+                            [Op.and]: [
+                                {classId: classId},
+                                {date: {
+                                    [Op.gte]: first
+                                }},
+                                {date: {
+                                    [Op.lte]: last
+                                }}
+                            ]
+                        },
+                        // logging: true
                     }
                 ),
             ]);
@@ -97,6 +102,7 @@ class CostCreateService {
 
     async build(data, month, year, name) {
         try {
+            let timerTime = new Date(year, month - 1, 1);
             return data.map(item => ({
                 name: name,
                 referenceId: item.classId,
@@ -106,8 +112,9 @@ class CostCreateService {
                 forMonth: month,
                 forYear: year,
                 forUserId: item.userId,
-                debtMoney: 0,
-                paidMoney: 0
+                debtMoney: item.fee,
+                paidMoney: 0,
+                timerTime: timerTime
             }));
         }
         catch (err) {

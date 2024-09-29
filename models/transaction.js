@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
             content: DataTypes.TEXT,
             totalMoney: DataTypes.DOUBLE,
             costId: DataTypes.INTEGER,
+			costType: DataTypes.INTEGER,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},

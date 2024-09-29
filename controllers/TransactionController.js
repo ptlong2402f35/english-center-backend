@@ -1,11 +1,14 @@
 const { Op, where } = require("sequelize");
 const { ErrorService } = require("../services/errorService");
 const { UserRole } = require("../constants/roles");
-const { NotEnoughPermission, InputInfoEmpty } = require("../constants/message");
+const { NotEnoughPermission, InputInfoEmpty, CostNotFound } = require("../constants/message");
 const { TransactionService } = require("../services/transaction/transactionService");
+const { CostStatus } = require("../constants/status");
+const { CostType } = require("../constants/type");
 const Transaction = require("../models").Transaction;
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
+const Cost = require("../models").Cost;
 const ParentStudent = require("../models").ParentStudent;
 
 class TransactionController {
@@ -99,6 +102,9 @@ class TransactionController {
         try {
             let data = req.body;
             if(!data.costId || !data) throw InputInfoEmpty;
+            let cost = await Cost.findByPk(data.costId);
+            if(!cost) throw CostNotFound;
+            if(cost.status === CostStatus.Done) return res.status(403).json({message: "Hóa đơn này đã thanh toán"}); 
 
             await new TransactionService().createTransaction(data, data.costId, {isAdmin: true});
 
@@ -115,8 +121,10 @@ class TransactionController {
         try {
             let data = req.body;
             if(!data) throw InputInfoEmpty;
-
-            await new TransactionService().createTransaction(data, costId);
+            let cost = await Cost.findByPk(data.costId);
+            if(!cost) throw CostNotFound;
+            if(cost.status === CostStatus.Done) return res.status(403).json({message: "Hóa đơn này đã thanh toán"}); 
+            await new TransactionService().createTransaction(data, data.costId);
 
             return res.status(200).json({message: "Thành công"});
         }

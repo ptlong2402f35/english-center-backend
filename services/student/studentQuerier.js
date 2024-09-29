@@ -2,6 +2,8 @@ const { Op } = require("sequelize");
 const Parent = require("../../models").Parent;
 const Student = require("../../models").Student;
 const Class = require("../../models").Class;
+const User = require("../../models").User;
+const Attendance = require("../../models").Attendance;
 
 class StudentQuerier {
     
@@ -62,6 +64,7 @@ class StudentQuerier {
         {
             includeParent,
             includeClass,
+            includeUser,
         }
     ) {
         let include = [];
@@ -83,7 +86,24 @@ class StudentQuerier {
                 {
                     model: Class,
                     as: "classes",
-                    through: { attributes: [] } 
+                    through: { attributes: [] },
+                    include: [
+                        {
+                            model: Attendance,
+                            as: "attendances"
+                        }
+                    ]
+                }
+            ]
+        }
+
+        if(includeUser) {
+            include = [
+                ...include,
+                {
+                    model: User,
+                    as: "user",
+                    attributes: ["id", "userName"]
                 }
             ]
         }

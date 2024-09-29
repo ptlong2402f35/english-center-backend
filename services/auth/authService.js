@@ -159,6 +159,7 @@ class AuthService {
                             age: data.age,
                             phone: data.phone,
                             email: data.email,
+                            address: data.address,
                             createdAt: new Date(),
                             updatedAt: new Date()
                         },
@@ -178,6 +179,7 @@ class AuthService {
                             phone: data.phone,
                             age: data.age,
                             email: data.email,
+                            address: data.address,
                             createdAt: new Date(),
                             updatedAt: new Date()
                         },
@@ -198,6 +200,7 @@ class AuthService {
                             age: data.age,
                             email: data.email,
                             level: data.level,
+                            address: data.address,
                             createdAt: new Date(),
                             updatedAt: new Date()
                         },
