@@ -34,6 +34,7 @@ class TransactionService {
                         createdByUserId: isAdmin ? 1 : data.createdByUserId,
                         content: `Giao dịch thanh toán hóa đơn ${costId}`,
                         totalMoney: data.totalMoney,
+                        timerTime: data.timerTime || new Date(),
                         costId: costId,
                         costType: cost.type
                     },
@@ -97,6 +98,103 @@ class TransactionService {
                 }
             );
             return cost;
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+
+    async updateTransactions(data, transaction) {
+        try {
+            let bData = {
+                ...((data.content && data.allowContent) ? { content: data.content} : {}),
+                ...(data.totalMoney ? { totalMoney: data.totalMoney} : {}),
+                ...(data.timerTime ? { timerTime: data.timerTime} : {}),
+            }
+            let cost = await Cost.findOne({
+                where: {
+                    id: transaction.costId
+                }
+            });
+            if(!cost) throw CostNotFound;
+            let newTotal = cost.paidMoney + (data.totalMoney - transaction.totalMoney);
+            if(newTotal > cost.totalMoney) {
+                throw TotalMoneyIsOver;
+            }
+            let trans = await sequelize.transaction();
+            try {
+                if(newTotal === cost.totalMoney) {
+                    await cost.update({
+                        debtMoney: 0,
+                        paidMoney: newTotal,
+                        status: CostStatus.Done,
+                        paidAt: new Date()
+                    },{
+                        transaction: trans
+                    });
+                };
+                if(newTotal < cost.totalMoney) {
+                    await cost.update({
+                        debtMoney: cost.totalMoney - newTotal,
+                        paidMoney: newTotal,
+                        status: CostStatus.Debt,
+                        paidAt: null
+                    },{
+                        transaction: trans
+                    });
+                };
+                await transaction.update(bData, 
+                    {
+                        transaction: trans
+                    }
+                );
+                await trans.commit();
+            }
+            catch (err1) {
+                await trans.rollback();
+                console.error(err1);
+            }
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+
+    async deleteTransaction(transaction) {
+        try {
+            let cost = await Cost.findOne({
+                where: {
+                    id: transaction.costId
+                }
+            });
+            if(!cost) throw CostNotFound;
+            let newPaid = cost.paidMoney - transaction.totalMoney;
+            if(newPaid > cost.totalMoney) throw TotalMoneyIsOver;
+            if(newPaid === cost.totalMoney) {
+                await cost.update({
+                    debtMoney: 0,
+                    paidMoney: newPaid,
+                    status: CostStatus.Done,
+                    paidAt: new Date()
+                });
+            }
+            if(newPaid < cost.totalMoney) {
+                await cost.update({
+                    debtMoney: cost.totalMoney - newPaid,
+                    paidMoney: newPaid,
+                    status: CostStatus.Debt,
+                    paidAt: null
+                });
+            }
+            await Transaction.destroy(
+                {
+                    where: {
+                        id: transaction.id
+                    }
+                }
+            );
+
+            return;
         }
         catch (err) {
             throw err;

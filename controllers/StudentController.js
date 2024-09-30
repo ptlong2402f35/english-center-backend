@@ -7,6 +7,7 @@ const { StudentUpdateService } = require("../services/student/studentUpdateServi
 const { StudentQuerier } = require("../services/student/studentQuerier");
 const { AuthService } = require("../services/auth/authService");
 const { StudentService } = require("../services/student/studentService");
+const { UserService } = require("../services/user/userService");
 
 const User = require("../models").User;
 const Student = require("../models").Student;
@@ -170,16 +171,17 @@ class StudentController {
         try {
             let data = req.body;
             const authSerivce = new AuthService();
-            if(!data.userName || !data.password) throw InputInfoEmpty;
+            let {userName, password} = await new UserService().autoGenerateUserAccount(UserRole.Student);
+            if(!userName || !password) throw InputInfoEmpty;
 
-            if(await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
+            if(await authSerivce.checkUserNameExist(userName)) throw ExistedEmail;
 
             let builtData = await new StudentUpdateService().build(data, {forAdmin: true});
             
             let resp = await authSerivce.handleCustomerSignup(
                 {
-                    userName: data.userName,
-                    password: data.password,
+                    userName: userName,
+                    password: password,
                     ...builtData,
                     role: UserRole.Student
                 }

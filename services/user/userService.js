@@ -1,7 +1,19 @@
-const { UpdateFailMessage, UserNotFound, PasswordNotMatch } = require("../../constants/message");
+const { UpdateFailMessage, UserNotFound, PasswordNotMatch, StudentNotFound } = require("../../constants/message");
 var bcrypt = require("bcryptjs");
+const { UserRole } = require("../../constants/roles");
+const { sequelize } = require("../../models");
+const { Op } = require("sequelize");
 
 const User = require("../../models").User;
+const Parent = require("../../models").Parent;
+const Student = require("../../models").Student;
+const Teacher = require("../../models").Teacher;
+const Class = require("../../models").Class;
+const ParentStudent = require("../../models").ParentStudent;
+const Request = require("../../models").Request;
+const StudentClass = require("../../models").StudentClass;
+const TeacherClass = require("../../models").TeacherClass;
+const Attendance = require("../../models").Attendance;
 
 class UserService {
     constructor() {
@@ -97,6 +109,55 @@ class UserService {
     async fetchUser(userId) {
         try {
             return await User.findByPk(userId);
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+
+    async autoGenerateUserAccount(role) {
+        try {
+            let last = null;
+            let prefix ="";
+            switch(role) {
+                case UserRole.Student: {
+                    prefix = "hocsinhthu";
+                    last = await Student.findOne({
+                        order: [["id", "desc"]],
+                        limit: 1
+                    });
+                    break;
+                }
+                case UserRole.Parent: {
+                    prefix = "phuhuynhthu";
+                    last = await Parent.findOne({
+                        order: [["id", "desc"]],
+                        limit: 1
+                    });
+                    break;
+                }
+                case UserRole.Teacher: {
+                    prefix = "giaovienthu";
+                    last = await Teacher.findOne({
+                        order: [["id", "desc"]],
+                        limit: 1
+                    });
+                    break;
+                }
+                default: {
+                    prefix = "hocsinhthu";
+                    last = await Student.findOne({
+                        order: [["id", "desc"]],
+                        limit: 1
+                    });
+                    break;
+                }
+            }
+            let id = (last.id + 1) || 0;
+            return {
+                userName: `${prefix}${id}`,
+                password: "123456"
+            }
         }
         catch (err) {
             throw err;

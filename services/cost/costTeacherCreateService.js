@@ -63,6 +63,12 @@ class CostTeacherCreateService {
                         where: {
                             teacherId: teacherId
                         },
+                        include: [
+                            {
+                                model: Class,
+                                as: "class"
+                            }
+                        ]
                     }
                 )
             ]);

@@ -12,7 +12,10 @@ module.exports = (sequelize, DataTypes) => {
 		
 
 		static associate(models) {
-
+			TeacherClass.belongsTo(models.Class, {
+				foreignKey: "classId",
+				as: "class",
+			});
 		}
 	}
 	TeacherClass.init(

@@ -39,7 +39,6 @@ router.get("/users", Auth.onlyAdmin, UserController.adminGetUsers);
 router.post("/user", Auth.onlyAdmin, UserController.adminCreateUser);
 router.get("/user-detail/:id", Auth.onlyAdmin, UserController.adminGetUserDetail);
 router.put("/user-detail-by-admin/:id", Auth.onlyAdmin, UserController.adminUpdateUserDetail);
-router.put("/user-deactive/:id", Auth.onlyAdmin, UserController.adminDeactiveUser);
 router.put("/user-password-by-admin/:id", Auth.onlyAdmin, UserController.adminUpdateUserPassword);
 
 /* Student Controller */
@@ -145,8 +144,9 @@ router.post("/notification-seen/:id", Auth.auth, NotificationController.updateNo
 /* Transaction Controller */
 router.get("/transactions", Auth.onlyAdmin, TransactionController.getTransactions);
 router.get("/my-transactions", Auth.auth, TransactionController.getMyTransactions);
-//need update
 router.post("/transaction", Auth.onlyAdmin, TransactionController.adminCreateTransaction);
+router.put("/transaction/:id", Auth.onlyAdmin, TransactionController.adminUpdateTransaction);
+router.delete("/transaction/:id", Auth.onlyAdmin, TransactionController.adminDeleteTransaction);
 router.get("/payment-success", Auth.auth, TransactionController.paymentSuccess);
 
 

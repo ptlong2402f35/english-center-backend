@@ -8,6 +8,7 @@ const { StudentQuerier } = require("../services/student/studentQuerier");
 const { ParentQuerier } = require("../services/parent/parentQuerier");
 const { AuthService } = require("../services/auth/authService");
 const { parentUpdateService } = require("../services/parent/parentUpdateService");
+const { UserService } = require("../services/user/userService");
 
 const User = require("../models").User;
 const Student = require("../models").Student;
@@ -160,15 +161,16 @@ class ParentController {
         try {
             let data = req.body;
             const authSerivce = new AuthService();
-            if(!data.userName || !data.password) throw InputInfoEmpty;
+            let {userName, password} = await new UserService().autoGenerateUserAccount(UserRole.Parent);
+            if(!userName || !password) throw InputInfoEmpty;
 
-            if(await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
+            if(await authSerivce.checkUserNameExist(userName)) throw ExistedEmail;
             let builtData = await new StudentUpdateService().build(data, {forAdmin: true});
             
             await authSerivce.handleCustomerSignup(
                 {
-                    userName: data.userName,
-                    password: data.password,
+                    userName: userName,
+                    password: password,
                     ...builtData,
                     role: UserRole.Parent
                 }

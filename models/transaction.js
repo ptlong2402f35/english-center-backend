@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
 			costType: DataTypes.INTEGER,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
+			timerTime: DataTypes.DATE,
 		},
 		{
 			sequelize,
