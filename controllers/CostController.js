@@ -87,6 +87,8 @@ class CostController {
             if(!id) throw InputInfoEmpty;
             let data = await Cost.findByPk(id);
 
+            await new CostService().attachExtendInfoToCost(data);
+
             return data;
         }
         catch (err) {
@@ -185,6 +187,10 @@ class CostController {
                 }
             );
 
+            for( let item of data.docs) {
+                await new CostService().attachExtendInfoToCost(item);
+            }
+
             data.currentPage = page;
             return res.status(200).json(data);
         }
@@ -262,6 +268,10 @@ class CostController {
                     order: [["id", "desc"]]
                 }
             );
+
+            for( let item of data.docs) {
+                await new CostService().attachExtendInfoToCost(item);
+            }
 
             data.currentPage = page;
             return res.status(200).json(data);

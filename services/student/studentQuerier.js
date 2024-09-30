@@ -91,6 +91,10 @@ class StudentQuerier {
                         {
                             model: Attendance,
                             as: "attendances"
+                        },
+                        {
+                            model: Teacher,
+                            as: "teacher"
                         }
                     ]
                 }

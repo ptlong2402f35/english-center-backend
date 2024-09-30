@@ -124,14 +124,14 @@ class UserController {
         try {
             let data = req.body;
             const authSerivce = new AuthService();
-            if(!data.userName || !data.password) throw InputInfoEmpty;
-
-            if(await authSerivce.checkUserNameExist(data.userName)) throw ExistedEmail;
+            let {userName, password} = await new UserService().autoGenerateUserAccount(UserRole.Student);
+            if(await authSerivce.checkUserNameExist(userName)) throw ExistedEmail;
 
             let resp = await authSerivce.handleCustomerSignup(
                 {
                     ...data,
-                    
+                    userName,
+                    password
                 }
             );
 
@@ -166,34 +166,6 @@ class UserController {
             if(!userId) throw UserNotFound;
             let data = req.body;
             await new UserService().updatePassword(data, userId);
-
-            return res.status(200).json({message: "Thành Công"});
-        }
-        catch (err) {
-            console.error(err);
-            let {code, message} = new ErrorService(req).getErrorResponse(err);
-            return res.status(code).json({message});
-        }
-    }
-
-    adminDeactiveUser = async (req, res, next) => {
-        try {
-            let userId = req.params.id ? parseInt(req.params.id) : null;
-            if(!userId) throw UserNotFound;
-            let active = req.body.active;
-            if(!active && active != false) throw InputInfoEmpty;
-
-            await User.update(
-                {
-                    active: active,
-                    updatedAt: new Date()
-                },
-                {
-                    where: {
-                        id: userId
-                    }
-                }
-            );
 
             return res.status(200).json({message: "Thành Công"});
         }

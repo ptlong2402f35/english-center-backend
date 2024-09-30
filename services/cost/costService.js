@@ -1,11 +1,18 @@
 const { Op } = require("sequelize");
 const { UserRole } = require("../../constants/roles");
-const { NotificationType } = require("../../constants/type");
+const { NotificationType, CostType } = require("../../constants/type");
 const { CommunicationService } = require("../communication/communicationService");
+const { CostTeacherCreateService } = require("./costTeacherCreateService");
+const { TimeHandle } = require("../../utils/timeHandle");
 const ParentStudent = require("../../models").ParentStudent;
 const Student = require("../../models").Student;
 const Parent = require("../../models").Parent;
 const Teacher = require("../../models").Teacher;
+const Class = require("../../models").Class;
+const StudentClass = require("../../models").StudentClass;
+const TeacherClass = require("../../models").TeacherClass;
+const Attendance = require("../../models").Attendance;
+const Program = require("../../models").Program;
 
 class CostService {
     communicationService;
@@ -76,6 +83,97 @@ class CostService {
                 `Đã có hóa đơn lương tháng ${month}/${year} xin vui lòng kiểm tra, nếu có thắc mắc xin liên lạc với ban quản trị trung tâm`,
                 NotificationType.Transaction
             );
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    async attachExtendInfoToCost(cost) {
+        try {
+            if(!cost || !cost.type) return;
+            switch(cost.type) {
+                case CostType.StudentFee: {
+                    let student = await Student.findOne({
+                        where: {
+                            userId: cost.forUserId
+                        }
+                    });
+                    if(!student) return;
+                    let {first, last} = TimeHandle.getStartAndEndDayOfMonth(cost.forMonth, cost.forYear);
+                    let [classInfo, attendances, studentClass] = await Promise.all(
+                        [
+                            Class.findOne(
+                                {
+                                    where: 
+                                    {
+                                        id: cost.referenceId
+                                    },
+                                    include: [
+                                        {
+                                            model: Program,
+                                            as: "program"
+                                        }
+                                    ]
+                                },
+                                
+                            ),
+                            Attendance.findAll(
+                                {
+                                    where: {
+                                        [Op.and]: [
+                                            {classId: cost.referenceId},
+                                            {date: {
+                                                [Op.gte]: first
+                                            }},
+                                            {date: {
+                                                [Op.lte]: last
+                                            }},
+                                            {studentIds: {
+                                                [Op.contains]: [student.id]
+                                            }}
+                                        ]
+                                    },
+                                }
+                            ),
+                            StudentClass.findOne({
+                                where: {
+                                    studentId: student.id,
+                                    classId: cost.referenceId
+                                }
+                            })
+                        ]
+                    );
+                    if(!classInfo || !attendances) return;
+                    classInfo.joinCount = attendances.length || 0;
+                    classInfo?.setDataValue("joinCount", attendances.length);
+                    cost.class = classInfo;
+                    cost?.setDataValue("class", classInfo);
+                    cost.studentClass = studentClass;
+                    cost?.setDataValue("studentClass", studentClass);
+                    return;
+                }
+                case CostType.TeacherSalary: {
+                    let {
+                        teacher,
+                        teacherClass,
+                        attendances
+                    } = await new CostTeacherCreateService().prepare(cost.referenceId, cost.forYear, cost.forMonth);
+                    if(!attendances || !attendances.length) return;
+                    let ret = teacherClass.map(item => ({
+                        ...item.dataValues,
+                        teachedCount: (attendances.filter(el => el.classId === item.classId).length || 0)
+                    }));
+
+                    cost.teachedInfo = ret;
+                    cost?.setDataValue("teachedInfo", ret);
+                    return;
+                }
+                default: {
+                    return;
+                }
+            }
+
         }
         catch (err) {
             console.error(err);

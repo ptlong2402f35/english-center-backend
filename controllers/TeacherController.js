@@ -8,6 +8,7 @@ const { UserRole } = require("../constants/roles");
 const { ClassStatus } = require("../constants/status");
 const { AttendanceService } = require("../services/attendance/attendanceService");
 const { TeacherService } = require("../services/teacher/teacherService");
+const { UserService } = require("../services/user/userService");
 const Teacher = require("../models").Teacher;
 const TeacherClass = require("../models").TeacherClass;
 const Class = require("../models").Class;
@@ -152,12 +153,15 @@ class TeacherController {
     adminCreateTeacher = async (req, res, next) => {
         try {
             let data = req.body;
-            if(!data.userName || !data.password) throw InputInfoEmpty;
-            if(await new AuthService().checkUserNameExist(data.userName)) throw ExistedEmail;
+            let {userName, password} = await new UserService().autoGenerateUserAccount(UserRole.Teacher);
+            if(!userName || !password) throw InputInfoEmpty;
+            if(await new AuthService().checkUserNameExist(userName)) throw ExistedEmail;
 
             await new AuthService().handleCustomerSignup(
                 {
                     ...data,
+                    userName,
+                    password,
                     role: UserRole.Teacher
                 }
             );

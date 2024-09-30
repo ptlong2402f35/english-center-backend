@@ -117,6 +117,45 @@ class TransactionController {
         }
     }
 
+    adminUpdateTransaction = async (req, res, next) => {
+        try {
+            let transactionId = req.params.id ? parseInt(req.params.id) : null;
+            if(!transactionId) throw InputInfoEmpty;
+            let data = req.body;
+
+            let transaction = await Transaction.findByPk(transactionId);
+            if(!transaction) return res.status(403).json({message: "Giao dịch không tồn tại"});
+
+            await new TransactionService().updateTransactions(data, transaction);
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    adminDeleteTransaction = async (req, res, next) => {
+        try {
+            let transactionId = req.params.id ? parseInt(req.params.id) : null;
+            if(!transactionId) throw InputInfoEmpty;
+
+            let transaction = await Transaction.findByPk(transactionId);
+            if(!transaction) return res.status(403).json({message: "Giao dịch không tồn tại"});
+
+            await new TransactionService().deleteTransaction(transaction);
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
     paymentSuccess = async (req, res, next) => {
         try {
             let data = req.body;
