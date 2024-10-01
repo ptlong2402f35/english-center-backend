@@ -3,6 +3,7 @@ const Parent = require("../../models").Parent;
 const Student = require("../../models").Student;
 const Class = require("../../models").Class;
 const User = require("../../models").User;
+const Teacher = require("../../models").Teacher;
 const Attendance = require("../../models").Attendance;
 
 class StudentQuerier {
@@ -94,7 +95,7 @@ class StudentQuerier {
                         },
                         {
                             model: Teacher,
-                            as: "teacher"
+                            as: "teachers"
                         }
                     ]
                 }
