@@ -109,6 +109,8 @@ class CostCreateService {
                 type: CostType.StudentFee,
                 status: CostStatus.Pending,
                 totalMoney: item.fee,
+                originTotalMoney: item.originFee,
+                totalReduceMoney: item.reduceFee,
                 forMonth: month,
                 forYear: year,
                 forUserId: item.userId,

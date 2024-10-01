@@ -40,6 +40,8 @@ module.exports = (sequelize, DataTypes) => {
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 			timerTime: DataTypes.DATE,
+			originTotalMoney: DataTypes.DOUBLE,
+			totalReduceMoney: DataTypes.DOUBLE,
 		},
 		{
 			sequelize,

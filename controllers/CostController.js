@@ -71,6 +71,10 @@ class CostController {
                 }
             );
 
+            for( let item of data.docs) {
+                await new CostService().attachExtendInfoToCost(item);
+            }
+
             data.currentPage = page;
             return res.status(200).json(data);
         }
@@ -290,7 +294,6 @@ class CostController {
 
             let costs = await Cost.findOne({
                 where: {
-                    name: data.name,
                     forMonth: data.month,
                     forYear: data.year,
                     referenceId: data.classId,

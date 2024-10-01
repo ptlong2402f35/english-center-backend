@@ -16,6 +16,8 @@ class CostHandler {
                     studentId: item,
                     count: 1,
                     fee: 0,
+                    originFee: 0,
+                    reduceFee: 0,
                     userId: fStudent?.student?.userId || 0,
                     classId: fStudent.classId
                 });
@@ -27,6 +29,8 @@ class CostHandler {
             if(!fItem) continue;
             let totalFee = (fee - (fItem?.reduceFee || 0)) * item.count;
             item.fee = totalFee;
+            item.originFee = fee * item.count;
+            item.reduceFee = item.originFee - totalFee;
         }
 
         return studentData.filter(item => item.userId);
