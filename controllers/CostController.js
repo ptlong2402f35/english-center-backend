@@ -90,10 +90,11 @@ class CostController {
             let id = req.params.id ? parseInt(req.params.id) : null;
             if(!id) throw InputInfoEmpty;
             let data = await Cost.findByPk(id);
+            if(!data) return res.status(403).json({message: "Hóa đơn không tồn tại"});
 
             await new CostService().attachExtendInfoToCost(data);
 
-            return data;
+            return res.status(200).json(data);
         }
         catch (err) {
             console.error(err);
