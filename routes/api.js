@@ -158,6 +158,7 @@ router.get("/costs-by-parent", Auth.auth, CostController.parentGetCosts);
 router.get("/costs-by-teacher", Auth.auth, CostController.teacherGetCosts);
 router.get("/cost/:id", Auth.onlyAdmin, CostController.getCostDetail);
 router.post("/cost-class", Auth.onlyAdmin, CostController.createClassCost);
+router.post("/cost-to-student", Auth.onlyAdmin, CostController.createClassCostForSingleStudent);
 router.post("/cost-teacher", Auth.onlyAdmin, CostController.createTeacherSalary);
 router.post("/cost-other", Auth.onlyAdmin, CostController.createOtherCost);
 router.put("/cost/:id", Auth.onlyAdmin, CostController.updateCost);

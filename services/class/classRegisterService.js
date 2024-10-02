@@ -135,15 +135,18 @@ class ClassRegisterService {
                 return;
             }
             let reduceFee = 0;
+            let reducePercent = 0;
             if(data?.program?.startAt <= new Date() && data?.program?.endAt >= new Date()) {
-                reduceFee = data?.program?.reduceValue || (data?.program?.reducePercent * data?.fee / 100) || 0
+                reduceFee = data?.program?.reduceValue || (data?.program?.reducePercent * data?.fee / 100) || 0;
+                reducePercent = data?.program?.reducePercent;
             }
             await StudentClass.create(
                 {
                     studentId: data?.studentId,
                     classId: data?.classId,
                     offSession: 0,
-                    reduceFee: reduceFee
+                    reduceFee: reduceFee,
+                    reducePercent: reducePercent
                 },
                 {
                     transaction: transaction

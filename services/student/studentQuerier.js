@@ -87,7 +87,7 @@ class StudentQuerier {
                 {
                     model: Class,
                     as: "classes",
-                    through: { attributes: [] },
+                    through: { attributes: ["id", "classId", "studentId", "reduceFee", "reducePercent"] },
                     include: [
                         {
                             model: Attendance,

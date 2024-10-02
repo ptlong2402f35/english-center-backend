@@ -8,6 +8,7 @@ const {TimeHandle} = require("../../utils/timeHandle");
 const { CostHandler } = require("./costHandler");
 const { CostType } = require("../../constants/type");
 const { CostStatus } = require("../../constants/status");
+const { UpdateFailMessage } = require("../../constants/message");
 
 class CostCreateService {
     costHandler;
@@ -35,7 +36,48 @@ class CostCreateService {
         }
     }
 
-    async prepare(classId, year, month) {
+    async createCostToSingleStudent(classId, student, month, year, name) {
+        try {
+            let {
+                classInfo,
+                studentClasses, 
+                attendances
+            } = await this.prepare(classId, year, month, student.id);
+            let studentClass = studentClasses[0];
+            if(!studentClass || !attendances || !classInfo) throw UpdateFailMessage;
+            let originFee = classInfo.fee * attendances.length;
+            let totalMoney = (classInfo.fee - (studentClass.reduceFee ||0)) * attendances.length;
+            let totalReduce = originFee - totalMoney;
+            let data = {
+                name: name,
+                referenceId: classId,
+                type: CostType.StudentFee,
+                status: CostStatus.Pending,
+                totalMoney: totalMoney,
+                originTotalMoney: originFee,
+                totalReduceMoney: totalReduce,
+                forMonth: month,
+                forYear: year,
+                forUserId: student.userId,
+                debtMoney: totalMoney,
+                paidMoney: 0,
+                timerTime: new Date(year, month - 1, 1)
+            }
+
+            console.log(data);
+
+            await Cost.create(data);
+
+            return {
+                userIds: [student.userId]
+            };
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+
+    async prepare(classId, year, month, studentId) {
         try {
             let {first, last} = TimeHandle.getStartAndEndDayOfMonth(month, year);
             let [classInfo, studentClasses, attendances] = await Promise.all([
@@ -49,7 +91,8 @@ class CostCreateService {
                 StudentClass.findAll(
                     {
                         where: {
-                            classId: classId
+                            classId: classId,
+                            ...(studentId ? {studentId: studentId} : {})
                         },
                         include: [
                             {
@@ -70,10 +113,17 @@ class CostCreateService {
                                 }},
                                 {date: {
                                     [Op.lte]: last
-                                }}
+                                }},
+                                {
+                                ...(studentId ? {
+                                    studentIds: {
+                                        [Op.contains]: [studentId]
+                                    }
+                                } : {})
+                                }
                             ]
                         },
-                        // logging: true
+                        logging: true
                     }
                 ),
             ]);

@@ -315,6 +315,37 @@ class CostController {
         }
     }
 
+    createClassCostForSingleStudent = async (req, res, next) => {
+        try {
+            let data = req.body;
+            if(!data.classId || !data.month || !data.year || !data.name || !data.studentId) throw InputInfoEmpty;
+
+            let student = await Student.findByPk(data.studentId);
+            if(!student) return res.status(403).json({message: "Học sinh này không tồn tại"});
+
+            let costs = await Cost.findOne({
+                where: {
+                    forMonth: data.month,
+                    forYear: data.year,
+                    referenceId: data.classId,
+                    forUserId: student.userId,
+                    type: CostType.StudentFee
+                }
+            });
+            if(costs) return res.status(422).json({message: "Hóa đơn này đã tồn tại"});
+            let {userIds} = await new CostCreateService().createCostToSingleStudent(data.classId, student, data.month, data.year, data.name);
+
+            new CostService().createNewCostNoti(userIds, data.month, data.year);
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
     createTeacherSalary = async (req, res, next) => {
         try {
             let data = req.body;

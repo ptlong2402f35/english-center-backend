@@ -44,6 +44,7 @@ class ProgramApplyService {
             if(!classInfo.programId) {
                 await StudentClass.update(
                     {
+                        reducePercent: 0,
                         reduceFee: 0,
                         updatedAt: new Date()
                     },
@@ -64,6 +65,7 @@ class ProgramApplyService {
             let reduceFee = program.reduceValue ? program.reduceValue : (program.reducePercent * classInfo.fee / 100);
             await StudentClass.update(
                 {
+                    reducePercent: program.reducePercent,
                     reduceFee: reduceFee,
                     updatedAt: new Date()
                 },
