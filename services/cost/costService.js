@@ -174,7 +174,7 @@ class CostService {
                     let ret = teacherClass.map(item => ({
                         ...item.dataValues,
                         teachedCount: (attendances.filter(el => el.classId === item.classId).length || 0)
-                    }));
+                    })).filter(item => item.teachedCount);
 
                     let user = await User.findByPk(
                         teacher.userId,

@@ -28,6 +28,7 @@ class CostController {
             let referenceId = req.query.referenceId ? parseInt(req.query.referenceId) : null;
             let fromDate = req.query.fromDate || null;
             let toDate = req.query.toDate || null;
+            let multipleType = req.query.multipleType ? req.query.multipleType?.split(";").map(item => parseInt(item)).filter(val => val) : null;
 
             let conds = [];
             if(forUserId) {
@@ -35,6 +36,15 @@ class CostController {
             }
             if(type) {
                 conds.push({type: type});
+            }
+            if(multipleType) {
+                conds.push(
+                    {
+                        type: {
+                            [Op.in]: multipleType
+                        }
+                    }
+                );
             }
             if(referenceId) {
                 conds.push({referenceId: referenceId});
@@ -490,7 +500,8 @@ class CostController {
                                 content: `Giao dịch thanh toán hóa đơn ${cost.name || id}`,
                                 totalMoney: cost.totalMoney,
                                 costId: id,
-                                costType: cost.type
+                                costType: cost.type,
+                                timerTime: new Date()
                             },
                             {
                                 transaction: transaction
@@ -513,6 +524,7 @@ class CostController {
                         status: status,
                         debtMoney: cost.totalMoney,
                         paidMoney: 0,
+                        paidAt: null,
                     }
                 );
                 let targetId = 0;
