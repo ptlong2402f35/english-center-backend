@@ -12,6 +12,7 @@ const Class = require("../../models").Class;
 const StudentClass = require("../../models").StudentClass;
 const TeacherClass = require("../../models").TeacherClass;
 const Attendance = require("../../models").Attendance;
+const User = require("../../models").User;
 const Program = require("../../models").Program;
 
 class CostService {
@@ -99,6 +100,14 @@ class CostService {
                             userId: cost.forUserId
                         }
                     });
+                    let user = await User.findByPk(cost.
+                        forUserId,
+                        {
+                            attributes: ["id", "role", "userName"] 
+                        }
+                    );
+                    user.student = student;
+                    user.setDataValue("student", student);
                     if(!student) return;
                     let {first, last} = TimeHandle.getStartAndEndDayOfMonth(cost.forMonth, cost.forYear);
                     let [classInfo, attendances, studentClass] = await Promise.all(
@@ -151,6 +160,8 @@ class CostService {
                     cost?.setDataValue("class", classInfo);
                     cost.studentClass = studentClass;
                     cost?.setDataValue("studentClass", studentClass);
+                    cost.user = user;
+                    cost?.setDataValue("user", user);
                     return;
                 }
                 case CostType.TeacherSalary: {
@@ -165,6 +176,16 @@ class CostService {
                         teachedCount: (attendances.filter(el => el.classId === item.classId).length || 0)
                     }));
 
+                    let user = await User.findByPk(
+                        teacher.userId,
+                        {
+                            attributes: ["id", "role", "userName"]
+                        }
+                    );
+                    user.teacher = teacher;
+                    user.setDataValue("teacher", teacher);
+                    cost.user = user;
+                    cost.setDataValue("user", user);
                     cost.teachedInfo = ret;
                     cost?.setDataValue("teachedInfo", ret);
                     return;

@@ -51,6 +51,8 @@ router.post("/student", Auth.onlyAdmin, StudentController.adminCreateStudent);
 router.get("/student-detail-by-admin/:id", Auth.onlyAdmin, StudentController.adminGetStudentDetail);
 router.put("/student-detail-by-admin/:id", Auth.onlyAdmin, StudentController.adminUpdateStudentDetail);
 router.put("/student-deactive", Auth.onlyAdmin, StudentController.adminDeactiveStudent);
+router.post("/student-reduce-value", Auth.onlyAdmin, StudentController.adminUpdateStudentReduceValue);
+
 
 /* Parent Controller */
 // router.get("/my-parent-detail", Auth.auth, ParentController.getMyDetail);
@@ -67,7 +69,7 @@ router.get("/centers", CenterController.getCenter);
 router.get("/center/:id", CenterController.getCenterDetail);
 router.post("/center", Auth.onlyAdmin, CenterController.createCenter);
 router.put("/center/:id", Auth.onlyAdmin, CenterController.updateCenter);
-
+router.delete("/center/:id", Auth.onlyAdmin, CenterController.adminDeleteCenter);
 
 /* Class Controller */
 router.get("/class", ClassController.getClasses);
@@ -160,6 +162,7 @@ router.post("/cost-teacher", Auth.onlyAdmin, CostController.createTeacherSalary)
 router.post("/cost-other", Auth.onlyAdmin, CostController.createOtherCost);
 router.put("/cost/:id", Auth.onlyAdmin, CostController.updateCost);
 router.put("/cost-status/:id", Auth.onlyAdmin, CostController.adminUpdateCostStatus);
+router.delete("/cost/:id", Auth.onlyAdmin, CostController.adminDeleteCost);
 
 /* Search */
 router.get("/search-student", SearchController.searchStudent);

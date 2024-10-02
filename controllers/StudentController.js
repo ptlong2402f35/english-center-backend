@@ -12,7 +12,9 @@ const { UserService } = require("../services/user/userService");
 const User = require("../models").User;
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
+const Class = require("../models").Class;
 const ParentStudent = require("../models").ParentStudent;
+const StudentClass = require("../models").StudentClass;
 
 class StudentController {
     getMyDetail = async (req, res, next) => {
@@ -243,6 +245,37 @@ class StudentController {
                 {
                     where: {
                         id: studentId
+                    }
+                }
+            );
+
+            return res.status(200).json({message: "Thành Công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    adminUpdateStudentReduceValue = async (req, res, next) => {
+        try {
+            let data = req.body;
+            if(!data.classId || !data.studentId || (!data.reduceFee && data.reduceFee != 0)) throw InputInfoEmpty;
+            let student = await Student.findByPk(data.studentId);
+            if(!student) return res.status(403).json({message: "Học sinh không tồn tại"});
+            let classInfo = await Class.findByPk(data.classId);
+            if(!classInfo) return res.status(403).json({message: "Lớp học không tồn tại"});
+
+            await StudentClass.update(
+                {
+                    reduceFee: data.reduceFee,
+                    updatedAt: new Date()
+                },
+                {
+                    where: {
+                        studentId: data.studentId,
+                        classId: data.classId
                     }
                 }
             );

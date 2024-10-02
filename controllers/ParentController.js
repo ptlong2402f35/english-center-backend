@@ -110,7 +110,7 @@ class ParentController {
 
             let conds = parentQuerier.buildWhere({name, phone, email, active});
             let attributes = parentQuerier.buildAttributes({});
-            let include = parentQuerier.buildInclude({includeStudent: true});
+            let include = parentQuerier.buildInclude({includeStudent: true, includeUser: true});
             let orderBy = parentQuerier.buildSort({});
 
             let data = await Parent.paginate({
@@ -139,7 +139,7 @@ class ParentController {
         try {
             let parentId = req.params.id ? parseInt(req.params.id) : null;
             if(!parentId) throw ParentNotFound;
-            let include = new ParentQuerier().buildInclude({includeStudent: true});
+            let include = new ParentQuerier().buildInclude({includeStudent: true, includeUser: true});
             let parent = await Parent.findByPk(
                 parentId,
                 {

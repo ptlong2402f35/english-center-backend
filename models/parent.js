@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
 				// targetKey: "id",
 				as: "childs",
 			});
+			Parent.belongsTo(models.User, {
+                foreignKey: "userId",
+                as: "user"
+            });
 		}
 	}
 	Parent.init(
