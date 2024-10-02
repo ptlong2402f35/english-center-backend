@@ -31,7 +31,8 @@ class TeacherController {
             let conds = teacherQuerier.buildWhere({name, phone, email, level, active});
             let attributes = teacherQuerier.buildAttributes({});
             let include = teacherQuerier.buildInclude({
-                includeClass,
+                includeClass: true,
+                includeUser: true
             });
             let orderBy = teacherQuerier.buildSort({});
 
@@ -66,6 +67,7 @@ class TeacherController {
             let attributes = teacherQuerier.buildAttributes({});
             let include = teacherQuerier.buildInclude({
                 includeClass: true,
+                includeUser: true
             });
 
             let data = await Teacher.findByPk(teacherId,

@@ -6,6 +6,7 @@ const { CenterUpdateService } = require("../services/center/centerUpdateService"
 const { ErrorService } = require("../services/errorService");
 
 const Center = require("../models").Center;
+const Class = require("../models").Class;
 
 class CenterController {
     getCenter = async (req, res, next) => {
@@ -112,6 +113,39 @@ class CenterController {
             let data = req.body;
 
             await new CenterUpdateService().handleUpdateCenterInfo(data, centerId);
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    adminDeleteCenter = async (req, res, next) => {
+        try {
+            let id = req.params.id ? parseInt(req.params.id) : null;
+            if(!id) throw InputInfoEmpty;
+            let center = await Center.findByPk(
+                id,
+                {
+                        include: [
+                        {
+                            model: Class,
+                            as: "classes"
+                        }
+                    ]
+                }
+            );
+            if(!center) return res.status(403).json({message: "Trung tâm không tồn tại"});
+            if(center.classes?.length) return res.status(403).json({message: "Không thể xóa trung tâm đã có lớp học"});
+
+            await Center.destroy({
+                where: {
+                    id: id
+                }
+            });
 
             return res.status(200).json({message: "Thành công"});
         }

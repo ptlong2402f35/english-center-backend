@@ -1,4 +1,5 @@
 const Class = require("../../models").Class;
+const User = require("../../models").User;
 
 class TeacherQuerier {
     
@@ -77,6 +78,7 @@ class TeacherQuerier {
     buildInclude(
         {
             includeClass,
+            includeUser
         }
     ) {
         let include = [];
@@ -88,6 +90,17 @@ class TeacherQuerier {
                     model: Class,
                     as: "classes",
                     through: { attributes: ["classId", "teacherId", "salary"] } 
+                }
+            ]
+        }
+
+        if(includeUser) {
+            include = [
+                ...include,
+                {
+                    model: User,
+                    as: "user",
+                    attributes: ["id", "userName"]
                 }
             ]
         }

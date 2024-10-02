@@ -513,6 +513,39 @@ class CostController {
             return res.status(code).json({message});
         }
     }
+
+    adminDeleteCost = async (req, res, next) => {
+        try {
+            let id = req.params.id ? parseInt(req.params.id) : null;
+            if(!id) throw InputInfoEmpty;
+            let cost = await Cost.findByPk(
+                id,
+                {
+                        include: [
+                        {
+                            model: Transaction,
+                            as: "transactions"
+                        }
+                    ]
+                }
+            );
+            if(!cost) return res.status(403).json({message: "Hóa đơn không tồn tại"});
+            if(cost.transactions?.length) return res.status(403).json({message: "Không thể xóa hóa đơn đã có giao dịch"});
+
+            await Cost.destroy({
+                where: {
+                    id: id
+                }
+            });
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
 }
 
 module.exports = new CostController();
