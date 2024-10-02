@@ -1,10 +1,13 @@
 const { Op } = require("sequelize");
+const { TimeHandle } = require("../utils/timeHandle");
 
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const Teacher = require("../models").Teacher;
 const Class = require("../models").Class;
 const Center = require("../models").Center;
+const Attendance = require("../models").Attendance;
+const TeacherClass = require("../models").TeacherClass;
 
 
 class SearchController {
@@ -114,6 +117,94 @@ class SearchController {
                 attributes: ["id", "name", "address"],
                 limit: 20
             });
+
+            return res.status(200).json(data);
+        }
+        catch (err) {
+            console.error(err);
+            return res.status(200).json([])
+        }
+    }
+
+    searchTeacherWork = async (req, res ,next) => {
+        try {
+            let month = req.query.month ? parseInt(req.query.month) : null;
+            let year = req.query.year ? parseInt(req.query.year) : null;
+            let {first, last} = TimeHandle.getStartAndEndDayOfMonth(month, year);
+            let attendances = await Attendance.findAll(
+                {
+                    where: {
+                        [Op.and]: [
+                            {date: {
+                                [Op.gte]: first
+                            }},
+                            {date: {
+                                [Op.lte]: last
+                            }},
+                        ]
+                    },
+                    attributes: ["id", "classId"]
+                }
+            );
+
+            let classIds = [...new Set(attendances.map(item => item.classId).filter(val => val))];
+            let teacherClass = await TeacherClass.findAll({
+                where: {
+                    classId: {
+                        [Op.in]: classIds
+                    }
+                },
+                attributes: ["id", "teacherId"]
+            });
+            let teacherIds = [...new Set(teacherClass.map(item => item.teacherId).filter(val => val))];
+
+            let teachers = await Teacher.findAll({
+                where: {
+                    id: {
+                        [Op.in]: teacherIds
+                    }
+                },
+                attributes: ["id", "name", "userId"]
+            })
+
+            return res.status(200).json(teachers);
+        }
+        catch (err) {
+            console.error(err);
+            return res.status(200).json([])
+        }
+    }
+
+    searchClassWork = async (req, res ,next) => {
+        try {
+            let month = req.query.month ? parseInt(req.query.month) : null;
+            let year = req.query.year ? parseInt(req.query.year) : null;
+            let {first, last} = TimeHandle.getStartAndEndDayOfMonth(month, year);
+            let attendances = await Attendance.findAll(
+                {
+                    where: {
+                        [Op.and]: [
+                            {date: {
+                                [Op.gte]: first
+                            }},
+                            {date: {
+                                [Op.lte]: last
+                            }},
+                        ]
+                    },
+                    attributes: ["id", "classId"]
+                }
+            );
+
+            let classIds = [...new Set(attendances.map(item => item.classId).filter(val => val))];
+            let data = await Class.findAll({
+                where: {
+                    id: {
+                        [Op.in]: classIds
+                    }
+                },
+                attributes: ["id", "name", "code"]
+            })
 
             return res.status(200).json(data);
         }
