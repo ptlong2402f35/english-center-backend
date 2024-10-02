@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
             classId: DataTypes.INTEGER,
             offSession: DataTypes.INTEGER,
             reduceFee: DataTypes.DOUBLE,
+            reducePercent: DataTypes.DOUBLE,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},

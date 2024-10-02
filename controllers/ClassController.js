@@ -168,6 +168,8 @@ class ClassController {
             let userId = req.user.userId;
             if(!userId) throw UserNotFound;
 
+            if(req.user.role != UserRole.Teacher) return res.status(422).json({message: "Chức năng chỉ dành cho giáo viên"});
+
             let teacher = await Teacher.findOne({
                 where: {
                     userId: userId
@@ -198,7 +200,9 @@ class ClassController {
                 ]
             });
 
-            if(!teacher.classes) return res.status(200).json([]);
+            if(!teacher) return res.status(403).json({message: "Giáo viên không tồn tại"});
+
+            if(!teacher?.classes) return res.status(200).json([]);
 
             await new TeacherService().attachTeacherSalary(teacher.classes, teacher.id);
 

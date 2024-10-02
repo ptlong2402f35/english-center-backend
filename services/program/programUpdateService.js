@@ -30,6 +30,7 @@ class ProgramUpdateService {
                 )
                 await StudentClass.update(
                     {
+                        reducePercent: 0,
                         reduceFee: 0
                     },
                     {

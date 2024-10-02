@@ -261,24 +261,49 @@ class StudentController {
     adminUpdateStudentReduceValue = async (req, res, next) => {
         try {
             let data = req.body;
-            if(!data.classId || !data.studentId || (!data.reduceFee && data.reduceFee != 0)) throw InputInfoEmpty;
+            if(!data.classId || !data.studentId || (!data.reduceFee && data.reduceFee != 0 && !data.reducePercent && data.reducePercent !=0)) throw InputInfoEmpty;
             let student = await Student.findByPk(data.studentId);
             if(!student) return res.status(403).json({message: "Học sinh không tồn tại"});
             let classInfo = await Class.findByPk(data.classId);
             if(!classInfo) return res.status(403).json({message: "Lớp học không tồn tại"});
 
-            await StudentClass.update(
-                {
-                    reduceFee: data.reduceFee,
-                    updatedAt: new Date()
-                },
-                {
-                    where: {
-                        studentId: data.studentId,
-                        classId: data.classId
+            let value = data.reduceFee || 0;
+            let percent = data.reducePercent || 0;
+            if(percent || percent === 0) {
+                value = classInfo.fee * percent / 100;
+                await StudentClass.update(
+                    {
+                        reducePercent: data.reducePercent,
+                        reduceFee: value,
+                        updatedAt: new Date()
+                    },
+                    {
+                        where: {
+                            studentId: data.studentId,
+                            classId: data.classId
+                        }
                     }
-                }
-            );
+                );
+                return res.status(200).json({message: "Thành Công"});
+            }
+            
+            if(data.reduceFee || data.reduceFee === 0) {
+                percent = data.reduceFee / classInfo.fee * 100;
+                await StudentClass.update(
+                    {
+                        reducePercent: percent,
+                        reduceFee: data.reduceFee,
+                        updatedAt: new Date()
+                    },
+                    {
+                        where: {
+                            studentId: data.studentId,
+                            classId: data.classId
+                        }
+                    }
+                );
+                return res.status(200).json({message: "Thành Công"});
+            }
 
             return res.status(200).json({message: "Thành Công"});
         }
