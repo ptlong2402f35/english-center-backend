@@ -196,6 +196,8 @@ class SearchController {
                 }
             );
 
+            console.log(attendances);
+
             let classIds = [...new Set(attendances.map(item => item.classId).filter(val => val))];
             let data = await Class.findAll({
                 where: {
