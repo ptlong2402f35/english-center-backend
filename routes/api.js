@@ -171,6 +171,8 @@ router.get("/search-parent", SearchController.searchParent);
 router.get("/search-teacher", SearchController.searchTeacher);
 router.get("/search-class", SearchController.searchClass);
 router.get("/search-center", SearchController.searchCenter);
+router.get("/search-teacher-work", SearchController.searchTeacherWork);
+router.get("/search-class-work", SearchController.searchClassWork);
 
 /* Review */
 router.get("/review-by-admin", Auth.onlyAdmin, ReviewController.getAttendanceReviews);
