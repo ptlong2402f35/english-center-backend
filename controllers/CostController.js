@@ -114,7 +114,7 @@ class CostController {
             let referenceId = req.query.referenceId ? parseInt(req.query.referenceId) : null;
             let fromDate = req.query.fromDate || null;
             let toDate = req.query.toDate || null;
-
+ 
             let conds = [];
             if(forUserId) {
                 conds.push({forUserId: forUserId});
