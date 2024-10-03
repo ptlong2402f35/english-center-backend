@@ -391,7 +391,7 @@ class CostController {
     createOtherCost = async (req, res, next) => {
         try {
             let data = req.body;
-            if(!data.month || !data.year || !data.totalMoney || !data.type || !data.centerId) throw InputInfoEmpty;
+            if(!data.month || !data.year || !data.totalMoney || !data.type) throw InputInfoEmpty;
             if(![CostType.ElecFee, CostType.OtherFee, CostType.WaterFee].includes(data.type)) return res.status(403).json({message: "Loại hóa đơn không hợp lệ"});
             await new CostOtherService().createCost(data);
 
