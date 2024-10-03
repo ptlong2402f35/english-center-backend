@@ -215,6 +215,55 @@ class SearchController {
             return res.status(200).json([])
         }
     }
+
+    searchStudentWork = async (req, res ,next) => {
+        try {
+            let month = req.query.month ? parseInt(req.query.month) : null;
+            let year = req.query.year ? parseInt(req.query.year) : null;
+            let classId = req.query.classId ? parseInt(req.query.classId) : null;
+            let {first, last} = TimeHandle.getStartAndEndDayOfMonth(month, year);
+            let attendances = await Attendance.findAll(
+                {
+                    where: {
+                        [Op.and]: [
+                            {date: {
+                                [Op.gte]: first
+                            }},
+                            {date: {
+                                [Op.lte]: last
+                            }},
+                            {
+                                classId: classId
+                            },
+                        ]
+                    },
+                    attributes: ["id", "classId", "studentIds"],
+                    logging: true
+                }
+            );
+
+            let studentIds = [];
+            for(let item of attendances) {
+                studentIds.push(...item.studentIds);
+            }
+            studentIds = [... new Set(studentIds)];
+
+            let data = await Student.findAll({
+                where: {
+                    id: {
+                        [Op.in]: studentIds
+                    }
+                },
+                attributes: ["id", "name", "userId"]
+            })
+
+            return res.status(200).json(data);
+        }
+        catch (err) {
+            console.error(err);
+            return res.status(200).json([])
+        }
+    }
 }
 
 module.exports = new SearchController();
