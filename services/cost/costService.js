@@ -14,6 +14,7 @@ const TeacherClass = require("../../models").TeacherClass;
 const Attendance = require("../../models").Attendance;
 const User = require("../../models").User;
 const Program = require("../../models").Program;
+const Center = require("../../models").Center;
 
 class CostService {
     communicationService;
@@ -195,6 +196,27 @@ class CostService {
                 }
             }
 
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    async attachCenterInfo(cost) {
+        try {
+            if(![CostType.ElecFee, CostType.OtherFee, CostType.WaterFee].includes(cost.type)) {
+                cost.center = null;
+                cost?.setDataValue("center", null);
+                return;
+            };
+            let center = await Center.findByPk(cost.referenceId);
+            if(!center) {
+                cost.center = null;
+                cost?.setDataValue("center", null);
+                return;
+            }
+            cost.center = center;
+            cost?.setDataValue("center", center);
         }
         catch (err) {
             console.error(err);

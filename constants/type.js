@@ -22,7 +22,8 @@ const CostType = {
     StudentFee: 2,
     ElecFee: 3,
     WaterFee: 4,
-    OtherFee: 5
+    OtherFee: 5,
+    Bonus: 6,
 }
 
 const NotificationType = {
