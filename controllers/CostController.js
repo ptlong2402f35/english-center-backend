@@ -83,6 +83,7 @@ class CostController {
 
             for( let item of data.docs) {
                 await new CostService().attachExtendInfoToCost(item);
+                await new CostService().attachCenterInfo(item);
             }
 
             data.currentPage = page;
@@ -103,6 +104,7 @@ class CostController {
             if(!data) return res.status(403).json({message: "Hóa đơn không tồn tại"});
 
             await new CostService().attachExtendInfoToCost(data);
+            await new CostService().attachCenterInfo(data);
 
             return res.status(200).json(data);
         }
@@ -389,7 +391,7 @@ class CostController {
     createOtherCost = async (req, res, next) => {
         try {
             let data = req.body;
-            if(!data.month || !data.year || !data.totalMoney || !data.type) throw InputInfoEmpty;
+            if(!data.month || !data.year || !data.totalMoney || !data.type || !data.centerId) throw InputInfoEmpty;
             if(![CostType.ElecFee, CostType.OtherFee, CostType.WaterFee].includes(data.type)) return res.status(403).json({message: "Loại hóa đơn không hợp lệ"});
             await new CostOtherService().createCost(data);
 
@@ -425,6 +427,7 @@ class CostController {
             await cost.update(
                 {
                     ...data,
+                    referenceId: data.centerId
                 }
             );
 

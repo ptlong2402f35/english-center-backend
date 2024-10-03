@@ -10,7 +10,7 @@ class CostOtherService {
             let timerTime = new Date(data.year, data.month - 1, 1);
             let bData = {
                 name: data.name,
-                referenceId: 0,
+                referenceId: data.centerId,
                 type: data.type,
                 status: CostStatus.Pending,
                 totalMoney: data.totalMoney,
