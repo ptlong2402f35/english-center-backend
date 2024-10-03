@@ -173,6 +173,7 @@ router.get("/search-class", SearchController.searchClass);
 router.get("/search-center", SearchController.searchCenter);
 router.get("/search-teacher-work", SearchController.searchTeacherWork);
 router.get("/search-class-work", SearchController.searchClassWork);
+router.get("/search-student-work", SearchController.searchStudentWork);
 
 /* Review */
 router.get("/review-by-admin", Auth.onlyAdmin, ReviewController.getAttendanceReviews);
