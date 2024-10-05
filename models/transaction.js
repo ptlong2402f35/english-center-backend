@@ -12,7 +12,14 @@ module.exports = (sequelize, DataTypes) => {
 		
 
 		static associate(models) {
-
+			Transaction.belongsTo(models.User, {
+                foreignKey: "forUserId",
+                as: "user"
+            });
+			Transaction.belongsTo(models.Cost, {
+                foreignKey: "costId",
+                as: "cost"
+            });
 		}
 	}
 	Transaction.init(
