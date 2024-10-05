@@ -212,6 +212,7 @@ class TransactionController {
             if(!parent)  return res.status(403).json({message: "phụ huynh không tồn tại"});
             let checker = await new ConnectionService().checkStudentParentConnect(student.id, parent.id);
             if(!checker)  return res.status(403).json({message: "Hóa đơn này không phải của bạn"});
+            if(data.totalMoney > cost.debtMoney) return res.status(403).json({message: "Số tiền lớn hơn tiền hóa đơn còn lại"});
             await new TransactionService().createTransaction(data, data.costId);
 
             return res.status(200).json({message: "Thành công"});
