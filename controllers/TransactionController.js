@@ -5,9 +5,12 @@ const { NotEnoughPermission, InputInfoEmpty, CostNotFound } = require("../consta
 const { TransactionService } = require("../services/transaction/transactionService");
 const { CostStatus } = require("../constants/status");
 const { CostType } = require("../constants/type");
+const { TransactionHandler } = require("../services/transaction/transactionHandler");
 const Transaction = require("../models").Transaction;
 const Student = require("../models").Student;
+const User = require("../models").User;
 const Parent = require("../models").Parent;
+const Teacher = require("../models").Teacher;
 const Cost = require("../models").Cost;
 const ParentStudent = require("../models").ParentStudent;
 
@@ -30,7 +33,35 @@ class TransactionController {
                     where: {
                         [Op.and]: conds
                     },
-                    order: [["id", "desc"]]
+                    order: [["id", "desc"]],
+                    include: [
+                        {
+                            model: User,
+                            as: "user",
+                            attributes: ["id", "role"],
+                            include: [
+                                {
+                                    model: Student,
+                                    as: "student",
+                                    attributes: ["id", "name"]
+                                },
+                                {
+                                    model: Teacher,
+                                    as: "teacher",
+                                    attributes: ["id", "name"]
+                                },
+                                {
+                                    model: Parent,
+                                    as: "parent",
+                                    attributes: ["id", "name"]
+                                }
+                            ]
+                        },
+                        {
+                            model: Cost,
+                            as: "cost"
+                        }
+                    ]
                 }
             );
 
@@ -145,7 +176,9 @@ class TransactionController {
             let transaction = await Transaction.findByPk(transactionId);
             if(!transaction) return res.status(403).json({message: "Giao dịch không tồn tại"});
 
-            await new TransactionService().deleteTransaction(transaction);
+            let cost = await new TransactionService().deleteTransaction(transaction);
+
+            await new TransactionHandler().onDeleteTransactionHandler(cost);
 
             return res.status(200).json({message: "Thành công"});
         }

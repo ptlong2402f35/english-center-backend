@@ -194,7 +194,7 @@ class TransactionService {
                 }
             );
 
-            return;
+            return cost;
         }
         catch (err) {
             throw err;
