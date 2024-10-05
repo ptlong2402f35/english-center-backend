@@ -6,6 +6,7 @@ const { TransactionService } = require("../services/transaction/transactionServi
 const { CostStatus } = require("../constants/status");
 const { CostType } = require("../constants/type");
 const { TransactionHandler } = require("../services/transaction/transactionHandler");
+const { ConnectionService } = require("../services/connection/connectionService");
 const Transaction = require("../models").Transaction;
 const Student = require("../models").Student;
 const User = require("../models").User;
@@ -192,10 +193,25 @@ class TransactionController {
     paymentSuccess = async (req, res, next) => {
         try {
             let data = req.body;
+            if(req.user.role != UserRole.Parent) return res.status(403).json({message: "Chức năng chỉ dành cho phụ huynh"});
             if(!data) throw InputInfoEmpty;
             let cost = await Cost.findByPk(data.costId);
             if(!cost) throw CostNotFound;
             if(cost.status === CostStatus.Done) return res.status(403).json({message: "Hóa đơn này đã thanh toán"}); 
+            let student = await Student.findOne({
+                where: {
+                    userId: cost.forUserId
+                }
+            });
+            if(!student)  return res.status(403).json({message: "học sinh không tồn tại"});
+            let parent = await Parent.findOne({
+                where: {
+                    userId: req.user.userId
+                }
+            });
+            if(!parent)  return res.status(403).json({message: "phụ huynh không tồn tại"});
+            let checker = await new ConnectionService().checkStudentParentConnect(student.id, parent.id);
+            if(!checker)  return res.status(403).json({message: "Hóa đơn này không phải của bạn"});
             await new TransactionService().createTransaction(data, data.costId);
 
             return res.status(200).json({message: "Thành công"});

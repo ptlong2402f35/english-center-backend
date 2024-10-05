@@ -149,7 +149,7 @@ router.get("/my-transactions", Auth.auth, TransactionController.getMyTransaction
 router.post("/transaction", Auth.onlyAdmin, TransactionController.adminCreateTransaction);
 router.put("/transaction/:id", Auth.onlyAdmin, TransactionController.adminUpdateTransaction);
 router.delete("/transaction/:id", Auth.onlyAdmin, TransactionController.adminDeleteTransaction);
-router.get("/payment-success", Auth.auth, TransactionController.paymentSuccess);
+router.post("/payment-success", Auth.auth, TransactionController.paymentSuccess);
 
 
 /* Cost Controller */
