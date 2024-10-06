@@ -8,6 +8,7 @@ const Class = require("../models").Class;
 const Center = require("../models").Center;
 const Attendance = require("../models").Attendance;
 const TeacherClass = require("../models").TeacherClass;
+const Schedule = require("../models").Schedule;
 
 
 class SearchController {
@@ -117,6 +118,27 @@ class SearchController {
                 attributes: ["id", "name", "address"],
                 limit: 20
             });
+
+            return res.status(200).json(data);
+        }
+        catch (err) {
+            console.error(err);
+            return res.status(200).json([])
+        }
+    }
+
+    searchSchedule = async (req, res ,next) => {
+        try {
+            let keyword = req.query.keyword || "";
+            
+            let data = await Schedule.findAll({
+                order: [["id", "desc"]],
+                limit: 50
+            });
+
+            for(let schedule of (data || [])) {
+                TimeHandle.attachDayLabel(schedule);
+            }
 
             return res.status(200).json(data);
         }

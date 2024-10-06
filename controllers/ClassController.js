@@ -12,6 +12,7 @@ const { TimeHandle } = require("../utils/timeHandle");
 const util = require("util");
 const { UserRole } = require("../constants/roles");
 const { TeacherService } = require("../services/teacher/teacherService");
+const { ClassStatus } = require("../constants/status");
 
 const Class = require("../models").Class;
 const Student = require("../models").Student;
@@ -40,8 +41,9 @@ class ClassController {
             let includeTeacher = req.query.includeTeacher?.trim() === "true" || null;
             let includeCenter = req.query.includeCenter?.trim() === "true" || null;
             let includeSchedule = req.query.includeSchedule?.trim() === "true" || null;
+            let forAdmin = req.query.forAdmin?.trim() === "true" ? true : false;
 
-            let conds = classQuerier.buildWhere({forAge, fromDate, toDate, status, centerId, code});
+            let conds = classQuerier.buildWhere({forAge, fromDate, toDate, status, centerId, code}, forAdmin);
             let attributes = classQuerier.buildAttributes({});
             let include = classQuerier.buildInclude({
                 includeStudent,
@@ -108,7 +110,7 @@ class ClassController {
                     include: include,
                 }
             );
-            if(!data) throw ClassNotFound;
+            if(!data || data.status === ClassStatus.Disable) throw ClassNotFound;
 
             for(let schedule of (data?.schedules || [])) {
                 TimeHandle.attachDayLabel(schedule);
@@ -286,7 +288,19 @@ class ClassController {
 
     deactiveClass = async (req, res, next) => {
         try {
-            
+            let classId = req.params.id ? parseInt(req.params.id) : 0;
+            if(!classId) throw InputInfoEmpty;
+            let classEl = await Class.findByPk(classId);
+            if(!classEl) return res.status(403).json({message: "Lớp không tồn tại"});
+            let status = req.body.status;
+            await classEl.update(
+                {
+                    stat: status || ClassStatus.Disable
+                }
+            );
+
+            return res.status(200).json({message: "Thành công"});
+
         }
         catch (err) {
             console.error(err);

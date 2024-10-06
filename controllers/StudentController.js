@@ -148,7 +148,7 @@ class StudentController {
                 where: {
                     [Op.and]: conds
                 },
-                attributes: attributes,
+                // attributes: attributes,
                 include: include,
                 order: orderBy
             });

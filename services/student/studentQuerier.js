@@ -76,7 +76,7 @@ class StudentQuerier {
                 {
                     model: Parent,
                     as: "parents",
-                    attributes: ["id", "name", "gender", "userId", "age", "address", "phone", "email", "active"] 
+                    // attributes: ["id", "name", "gender", "userId", "age", "address", "phone", "email", "active"] 
                 }
             ]
         }
