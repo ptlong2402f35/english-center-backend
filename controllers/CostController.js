@@ -272,7 +272,9 @@ class CostController {
                                 referenceId: teacher.id
                             },
                             {
-                                type: CostType.TeacherSalary
+                                type: {
+                                    [Op.in]: [CostType.TeacherSalary, CostType.Bonus]
+                                }
                             }
                         ]
                     },
@@ -388,6 +390,23 @@ class CostController {
         }
     }
 
+    createBonusCost = async (req, res, next) => {
+        try {
+            let data = req.body;
+            if(!data.month || !data.year || !data.totalMoney || !data.teacherId) throw InputInfoEmpty;
+            let teacher = await Teacher.findByPk(data.teacherId);
+            if(!teacher) return res.status(403).json({message: "giáo viên không tồn tại"});
+            await new CostOtherService().createBonusCost(data);
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
     createOtherCost = async (req, res, next) => {
         try {
             let data = req.body;
@@ -477,7 +496,7 @@ class CostController {
                     if(cost.type === CostType.StudentFee) {
                         targetId = cost.user.id;
                     }
-                    if(cost.type === CostType.TeacherSalary) {
+                    if(cost.type === CostType.TeacherSalary || cost.type === CostType.Bonus) {
                         let teacherId = cost.referenceId;
                         let teacher = await Teacher.findByPk(teacherId);
                         if(!teacher) return res.status(403).json({message: "Giáo viên không tồn tại"});
@@ -534,7 +553,7 @@ class CostController {
                 if(cost.type === CostType.StudentFee) {
                     targetId = cost.user.id;
                 }
-                if(cost.type === CostType.TeacherSalary) {
+                if(cost.type === CostType.TeacherSalary || cost.type === CostType.Bonus) {
                     let teacherId = cost.referenceId;
                     let teacher = await Teacher.findByPk(teacherId);
                     if(!teacher) return res.status(403).json({message: "Giáo viên không tồn tại"});
