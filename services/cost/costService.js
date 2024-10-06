@@ -222,6 +222,27 @@ class CostService {
             console.error(err);
         }
     }
+
+    async attachTeacherInfo(cost) {
+        try {
+            if(![CostType.Bonus, CostType.TeacherSalary].includes(cost.type)) {
+                cost.teacher = null;
+                cost?.setDataValue("teacher", null);
+                return;
+            };
+            let teacher = await Teacher.findByPk(cost.referenceId);
+            if(!teacher) {
+                cost.teacher = null;
+                cost?.setDataValue("teacher", null);
+                return;
+            }
+            cost.teacher = teacher;
+            cost?.setDataValue("teacher", teacher);
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
 }
 
 module.exports = {

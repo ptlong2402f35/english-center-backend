@@ -84,6 +84,7 @@ class CostController {
             for( let item of data.docs) {
                 await new CostService().attachExtendInfoToCost(item);
                 await new CostService().attachCenterInfo(item);
+                await new CostService().attachTeacherInfo(item);
             }
 
             data.currentPage = page;

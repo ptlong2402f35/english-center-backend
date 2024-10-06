@@ -1,4 +1,5 @@
 const { Op } = require("sequelize");
+const { ClassStatus } = require("../../constants/status");
 const Parent = require("../../models").Parent;
 const Student = require("../../models").Student;
 const Program = require("../../models").Program;
@@ -17,9 +18,16 @@ class ClassQuerier {
             centerId,
             status,
             code
-        }
+        },
+        forAdmin
     ) {
-        let conds = [];
+        let conds = [
+            ...(forAdmin ? {} : {
+                status: {
+                    [Op.ne]: ClassStatus.Disable
+                }
+            })
+        ];
 
         if(forAge) {
             conds.push({

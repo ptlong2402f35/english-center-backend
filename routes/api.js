@@ -172,6 +172,7 @@ router.get("/search-parent", SearchController.searchParent);
 router.get("/search-teacher", SearchController.searchTeacher);
 router.get("/search-class", SearchController.searchClass);
 router.get("/search-center", SearchController.searchCenter);
+router.get("/search-schedule", SearchController.searchSchedule);
 router.get("/search-teacher-work", SearchController.searchTeacherWork);
 router.get("/search-class-work", SearchController.searchClassWork);
 router.get("/search-student-work", SearchController.searchStudentWork);
