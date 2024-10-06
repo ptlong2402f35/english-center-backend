@@ -1,5 +1,6 @@
 const { Op } = require("sequelize");
 const { TimeHandle } = require("../utils/timeHandle");
+const { ClassStatus } = require("../constants/status");
 
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
@@ -89,6 +90,9 @@ class SearchController {
                 where: {
                     code: {
                         [Op.iLike]: `%${keyword}%`
+                    },
+                    status: {
+                        [Op.ne]: ClassStatus.Disable
                     }
                 },
                 order: [["id", "desc"]],
