@@ -22,11 +22,11 @@ class ClassQuerier {
         forAdmin
     ) {
         let conds = [
-            ...(forAdmin ? {} : {
+            ...(forAdmin ? {} : [{
                 status: {
                     [Op.ne]: ClassStatus.Disable
                 }
-            })
+            }])
         ];
 
         if(forAge) {

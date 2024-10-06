@@ -10,6 +10,7 @@ const Center = require("../models").Center;
 const Attendance = require("../models").Attendance;
 const TeacherClass = require("../models").TeacherClass;
 const Schedule = require("../models").Schedule;
+const Program = require("../models").Program;
 
 
 class SearchController {
@@ -143,6 +144,23 @@ class SearchController {
             for(let schedule of (data || [])) {
                 TimeHandle.attachDayLabel(schedule);
             }
+
+            return res.status(200).json(data);
+        }
+        catch (err) {
+            console.error(err);
+            return res.status(200).json([])
+        }
+    }
+
+    searchProgram = async (req, res ,next) => {
+        try {
+            let keyword = req.query.keyword || "";
+            
+            let data = await Program.findAll({
+                order: [["id", "desc"]],
+                limit: 50
+            });
 
             return res.status(200).json(data);
         }
