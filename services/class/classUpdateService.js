@@ -8,6 +8,7 @@ class classUpdateService {
         try {
             let allowData = {
                 name: data.name,
+                code: data.code,
                 fee: data.fee,
                 totalSession: data.totalSession,
                 status: data.status,
