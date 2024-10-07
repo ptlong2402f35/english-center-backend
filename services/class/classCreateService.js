@@ -49,7 +49,7 @@ class ClassCreateService {
             initTrans = true;
         }
         try {
-            let data = await Class.create(
+            let resp = await Class.create(
                 data,
                 {
                     transaction: transaction
@@ -59,7 +59,7 @@ class ClassCreateService {
             if(initTrans) {
                 await transaction.commit();
             }
-            return data;
+            return resp;
         }
         catch (err) {
             if(initTrans) {
