@@ -262,9 +262,9 @@ class ClassController {
         try {
             let data = req.body;
 
-            await new ClassCreateService().createClass(data);
+            let resp = await new ClassCreateService().createClass(data);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(resp);
         }
         catch (err) {
             console.error(err);

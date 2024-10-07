@@ -14,16 +14,17 @@ class ClassCreateService {
             if(!await this.validate(data)) return;
             let builtData = await this.build(data);
             //update class register
+            let data = null;
             let transaction = await sequelize.transaction();
             try {
-                await this.createClassInstance(builtData);
+                data = await this.createClassInstance(builtData);
                 await transaction.commit();
             }
             catch (err1) {
                 await transaction.rollback();
                 throw err1;
             }
-
+            return data;
         }
         catch (err) {
             throw err;
@@ -48,7 +49,7 @@ class ClassCreateService {
             initTrans = true;
         }
         try {
-            await Class.create(
+            let data = await Class.create(
                 data,
                 {
                     transaction: transaction
@@ -58,6 +59,7 @@ class ClassCreateService {
             if(initTrans) {
                 await transaction.commit();
             }
+            return data;
         }
         catch (err) {
             if(initTrans) {
