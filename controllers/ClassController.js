@@ -117,6 +117,7 @@ class ClassController {
             for(let schedule of (data?.schedules || [])) {
                 TimeHandle.attachDayLabel(schedule);
             }
+            await new ClassHandler().attachAttendancesExtendInfo(data.students, data.id);
             
             return res.status(200).json(data);
         }
