@@ -153,6 +153,7 @@ class ClassQuerier {
                 {
                     model: Student,
                     as: "students",
+                    through: { attributes: ["classId", "studentId", "offSession", "reduceFee", "reducePercent"] } 
                 }
             ]
         }
