@@ -14,17 +14,17 @@ class ClassCreateService {
             if(!await this.validate(data)) return;
             let builtData = await this.build(data);
             //update class register
-            let data = null;
+            let resp = null;
             let transaction = await sequelize.transaction();
             try {
-                data = await this.createClassInstance(builtData);
+                resp = await this.createClassInstance(builtData);
                 await transaction.commit();
             }
             catch (err1) {
                 await transaction.rollback();
                 throw err1;
             }
-            return data;
+            return resp;
         }
         catch (err) {
             throw err;
