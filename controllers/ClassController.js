@@ -13,6 +13,7 @@ const util = require("util");
 const { UserRole } = require("../constants/roles");
 const { TeacherService } = require("../services/teacher/teacherService");
 const { ClassStatus } = require("../constants/status");
+const { ClassHandler } = require("../services/class/classHandler");
 
 const Class = require("../models").Class;
 const Student = require("../models").Student;
@@ -72,6 +73,7 @@ class ClassController {
                 for(let schedule of (item?.schedules || [])) {
                     TimeHandle.attachDayLabel(schedule);
                 }
+                await new ClassHandler().attachAttendancesExtendInfo(item.students, item.id);
             }
 
             return res.status(200).json(data);
