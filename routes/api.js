@@ -16,6 +16,7 @@ const TransactionController = require("../controllers/TransactionController");
 const CostController = require("../controllers/CostController");
 const SearchController = require("../controllers/SearchController");
 const ReviewController = require("../controllers/ReviewController");
+const AnalyticController = require("../controllers/AnalyticController");
 var router = express.Router();
 
 //test connect
@@ -186,5 +187,9 @@ router.get("/review-by-student", Auth.auth, ReviewController.studentGetAttendanc
 router.post("/review", Auth.auth, ReviewController.createReviews);
 router.put("/review", Auth.auth, ReviewController.updateReviews);
 router.delete("/review/:id", Auth.auth, ReviewController.deleteReviews);
+
+/* Analytics */
+router.get("/user-analytics", Auth.onlyAdmin, AnalyticController.getUserAnalytic);
+
 
 module.exports = router;
