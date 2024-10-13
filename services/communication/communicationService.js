@@ -1,5 +1,7 @@
 const { EmailService } = require("./emailService");
 const Notification = require("../../models").Notification;
+let FireBaseProjectId = process.env.FIREBASE_PROJECT_ID || "english-center-1e883";
+let FCMPushNotiUrl = `https://fcm.googleapis.com/v1/projects/${FireBaseProjectId}/messages:send`
 
 class CommunicationService {
     emailService;
@@ -43,7 +45,7 @@ class CommunicationService {
         }
     }
     
-    //one signal
+    //fire base noti
     async sendMobileNotification() {
         try {
 
@@ -52,6 +54,31 @@ class CommunicationService {
             console.error(err);
         }
     }
+
+    // async getToken() {
+    //     try {
+    //         return new Promise(function(resolve, reject) {
+    //             const key = require('../placeholders/service-account.json');
+    //             const jwtClient = new google.auth.JWT(
+    //               key.client_email,
+    //               null,
+    //               key.private_key,
+    //               SCOPES,
+    //               null
+    //             );
+    //             jwtClient.authorize(function(err, tokens) {
+    //               if (err) {
+    //                 reject(err);
+    //                 return;
+    //               }
+    //               resolve(tokens.access_token);
+    //             });
+    //           });
+    //     }
+    //     catch (err) {
+    //         console.error(err);
+    //     }
+    // }
 }
 
 module.exports = {

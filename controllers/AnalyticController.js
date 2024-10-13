@@ -167,24 +167,28 @@ class AnalyticController {
 
                 let classRegisters = studentClasses.filter(el => classIds.includes(el.classId));
                 let joinClassProcess = [];
-                for(let month=1; month <= 12; month++) {
-                    let {first, last} = TimeHandle.getStartAndEndDayOfMonth(month, studentClassForYear);
-                    let tmp = {
-                        month: month,
-                        year: studentClassForYear,
-                        totalStudent: studentIds.length,
-                        joinClassStudent: 0,
-                        unJoinClassStudent: 0
+                for(let register of classRegisters) {
+                    let month = new Date(register.createdAt).getMonth() + 1
+                    let year = new Date(register.createdAt).getFullYear();
+                    let findItem = joinClassProcess.find(el => el.month === month && el.year === year);
+                    if(findItem) {
+                        if(findItem.studentIds.includes(register.studentId)) continue;
+                        findItem.joinClassStudent += 1;
+                        findItem.unJoinClassStudent = findItem.totalStudent - findItem.joinClassStudent;
+                        findItem.studentIds.push(register.studentId);
                     }
-                    let joinStudentIds = [];
-                    for(let element of classRegisters) {
-                        if(element.createdAt <= last && element.createdAt >= first && !joinStudentIds.includes(element.studentId)) {
-                            tmp.joinClassStudent+=1;
-                            joinStudentIds.push(element.studentId)
-                        }
+                    else {
+                        joinClassProcess.push(
+                            {
+                                month: month,
+                                year: year,
+                                totalStudent: studentIds.length,
+                                joinClassStudent: 1,
+                                unJoinClassStudent: studentIds.length - 1,
+                                studentIds: [register.studentId]
+                            }
+                        )
                     }
-                    tmp.unJoinClassStudent = studentIds.length - tmp.joinClassStudent;
-                    joinClassProcess.push(tmp);
                 }
                 studentJoinItem.number = [...joinClassProcess];
                 studentJoinByMonth.push(studentJoinItem);
@@ -221,24 +225,31 @@ class AnalyticController {
                 //thu chi theo thang
                 let profitItem = [];
 
-                for(let month=1; month <= 12; month++) {
-                    let {first, last} = TimeHandle.getStartAndEndDayOfMonth(month, financeMonthOfYear);
-                    let tmp = {
-                        month: month,
-                        year: financeMonthOfYear,
-                        income: 0,
-                        expend: 0,
-                        profit: 0
+                for(let cost of costs) {
+                    let month = new Date(cost.timerTime).getMonth() + 1
+                    let year = new Date(cost.timerTime).getFullYear();
+                    let findItem = profitItem.find(el => el.month === month && el.year === year);
+                    if(findItem) {
+                        if(cost.type === CostType.StudentFee) findItem.income+=cost.totalMoney;
+                        else findItem.expend += cost.totalMoney;
+                        findItem.profit = findItem.income - findItem.expend;
                     }
-                    for(let cost of costs) {
-                        if(cost.timerTime <= last && cost.timerTime >= first) {
-                            if(cost.type === CostType.StudentFee) tmp.income+=cost.totalMoney;
-                            else tmp.expend += cost.totalMoney;
-                        }
+                    else {
+                        let tmp = 
+                            {
+                                month: month,
+                                year: year,
+                                income: 0,
+                                expend: 0,
+                                profit: 0
+                            }
+                        if(cost.type === CostType.StudentFee) tmp.income+=cost.totalMoney;
+                        else tmp.expend += cost.totalMoney;
+                        tmp.profit = tmp.income - tmp.expend;
+                        profitItem.push(tmp);
                     }
-                    tmp.profit = tmp.income - tmp.expend;
-                    profitItem.push(tmp);
                 }
+
                 profitByMonths = [{
                     centerID: item.id,
                     centerName: item.name,
@@ -248,23 +259,27 @@ class AnalyticController {
                 //thu chi theo nam
                 let profitByYearItem = [];
 
-                for(let year=2020; year <= 2030; year++) {
-                   let first = new Date(year, 0 ,1);
-                   let last = new Date(year, 11 ,31);
-                    let tmp = {
-                        year: year,
-                        income: 0,
-                        expend: 0,
-                        profit: 0
+                for(let cost of costs) {
+                    let year = new Date(cost.timerTime).getFullYear();
+                    let findItem = profitByYearItem.find(el => el.year === year);
+                    if(findItem) {
+                        if(cost.type === CostType.StudentFee) findItem.income+=cost.totalMoney;
+                        else findItem.expend += cost.totalMoney;
+                        findItem.profit = findItem.income - findItem.expend;
                     }
-                    for(let cost of costs) {
-                        if(cost.timerTime <= last && cost.timerTime >= first) {
-                            if(cost.type === CostType.StudentFee) tmp.income+=cost.totalMoney;
-                            else tmp.expend += cost.totalMoney;
-                        }
+                    else {
+                        let tmp = 
+                            {
+                                year: year,
+                                income: 0,
+                                expend: 0,
+                                profit: 0
+                            }
+                        if(cost.type === CostType.StudentFee) tmp.income+=cost.totalMoney;
+                        else tmp.expend += cost.totalMoney;
+                        tmp.profit = tmp.income - tmp.expend;
+                        profitByYearItem.push(tmp);
                     }
-                    tmp.profit = tmp.income - tmp.expend;
-                    profitByYearItem.push(tmp);
                 }
                 profitByYears = [{
                     centerID: item.id,
