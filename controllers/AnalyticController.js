@@ -64,7 +64,7 @@ class AnalyticController {
 
             let allStudents = await Student.findAll({
                 order: [["id", "asc"]],
-                attributes: ["id", "name", "age"]
+                attributes: ["id", "name", "age", "createdAt"]
             })
 
             let parentStudent = await ParentStudent.findAll(); 
@@ -83,6 +83,7 @@ class AnalyticController {
             let studentJoinAttendances = [];
             let profitByMonths = [];
             let profitByYears = [];
+            let classStatusByTime = [];
 
             for(let item of centers) {
                 let curItem = {
@@ -223,6 +224,40 @@ class AnalyticController {
                 }
                 studentJoinAttendances.push(attendanceItem);
 
+                //open class / close class
+                let classStatusItem = {
+                    centerID: item.id,
+                    centerName: item.name,
+                    data: []
+                }
+
+                let classStatusElement = [];
+                for(let att of attendances) {
+                    let month = new Date(att.date).getMonth() + 1
+                    let year = new Date(att.date).getFullYear();
+                    let fItem = classStatusElement.find(el => el.year === year && el.month === month);
+                    if(fItem) {
+                        if(!fItem.classIds?.includes(att.classId)) {
+                            fItem.classIds.push(att.classId);
+                            fItem.count += 1;
+                        }
+                    }
+                    else {
+                        classStatusElement.push(
+                            {
+                                month,
+                                year,
+                                classIds: [att.classId],
+                                count: 1
+                            }
+                        )
+                    }
+                }
+                classStatusItem.data = [...classStatusElement];
+                classStatusByTime.push({
+                    ...classStatusItem
+                });
+
                 //thu chi theo thang
                 let profitItem = [];
 
@@ -343,6 +378,79 @@ class AnalyticController {
             }
             resp.total = total
 
+            //attach class open
+
+            for(let centerData of classStatusByTime) {
+                let data = [...centerData.data];
+                for(let item of data) {
+                    if(!item.classIds?.length) continue;
+                    let nextMonth = item.month + 1;
+                    let nextYear = item.year;
+                    if(nextMonth > 12) {
+                        nextYear+=1;
+                        let findNext = data.find(el => el.month === 1 && el.year === nextYear);
+                        if(findNext) {
+                            let closeCount = 0;
+                            let closeArr = item.classIds.filter(el => !findNext.classIds.includes(el));
+                            closeCount = closeArr.length;
+                            findNext.closeCount = closeCount;
+                        }
+                        else {
+                            let tmp = {
+                                month: 1,
+                                year: nextYear,
+                                classIds: [],
+                                closeCount: item.classIds.length,
+                                openCount: 0
+                            }
+                            data.push(tmp);
+                        }
+                    }
+                    else {
+                        let findNext = data.find(el => el.month === nextMonth && el.year === nextYear);
+                        if(findNext) {
+                            let closeCount = 0;
+                            let closeArr = item.classIds.filter(el => !findNext.classIds.includes(el));
+                            closeCount = closeArr.length;
+                            findNext.closeCount = closeCount;
+                        }
+                        else {
+                            let tmp = {
+                                month: nextMonth,
+                                year: nextYear,
+                                classIds: [],
+                                closeCount: item.classIds.length,
+                                openCount: 0
+                            }
+                            data.push(tmp);
+                        }
+                    }
+                    if(!item.closeCount) item.closeCount = 0;
+                    item.openCount = item.classIds.length;
+                }
+                centerData.data = [...data];
+            }
+
+            //count studen registed
+            let registedStudentByTime = [];
+            for(let student of allStudents) {
+                let month = new Date(student.createdAt).getMonth() + 1
+                let year = new Date(student.createdAt).getFullYear();
+                let fItem = registedStudentByTime.find(el => el.year === year && el.month === month);
+                    if(fItem) {
+                        fItem.count += 1;
+                    }
+                    else {
+                        registedStudentByTime.push(
+                            {
+                                month,
+                                year,
+                                count: 1
+                            }
+                        )
+                    }
+            }
+
             //
             resp.numberUserByCenter = [...numberUserByCenter];
             resp.studentConnect = [...studentConnect];
@@ -351,6 +459,9 @@ class AnalyticController {
             resp.studentJoinAttendances = [...studentJoinAttendances];
             resp.profitByMonths = [...profitByMonths];
             resp.profitByYears = [...profitByYears];
+            resp.openClassByMonth = [...classStatusByTime];
+            resp.registedStudentByTime = [...registedStudentByTime];
+
             
             return res.status(200).json(resp);
         }
