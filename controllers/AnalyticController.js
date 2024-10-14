@@ -14,6 +14,7 @@ const StudentClass = require("../models").StudentClass;
 const Center = require("../models").Center;
 const TeacherClass = require("../models").TeacherClass;
 const Cost = require("../models").Cost;
+const Transaction = require("../models").Transaction;
 
 
 
@@ -69,11 +70,11 @@ class AnalyticController {
             let parentStudent = await ParentStudent.findAll(); 
             let teacherClasses = await TeacherClass.findAll(); 
             let studentClasses = await StudentClass.findAll(); 
-            let costs = await Cost.findAll(
+            let transactions = await Transaction.findAll(
                 {
-                    attributes: ["type", "totalMoney", "timerTime"]
+                    attributes: ["costType", "totalMoney", "timerTime"]
                 }
-            )
+            );
 
             let numberUserByCenter = [];
             let studentConnect = [];
@@ -225,12 +226,12 @@ class AnalyticController {
                 //thu chi theo thang
                 let profitItem = [];
 
-                for(let cost of costs) {
+                for(let cost of transactions) {
                     let month = new Date(cost.timerTime).getMonth() + 1
                     let year = new Date(cost.timerTime).getFullYear();
                     let findItem = profitItem.find(el => el.month === month && el.year === year);
                     if(findItem) {
-                        if(cost.type === CostType.StudentFee) findItem.income+=cost.totalMoney;
+                        if(cost.costType === CostType.StudentFee) findItem.income+=cost.totalMoney;
                         else findItem.expend += cost.totalMoney;
                         findItem.profit = findItem.income - findItem.expend;
                     }
@@ -243,7 +244,7 @@ class AnalyticController {
                                 expend: 0,
                                 profit: 0
                             }
-                        if(cost.type === CostType.StudentFee) tmp.income+=cost.totalMoney;
+                        if(cost.costType === CostType.StudentFee) tmp.income+=cost.totalMoney;
                         else tmp.expend += cost.totalMoney;
                         tmp.profit = tmp.income - tmp.expend;
                         profitItem.push(tmp);
@@ -259,11 +260,11 @@ class AnalyticController {
                 //thu chi theo nam
                 let profitByYearItem = [];
 
-                for(let cost of costs) {
+                for(let cost of transactions) {
                     let year = new Date(cost.timerTime).getFullYear();
                     let findItem = profitByYearItem.find(el => el.year === year);
                     if(findItem) {
-                        if(cost.type === CostType.StudentFee) findItem.income+=cost.totalMoney;
+                        if(cost.costType === CostType.StudentFee) findItem.income+=cost.totalMoney;
                         else findItem.expend += cost.totalMoney;
                         findItem.profit = findItem.income - findItem.expend;
                     }
@@ -275,7 +276,7 @@ class AnalyticController {
                                 expend: 0,
                                 profit: 0
                             }
-                        if(cost.type === CostType.StudentFee) tmp.income+=cost.totalMoney;
+                        if(cost.costType === CostType.StudentFee) tmp.income+=cost.totalMoney;
                         else tmp.expend += cost.totalMoney;
                         tmp.profit = tmp.income - tmp.expend;
                         profitByYearItem.push(tmp);
@@ -288,6 +289,61 @@ class AnalyticController {
                 }];
             }
 
+            //case total
+            let studentConnects = [... new Set(parentStudent.map(item => item.studentId))].length;
+            let studentNotConnects = resp.studentNumber - studentConnects;
+
+            //ages
+            let ages = [];
+            for(let stu of allStudents) {
+                let findItem = ages.find(age => age.age === stu.age);
+                if(findItem) {
+                    findItem.count += 1;
+                }
+                else {
+                        ages.push({
+                        age: stu.age,
+                        count: 1
+                    })
+                }
+            }
+            // joined students
+            let joinClassProcess = [];
+            for(let register of studentClasses) {
+                let month = new Date(register.createdAt).getMonth() + 1
+                let year = new Date(register.createdAt).getFullYear();
+                let findItem = joinClassProcess.find(el => el.month === month && el.year === year);
+                if(findItem) {
+                    if(findItem.studentIds.includes(register.studentId)) continue;
+                    findItem.joinClassStudent += 1;
+                    findItem.unJoinClassStudent = findItem.totalStudent - findItem.joinClassStudent;
+                    findItem.studentIds.push(register.studentId);
+                }
+                else {
+                    joinClassProcess.push(
+                        {
+                            month: month,
+                            year: year,
+                            totalStudent: resp.studentNumber,
+                            joinClassStudent: 1,
+                            unJoinClassStudent: resp.studentNumber - 1,
+                            studentIds: [register.studentId]
+                        }
+                    )
+                }
+            }
+
+            let total = {
+                studentConnect: {
+                    hocsinhlienket: studentConnects,
+                    hocsinhkolienket: studentNotConnects
+                },
+                studentAges: ages,
+                studentJoinByMonth: joinClassProcess
+            }
+            resp.total = total
+
+            //
             resp.numberUserByCenter = [...numberUserByCenter];
             resp.studentConnect = [...studentConnect];
             resp.studentAges = [...studentAges];
