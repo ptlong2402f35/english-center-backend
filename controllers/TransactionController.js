@@ -7,6 +7,7 @@ const { CostStatus } = require("../constants/status");
 const { CostType } = require("../constants/type");
 const { TransactionHandler } = require("../services/transaction/transactionHandler");
 const { ConnectionService } = require("../services/connection/connectionService");
+const { CostService } = require("../services/cost/costService");
 const Transaction = require("../models").Transaction;
 const Student = require("../models").Student;
 const User = require("../models").User;
@@ -47,39 +48,11 @@ class TransactionController {
                                     model: Student,
                                     as: "student",
                                     attributes: ["id", "name"],
-                                    include: [
-                                        {
-                                            model: Class,
-                                            as: "classes",
-                                            attributes: ["id", "centerId"],
-                                            include: [
-                                                {
-                                                    model: Attendance,
-                                                    as: "attendances",
-                                                    attributes: ["id", "date"]
-                                                }
-                                            ]
-                                        }
-                                    ]
                                 },
                                 {
                                     model: Teacher,
                                     as: "teacher",
                                     attributes: ["id", "name"],
-                                    include: [
-                                        {
-                                            model: Class,
-                                            as: "classes",
-                                            attributes: ["id", "centerId"],
-                                            include: [
-                                                {
-                                                    model: Attendance,
-                                                    as: "attendances",
-                                                    attributes: ["id", "date"]
-                                                }
-                                            ]
-                                        }
-                                    ]
                                 },
                                 {
                                     model: Parent,
@@ -95,6 +68,10 @@ class TransactionController {
                     ]
                 }
             );
+
+            for(let item of data.docs) {
+                await new CostService().attachExtendInfoToCost(item.cost);
+            }
 
             data.currentPage = page;
             return res.status(200).json(data);
