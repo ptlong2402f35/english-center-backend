@@ -7,6 +7,7 @@ const { CostStatus } = require("../constants/status");
 const { CostType } = require("../constants/type");
 const { TransactionHandler } = require("../services/transaction/transactionHandler");
 const { ConnectionService } = require("../services/connection/connectionService");
+const { CostService } = require("../services/cost/costService");
 const Transaction = require("../models").Transaction;
 const Student = require("../models").Student;
 const User = require("../models").User;
@@ -14,6 +15,8 @@ const Parent = require("../models").Parent;
 const Teacher = require("../models").Teacher;
 const Cost = require("../models").Cost;
 const ParentStudent = require("../models").ParentStudent;
+const Class = require("../models").Class;
+const Attendance = require("../models").Attendance;
 
 class TransactionController {
     getTransactions = async (req, res, next) => {
@@ -21,7 +24,7 @@ class TransactionController {
             let page = req.query.page ? parseInt(req.query.page) : 1;
             let perPage = req.query.perPage ? parseInt(req.query.perPage) : 50;
             let forUserId = req.query.forUserId ? parseInt(req.query.forUserId) : null;
-
+            
             let conds = [];
             if(forUserId) {
                 conds.push({forUserId: forUserId});
@@ -44,12 +47,12 @@ class TransactionController {
                                 {
                                     model: Student,
                                     as: "student",
-                                    attributes: ["id", "name"]
+                                    attributes: ["id", "name"],
                                 },
                                 {
                                     model: Teacher,
                                     as: "teacher",
-                                    attributes: ["id", "name"]
+                                    attributes: ["id", "name"],
                                 },
                                 {
                                     model: Parent,
@@ -65,6 +68,10 @@ class TransactionController {
                     ]
                 }
             );
+
+            for(let item of data.docs) {
+                await new CostService().attachExtendInfoToCost(item.cost);
+            }
 
             data.currentPage = page;
             return res.status(200).json(data);
