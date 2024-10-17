@@ -72,7 +72,12 @@ class AnalyticController {
             let studentClasses = await StudentClass.findAll(); 
             let transactions = await Transaction.findAll(
                 {
-                    attributes: ["costType", "totalMoney", "timerTime"]
+                    attributes: ["costType", "totalMoney", "timerTime", "costId", "createdAt"]
+                }
+            );
+            let costs = await Cost.findAll(
+                {
+                    attributes: ["id", "referenceId", "type"]
                 }
             );
 
@@ -257,13 +262,28 @@ class AnalyticController {
                 classStatusByTime.push({
                     ...classStatusItem
                 });
+                //cost cua class
+                
+                let classCosts = [];
+                for(let cost of costs) {
+                    if(cost.type != CostType.TeacherSalary && classIds.includes(cost.referenceId)) classCosts.push(cost);
+                    if(cost.type === CostType.TeacherSalary) {
+                        let teacherOfClass = teacherClass.find(item => item.teacherId === cost.referenceId);
+                        if(teacherOfClass) {
+                            classCosts.push(cost);
+                        }
+                    }
+                }
+
+                let classCostIds = classCosts.map(item => item.id).filter(val => val);
 
                 //thu chi theo thang
                 let profitItem = [];
 
                 for(let cost of transactions) {
-                    let month = new Date(cost.timerTime).getMonth() + 1
-                    let year = new Date(cost.timerTime).getFullYear();
+                    if(!classCostIds.includes(cost.costId)) continue;
+                    let month = new Date(cost.timerTime || cost.createdAt).getMonth() + 1
+                    let year = new Date(cost.timerTime || cost.createdAt).getFullYear();
                     let findItem = profitItem.find(el => el.month === month && el.year === year);
                     if(findItem) {
                         if(cost.costType === CostType.StudentFee) findItem.income+=cost.totalMoney;
@@ -286,17 +306,22 @@ class AnalyticController {
                     }
                 }
 
-                profitByMonths = [{
-                    centerID: item.id,
-                    centerName: item.name,
-                    data: [...profitItem]
-                }];
+                profitByMonths = [
+                    ...profitByMonths,
+                    {
+                        centerID: item.id,
+                        centerName: item.name,
+                        data: [...profitItem]
+                
+                    }
+                ];
 
                 //thu chi theo nam
                 let profitByYearItem = [];
 
                 for(let cost of transactions) {
-                    let year = new Date(cost.timerTime).getFullYear();
+                    if(!classCostIds.includes(cost.costId)) continue;
+                    let year = new Date(cost.timerTime || cost.createdAt).getFullYear();
                     let findItem = profitByYearItem.find(el => el.year === year);
                     if(findItem) {
                         if(cost.costType === CostType.StudentFee) findItem.income+=cost.totalMoney;
@@ -317,11 +342,14 @@ class AnalyticController {
                         profitByYearItem.push(tmp);
                     }
                 }
-                profitByYears = [{
-                    centerID: item.id,
-                    centerName: item.name,
-                    data: [...profitByYearItem]
-                }];
+                profitByYears = [
+                    ...profitByYears,
+                    {
+                        centerID: item.id,
+                        centerName: item.name,
+                        data: [...profitByYearItem]
+                    }
+                ];
             }
 
             //case total

@@ -192,6 +192,9 @@ class CostService {
                     return;
                 }
                 default: {
+                    cost.centerId = cost.referenceId;
+                    cost?.setDataValue("centerId", cost.referenceId);
+
                     return;
                 }
             }
