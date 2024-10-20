@@ -30,6 +30,11 @@ class CostService {
                 `Thanh toán thành công cho hóa đơn ${cost?.name || cost.id || ""}`,
                 NotificationType.Transaction
             );
+            this.communicationService.sendMobileNotification(
+                cost.user.id,
+                "Thanh toán thành công",
+                `Thanh toán thành công cho hóa đơn ${cost?.name || cost.id || ""}`,
+            );
         }
         catch (err) {
             console.error(err);
@@ -84,6 +89,11 @@ class CostService {
                 `Đã có hóa đơn lương tháng ${month}`,
                 `Đã có hóa đơn lương tháng ${month}/${year} xin vui lòng kiểm tra, nếu có thắc mắc xin liên lạc với ban quản trị trung tâm`,
                 NotificationType.Transaction
+            );
+            this.communicationService.sendMobileNotification(
+                teacher.userId,
+                `Đã có hóa đơn lương tháng ${month}`,
+                `Đã có hóa đơn lương tháng ${month}/${year} xin vui lòng kiểm tra, nếu có thắc mắc xin liên lạc với ban quản trị trung tâm`,
             );
         }
         catch (err) {

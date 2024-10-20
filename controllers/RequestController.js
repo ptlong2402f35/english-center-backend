@@ -206,6 +206,12 @@ class RequestController {
                     NotificationType.Request
                 );
 
+                communicationService.sendMobileNotification(
+                    student.userId,
+                    "Phụ huynh gửi lời mời kết nối",
+                    `Phụ huynh ${roleObj.name || roleObj.phone} gửi bạn lời mời kết nối, vui lòng kiểm tra`,
+                );
+
                 return res.status(200).json({message: "Thành công"})
             }
             if(user.role === UserRole.Student) {
@@ -253,6 +259,12 @@ class RequestController {
                     "Học sinh gửi lời mời kết nối",
                     `Học sinh ${roleObj.name || roleObj.phone} gửi bạn lời mời kết nối, vui lòng kiểm tra`,
                     NotificationType.Request
+                );
+
+                communicationService.sendMobileNotification(
+                    parent.userId,
+                    "Học sinh gửi lời mời kết nối",
+                    `Học sinh ${roleObj.name || roleObj.phone} gửi bạn lời mời kết nối, vui lòng kiểm tra`,
                 );
 
                 return res.status(200).json({message: "Thành công"})
@@ -319,6 +331,12 @@ class RequestController {
                             `Phụ huynh ${roleObj.name || roleObj.phone} chấp nhận lời mời kết nối, vui lòng kiểm tra`,
                             NotificationType.Request
                         );
+
+                        communicationService.sendMobileNotification(
+                            student.userId,
+                            "Phụ huynh chấp nhận lời mời kết nối",
+                            `Phụ huynh ${roleObj.name || roleObj.phone} chấp nhận lời mời kết nối, vui lòng kiểm tra`,
+                        );
                     }
                 }
 
@@ -367,6 +385,11 @@ class RequestController {
                             "Học sinh chấp nhận lời mời kết nối",
                             `Học sinh ${roleObj.name || roleObj.phone} chấp nhận lời mời kết nối, vui lòng kiểm tra`,
                             NotificationType.Request
+                        );
+                        communicationService.sendMobileNotification(
+                            parent.userId,
+                            "Học sinh chấp nhận lời mời kết nối",
+                            `Học sinh ${roleObj.name || roleObj.phone} chấp nhận lời mời kết nối, vui lòng kiểm tra`,
                         );
                     }
                 }
@@ -518,6 +541,16 @@ class RequestController {
                     "Bạn đã liên kết với học sinh",
                     `Bạn đã liên kết với học sinh ${student.name || student.phone}`,
                     NotificationType.Request
+                );
+                communicationService.sendMobileNotification(
+                    student.userId,
+                    "Bạn đã liên kết với phụ huynh",
+                    `Bạn đã liên kết với phụ huynh ${parent.name || parent.phone}`,
+                );
+                communicationService.sendMobileNotification(
+                    parent.userId,
+                    "Bạn đã liên kết với học sinh",
+                    `Bạn đã liên kết với học sinh ${student.name || student.phone}`,
                 );
             }
 

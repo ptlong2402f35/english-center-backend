@@ -14,6 +14,7 @@ const { TranslateService } = require("../services/translateService");
 const SuccessRespMessage = require("../resources/translation.json").message.done;
 const config = require("../config/config");
 const { UserService } = require("../services/user/userService");
+const { FirebaseConfig } = require("../firebase/firebaseConfig");
 class AuthController {
     login = async (req, res, next) => {
         try {
@@ -26,6 +27,7 @@ class AuthController {
                 throw PasswordEmpty;
             }
             let {action, accessToken, refreshToken, expiredIn, userId} = await new AuthLogin().handleLogin(data);
+            let messageToken = await new FirebaseConfig().getAccessToken();
             if(action) {
                 return res.status(200).json({
                     message: "Đăng nhập thành công",
@@ -33,6 +35,7 @@ class AuthController {
                     expiredIn,
                     userId,
                     refreshToken,
+                    messageToken
                 });
             }
             return res.status(403).json({
@@ -41,6 +44,7 @@ class AuthController {
                 expiredIn: null,
                 userId: null,
                 refreshToken: null,
+                messageToken: null
             });
         }
         catch (err) {
@@ -61,6 +65,7 @@ class AuthController {
                 throw PasswordEmpty;
             }
             let {action, accessToken, refreshToken, expiredIn, userId} = await new AuthLogin().handleLogin(data, true);
+            let messageToken = await new FirebaseConfig().getAccessToken();
             if(action) {
                 return res.status(200).json({
                     message: "Đăng nhập thành công",
@@ -68,6 +73,7 @@ class AuthController {
                     expiredIn,
                     userId,
                     refreshToken,
+                    messageToken
                 });
             }
             return res.status(403).json({
@@ -76,6 +82,7 @@ class AuthController {
                 expiredIn: null,
                 userId: null,
                 refreshToken: null,
+                messageToken: null
             });
         }
         catch (err) {
