@@ -1,5 +1,6 @@
 const {initializeApp, applicationDefault} = require('firebase-admin/app');
 const firebase = require('firebase-admin');
+const util = require("util");
 const {getMessaging} = require("firebase-admin/messaging");
 const MESSAGING_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging';
 const SCOPES = [MESSAGING_SCOPE];
@@ -9,10 +10,11 @@ const httpProxyAgent = require('https-proxy-agent');
 const env = process.env.NODE_ENV;
 const FirebaseEndpoint = "https://fcm.googleapis.com/v1/projects/english-center-1e883/messages:send";
 
-var serviecAccount = require("../english-center-1e883-firebase-adminsdk-xqrnt-1a81931231.json");
+var serviceAccount = require("../english-center-1e883-firebase-adminsdk-xqrnt-4e359b8046.json");
 
 class FirebaseConfig {
     static instance;
+    firebase;
 
     getInstance() {
         if(!FirebaseConfig.instance) {
@@ -32,8 +34,8 @@ class FirebaseConfig {
             default:
               databaseUrl = 'https://english-center-backend.vercel.app/';
         }
-        initializeApp({
-            credential: firebase.credential.cert(serviecAccount),
+        this.firebase = firebase.initializeApp({
+            credential: firebase.credential.cert(serviceAccount),
             // databaseURL: databaseUrl,
             // projectId: "english-center-1e883"
         })
@@ -43,9 +45,9 @@ class FirebaseConfig {
         try {
             return new Promise(function(resolve, reject) {
                 const jwtClient = new google.auth.JWT(
-                  serviecAccount.client_email,
+                  serviceAccount.client_email,
                   null,
-                  serviecAccount.private_key,
+                  serviceAccount.private_key,
                   SCOPES,
                   null
                 );
@@ -89,7 +91,7 @@ class FirebaseConfig {
             //     },
             // )
 
-            let resp = await firebase.messaging().send(message)
+            let resp = await this.firebase.messaging().send(message)
             
             console.log('Successfully sent message:', resp);
 
@@ -97,7 +99,7 @@ class FirebaseConfig {
         }
         catch (err) {
             console.log('Fail sent message:');
-            console.error(err.response);
+             console.log(`==== error detail: `, util.inspect(err, false, null, true));
         }
     }
 

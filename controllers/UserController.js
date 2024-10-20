@@ -219,7 +219,7 @@ class UserController {
             //ya29.c.c0ASRK0GYMUzaPG9tbreyzct0Evdofwk2ieNo4WUJ2BHTg86nlnzr_scgmYnTLc91TWh1US48XVlVFqgvmX8AICN_pQjwZJ4vTmXl9GbpC7cUc-Z9Fr3cBgRRV-WB6QscDMmDPpJ2K6XIFKfdVzO_B0JmE0DwwYfyLWU_vLGbDV_kca_46indtRTxZC_7wflHBim2wQnMwTCzBPs-e1ASaPHmg-QrHeci_TqAhpjvdBRIn1EiVFo1mBlPSbYUhAo4pyd5YvF5W_xNxT687VeQ5J1FN-hlaH1fchmX7p2ZLamgAFJUBBO1jFnBzhH-kDuqDKRX0aD6f6iJ_VNyFDpFqft8aRZDNw4ipN_pwZZe5s3DxScpp3VGytINwG385A8XMRvzryd69vf-bVMM4yj6Shc-kFORdQ6sWVcuskkuW3k0u6Ylv7zU3vr17ISq0xsiQ-ubbsu8vdOBx-iW_dOpk899rhzBgyfQd-mj3RdBSXWb4B7afIhMY0jb8Icn-6WOc5owzwxcd1bUw4RXuZfjIat-lJ9tra1gZFaU34nt1eVtJlg3381JY8e5m_nyb_7ZJ2w0gcvh09BzQtOi_2sIvY3U9IapbW7l1Y3_ow1aZpZ63nFt6OZ6zZJXeve2F5YOb_fzepWmt6-b3SI1jr8a8uvw-WM_VmdgxFOcX9WaVg1SmdfreM7ZxkZFn6nBX9BYd5z3_tYgz3jca184gJrwhQqU6n4Jhgbeno21Oi0ZZy8WBza91w3kFm4-8O4OOfUzOlwz53UYxg4awc9Y4FMfpg5jeSIUxWjjkgZ1X-ej6SxeFxZ12Qe9Wy2ni4OXsX0vUI0cUdfcvyy09Wf4eWngzxQsQyzd-2m6tWt_uj1R3-klcI_rqkSVkgpy3Q5MzzhQRhedihO3glzbm9B4Vgmnqz-ZRnQ2Fj4d-t5-euXst7mWF76xkjMB-4arsp7I6jYhgtUjc9gi_JabusWRBU7Y2SFR7lXIMbvdoplixOMzOO1zl409S068hcef
             
             let user= await User.findByPk(userId);
-            let msgToken = user.messageToken;
+            let msgToken = "c2Vhwc14SQqQvxbDEtN2xj:APA91bEWG5o7ob7V2SSXjL0G2GFXxkqH0lHmiZ7l3dSSBqaMoOivZMZfTTnUvPkKILUNRJKka3UwCzAFvEj6Q-dOzvkyNlNAE1Ta4ezlE936gTTMNGai608P70bZLL5UGnm1vhBJNz50";
 
             let resp = await firebaseConfig.createMessage(msgToken, {title:"TEST title", body: "TEST body @@"});
 
