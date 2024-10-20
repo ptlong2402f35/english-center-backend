@@ -43,6 +43,7 @@ var debug = require("debug")("node-sequelize:server");
 
 var http = require("http");
 const { initSocket } = require("./socket/socket");
+const { FirebaseConfig } = require("./firebase/firebaseConfig");
 const HOST = "0.0.0.0";
 const ChannelPassword = "ccyT7JeiJ2";
 require("events").EventEmitter.prototype._maxListeners = 50;
@@ -111,5 +112,7 @@ function onListening() {
 	console.log(`Listening on http://localhost:${addr.port}`);
 	debug("Listening on " + bind);
 }
+
+new FirebaseConfig().getInstance().init();
 //connect socket
 setTimeout(()=>initSocket(server), 5000);

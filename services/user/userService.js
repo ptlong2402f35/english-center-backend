@@ -106,6 +106,25 @@ class UserService {
         }
     }
 
+    async updateMessageToken(userId, messageToken) {
+        try {
+            await User.update(
+                {
+                    messageToken,
+                    updatedAt: new Date()
+                },
+                {
+                    where: {
+                        id: userId
+                    }
+                }
+            );
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+
     async fetchUser(userId) {
         try {
             return await User.findByPk(userId);

@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
 			role: DataTypes.INTEGER,
             active: DataTypes.BOOLEAN,
 			resetKey: DataTypes.TEXT,
+			messageToken: DataTypes.TEXT,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
 		},

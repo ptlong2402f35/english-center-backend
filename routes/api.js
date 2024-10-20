@@ -191,5 +191,11 @@ router.delete("/review/:id", Auth.auth, ReviewController.deleteReviews);
 /* Analytics */
 router.get("/user-analytics", Auth.onlyAdmin, AnalyticController.getUserAnalytic);
 
+/* Firebase message */
+router.get("/message-send-test", UserController.testNoti);
+router.post("/update-user-message-token", Auth.auth, UserController.updateUserMessageToken);
+router.post("/remove-user-message-token", Auth.auth, UserController.removeUserMessageToken);
+
+
 
 module.exports = router;
