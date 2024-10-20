@@ -172,6 +172,7 @@ class AuthController {
                     "active",
                     "createdAt",
                     "updatedAt",
+                    "messageToken"
                 ]
             });
             if(!user) throw UserNotFound;
