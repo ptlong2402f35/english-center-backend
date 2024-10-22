@@ -9,6 +9,7 @@ const { ClassStatus } = require("../constants/status");
 const { AttendanceService } = require("../services/attendance/attendanceService");
 const { TeacherService } = require("../services/teacher/teacherService");
 const { UserService } = require("../services/user/userService");
+const { sequelize } = require("../models");
 const Teacher = require("../models").Teacher;
 const TeacherClass = require("../models").TeacherClass;
 const Class = require("../models").Class;
@@ -228,6 +229,51 @@ class TeacherController {
             await new AttendanceService().groupAttendanceByClass(attendances, classes);
 
             return res.status(200).json(classes);
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    adminUpdateTeacherToClass = async (req, res, next) => {
+        try {
+            let data = req.body;
+            if(!data.teacherId || !data.classId || !data.salary) throw InputInfoEmpty;
+
+            let teacher = await Teacher.findByPk(data.teacherId);
+            if(!teacher.active) throw TeacherNotActive;
+            let curClass = await Class.findByPk(data.classId);
+            if([ClassStatus.Disable, ClassStatus.Finish].includes(curClass.status)) throw ClassStatusInvalid;
+            let transaction = await sequelize.transaction();
+            try {
+                await TeacherClass.destroy(
+                    {
+                        where: {
+                            classId: data.classId
+                        },
+                        transaction
+                    }
+                )
+
+                await TeacherClass.create(
+                    {
+                        ...data
+                    },
+                    {
+                        transaction
+                    }
+                );
+
+                await transaction.commit();
+            }
+            catch (err1) {
+                await transaction.rollback();
+                throw err1;
+            }
+
+            return res.status(200).json({message: "Thành công"});
         }
         catch (err) {
             console.error(err);

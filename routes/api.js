@@ -100,6 +100,7 @@ router.get("/teacher/:id", TeacherController.getTeacherDetail);
 router.put("/teacher/:id", Auth.onlyAdmin, TeacherController.adminUpdateTeacherDetail);
 router.post("/teacher", Auth.onlyAdmin, TeacherController.adminCreateTeacher);
 router.post("/add-teacher-to-class", Auth.onlyAdmin, TeacherController.adminAssignTeacherToClass);
+router.put("/update-teacher-to-class", Auth.onlyAdmin, TeacherController.adminUpdateTeacherToClass);
 //need update
 router.get("/teached-session", Auth.auth, TeacherController.getTeachedSessionInTime);
  
