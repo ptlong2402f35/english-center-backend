@@ -298,7 +298,7 @@ class ClassController {
             let status = req.body.status;
             await classEl.update(
                 {
-                    stat: status || ClassStatus.Disable
+                    status: status || ClassStatus.Disable
                 }
             );
 

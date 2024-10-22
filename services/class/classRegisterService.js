@@ -102,9 +102,10 @@ class ClassRegisterService {
 
     async validate(data, forAdmin) {
         try {
+            console.log(data);
             if(forAdmin) return true;
-            if(data.status != ClassStatus.UnOpen) throw ClassStatusInvalid;
-            if(data.startAt < new Date()) throw ClassHasOpened;
+            if(data.status != ClassStatus.UnOpen && data.status != ClassStatus.Opening) throw ClassStatusInvalid;
+            // if(data.startAt < new Date()) throw ClassHasOpened;
             if(data.studentQuantity >= data.maxQuantity) throw ClassHasEnoughStudent;
             return true;
         }
