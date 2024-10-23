@@ -1,4 +1,5 @@
 const { InputInfoEmpty } = require("../constants/message");
+const { sequelize } = require("../models");
 const { ErrorService } = require("../services/errorService");
 const { TimeHandle } = require("../utils/timeHandle");
 
@@ -124,6 +125,45 @@ class ScheduleController {
                   classId: classId
                 },
             });
+
+            return res.status(200).json({message: "Thành công"});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    updateScheduleClass = async (req, res, next) => {
+        try {
+            let scheduleIds = req.body.scheduleIds || null;
+            let classId = req.body.classId ? parseInt(req.body.classId) : null;
+            if(!scheduleIds || !classId) throw InputInfoEmpty;
+            let t = await sequelize.transaction();
+            try {
+                await ClassSchedule.destroy({
+                    where: {
+                      classId: classId
+                    },
+                    transaction: t
+                });
+    
+                await ClassSchedule.bulkCreate(
+                    scheduleIds.map(item => ({
+                        classId,
+                        scheduleId: item
+                    })),
+                    {
+                        transaction: t
+                    }
+                );
+                await t.commit();
+            }
+            catch (err1) {
+                await t.rollback();
+                throw err1;
+            }
 
             return res.status(200).json({message: "Thành công"});
         }
