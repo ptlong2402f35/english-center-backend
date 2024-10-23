@@ -141,6 +141,7 @@ router.post("/schedule", Auth.onlyAdmin, ScheduleController.createSchedule);
 router.put("/schedule/:id", Auth.onlyAdmin, ScheduleController.updateSchedule);
 router.post("/apply-schedule", Auth.onlyAdmin, ScheduleController.applyScheduleToClass);
 router.post("/remove-schedule", Auth.onlyAdmin, ScheduleController.removeScheduleFromClass);
+router.put("/update-bulk-schedule", Auth.onlyAdmin, ScheduleController.updateScheduleClass);
 
 /* Notification Controller */
 router.get("/notifications", Auth.auth, NotificationController.getMyNoti);
