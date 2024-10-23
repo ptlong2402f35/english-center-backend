@@ -14,6 +14,8 @@ const { UserRole } = require("../constants/roles");
 const { TeacherService } = require("../services/teacher/teacherService");
 const { ClassStatus } = require("../constants/status");
 const { ClassHandler } = require("../services/class/classHandler");
+const { sequelize } = require("../models");
+const { CostType } = require("../constants/type");
 
 const Class = require("../models").Class;
 const Student = require("../models").Student;
@@ -24,6 +26,8 @@ const TeacherClass = require("../models").TeacherClass;
 const Schedule = require("../models").Schedule;
 const Attendance = require("../models").Attendance;
 const Center = require("../models").Center;
+const Cost = require("../models").Cost;
+const ClassSchedule = require("../models").ClassSchedule;
 
 class ClassController {
     getClasses = async (req, res, next) => {
@@ -301,6 +305,65 @@ class ClassController {
                     status: status || ClassStatus.Disable
                 }
             );
+
+            return res.status(200).json({message: "Thành công"});
+
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    deleteClass = async (req, res, next) => {
+        try {
+            let classId = req.params.id ? parseInt(req.params.id) : 0;
+            if(!classId) throw InputInfoEmpty;
+            let classEl = await Class.findByPk(classId);
+            if(!classEl) return res.status(403).json({message: "Lớp không tồn tại"});
+            let cost = await Cost.findOne({
+                where: {
+                    referenceId: classId,
+                    type: CostType.StudentFee
+                }
+            });
+            if(cost) return res.status(403).json({message: "Không thể xóa lớp đã có dữ liệu thu học phí"});
+            let t = await sequelize.transaction();
+            try {
+                await Class.destroy({
+                    where: {
+                        id: classId
+                    },
+                    transaction: t
+                });
+    
+                await StudentClass.destroy({
+                    where: {
+                        classId
+                    },
+                    transaction: t
+                });
+    
+                await TeacherClass.destroy({
+                    where: {
+                        classId
+                    },
+                    transaction: t
+                });
+
+                await ClassSchedule.destroy({
+                    where: {
+                        classId
+                    },
+                    transaction: t
+                });
+
+                await t.commit();
+            }
+            catch (err) {
+                await t.rollback();
+            }
 
             return res.status(200).json({message: "Thành công"});
 

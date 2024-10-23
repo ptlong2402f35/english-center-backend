@@ -81,6 +81,7 @@ router.get("/class-by-parent/:studentId", Auth.auth, ClassController.parentGetSt
 router.post("/class", Auth.onlyAdmin, ClassController.createClass);
 router.put("/class/:id", Auth.onlyAdmin, ClassController.updateClass);
 router.put("/class-deactive/:id", Auth.onlyAdmin, ClassController.deactiveClass);
+router.delete("/class/:id", Auth.onlyAdmin, ClassController.deleteClass);
 router.post("/register-by-student", Auth.auth, ClassController.studentRegisterClass);
 router.post("/register-by-parent", Auth.auth, ClassController.parentRegisterClass);
 router.post("/register-by-admin", Auth.onlyAdmin, ClassController.adminRegisterClass);
