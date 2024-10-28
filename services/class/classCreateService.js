@@ -33,7 +33,7 @@ class ClassCreateService {
 
     async validate(data) {
         try {
-            if(data.startAt > new Date()) throw OpenClassCreateStartAtNotValid;
+            // if(data.startAt > new Date()) throw OpenClassCreateStartAtNotValid;
             if(!data.centerId) throw CenterNotFound;
             return true;
         }
@@ -71,13 +71,14 @@ class ClassCreateService {
 
     async build(data) {
         try {
+            let tmpEndAt = new Date((data.startAt?.getTime() || new Date().getTime()) + 12960000000);
             return (
                 {
                     name: data.name,
                     fromAge: data.fromAge,
                     toAge: data.toAge,
                     startAt: data.startAt,
-                    endAt: data.endAt,
+                    endAt: data?.endAt || tmpEndAt,
                     studentQuantity: data.studentQuantity,
                     maxQuantity: data.maxQuantity,
                     fee: data.fee,
