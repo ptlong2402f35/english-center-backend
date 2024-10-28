@@ -71,7 +71,7 @@ class ClassCreateService {
 
     async build(data) {
         try {
-            let tmpEndAt = new Date((data.startAt?.getTime() || new Date().getTime()) + 12960000000);
+            let tmpEndAt = new Date((new Date(data.startAt)?.getTime() || new Date().getTime()) + 12960000000);
             return (
                 {
                     name: data.name,
