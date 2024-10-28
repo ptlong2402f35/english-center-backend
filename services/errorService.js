@@ -30,7 +30,16 @@ const {
     AdminOnly,
     CostNotFound,
     TransactionNotFound,
-    TotalMoneyIsOver
+    TotalMoneyIsOver,
+    CenterNotFound,
+    ParentNotFound,
+    StudentNotFound,
+    ClassNotFound,
+    TeacherNotFound,
+    NotConnectParent,
+    OpenClassCreateStartAtNotValid,
+    ClassHasOpened,
+    ClassHasEnoughStudent
 } = require("../constants/message");
 const ErrorMessage = require("../resources/translation.json").message.error;
 
@@ -66,6 +75,15 @@ const ErrorCodeMap = new Map([
     [CostNotFound, 403],
     [TransactionNotFound, 403],
     [TotalMoneyIsOver, 403],
+    [CenterNotFound, 403],
+    [ParentNotFound, 403],
+    [StudentNotFound, 403],
+    [ClassNotFound, 403],
+    [TeacherNotFound, 403],
+    [NotConnectParent, 403],
+    [ClassHasOpened, 403],
+    [ClassHasEnoughStudent, 403],
+    [OpenClassCreateStartAtNotValid, 403],
 ])
 
 class ErrorService {

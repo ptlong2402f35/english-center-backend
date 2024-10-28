@@ -126,6 +126,42 @@
             "TotalMoneyIsOver": {
                 "vi": "Giao dịch không được lớn hơn số tiền còn nợ / chưa trả",
                 "en": "Total money is more than debt money"
+            },
+            "CenterNotFound": {
+                "vi": "Trung tâm này không tồn tại",
+                "en": "Center is not exist"
+            },
+            "ParentNotFound": {
+                "vi": "Phụ huynh không tồn tại",
+                "en": "Parent is not exist"
+            },
+            "StudentNotFound": {
+                "vi": "Học sinh không tồn tại",
+                "en": ""
+            },
+            "ClassNotFound": {
+                "vi": "Lớp học không tồn tại",
+                "en": ""
+            },
+            "TeacherNotFound": {
+                "vi": "Giáo viên không tồn tại",
+                "en": ""
+            },
+            "NotConnectParent": {
+                "vi": "Phụ huynh chưa liên kết với học sinh",
+                "en": ""
+            },
+            "ClassHasOpened": {
+                "vi": "Lớp học này đã mở",
+                "en": ""
+            },
+            "OpenClassCreateStartAtNotValid": {
+                "vi": "Trạng thái của lớp học không hợp lệ",
+                "en": ""
+            },
+            "ClassHasEnoughStudent": {
+                "vi": "Lớp học này đã đủ học sinh",
+                "en": ""
             }
         }
     }
