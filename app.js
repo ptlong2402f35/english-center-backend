@@ -4,6 +4,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const crypto = require('crypto');
+const notiJob = require("./services/job/scheduleNotiJob");
 
 var indexRouter = require("./routes/index");
 var api = require("./routes/api");
@@ -114,5 +115,6 @@ function onListening() {
 }
 
 new FirebaseConfig().getInstance().init();
+notiJob.start();
 //connect socket
 setTimeout(()=>initSocket(server), 5000);
