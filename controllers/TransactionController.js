@@ -4,10 +4,11 @@ const { UserRole } = require("../constants/roles");
 const { NotEnoughPermission, InputInfoEmpty, CostNotFound } = require("../constants/message");
 const { TransactionService } = require("../services/transaction/transactionService");
 const { CostStatus } = require("../constants/status");
-const { CostType } = require("../constants/type");
+const { CostType, NotificationType } = require("../constants/type");
 const { TransactionHandler } = require("../services/transaction/transactionHandler");
 const { ConnectionService } = require("../services/connection/connectionService");
 const { CostService } = require("../services/cost/costService");
+const { CommunicationService } = require("../services/communication/communicationService");
 const Transaction = require("../models").Transaction;
 const Student = require("../models").Student;
 const User = require("../models").User;
@@ -221,6 +222,19 @@ class TransactionController {
             if(!checker)  return res.status(403).json({message: "Hóa đơn này không phải của bạn"});
             if(data.totalMoney > cost.debtMoney) return res.status(403).json({message: "Số tiền lớn hơn tiền hóa đơn còn lại"});
             await new TransactionService().createTransaction(data, data.costId);
+
+            await new CommunicationService().sendNotificationToUserId(
+                req.user.userId,
+                `Thanh toán thành công`,
+                `Thanh toán thành công cho hóa đơn ${cost?.name || cost.id || ""}`,
+                NotificationType.Transaction
+            );
+
+            await new CommunicationService().sendMobileNotification(
+                req.user.userId,
+                `Thanh toán thành công`,
+                `Thanh toán thành công cho hóa đơn ${cost?.name || cost.id || ""}`,
+            );
 
             return res.status(200).json({message: "Thành công"});
         }

@@ -104,7 +104,7 @@ class AuthController {
 
             let userByUserName = await authService.checkUserNameExist(data.userName);
 
-            if(userByUserName) throw ExistedEmail;
+            // if(userByUserName) throw ExistedEmail;
 
             let resp = await new AuthService().handleCustomerSignup(data);
 

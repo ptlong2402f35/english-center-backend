@@ -29,7 +29,8 @@ const CostType = {
 const NotificationType = {
     Request: 1,
     Transaction: 2,
-    Review: 3
+    Review: 3,
+    Schedule: 4
 }
 
 const ReviewType = {

@@ -42,8 +42,8 @@ class TimeHandle {
         let currentDate = new Date(start);
         let index = 0;
         let day = data.map(item => item.date).filter(val => val);
-        if(!end) end = new Date(start.getTime() + 60*60*24*60*1000);
-        while (currentDate <= end) {
+        if(!end) end = new Date(start.getTime() + 60*60*24*120*1000);
+        while (1) {
             if(count >= total) break;
             let convertday = currentDate.getDay();
             if(convertday === 0 ) {
