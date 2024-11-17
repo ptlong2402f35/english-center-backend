@@ -10,7 +10,7 @@ const httpProxyAgent = require('https-proxy-agent');
 const env = process.env.NODE_ENV;
 const FirebaseEndpoint = "https://fcm.googleapis.com/v1/projects/english-center-1e883/messages:send";
 
-var serviceAccount = require("../english-center-1e883-firebase-adminsdk-xqrnt-4e359b8046.json");
+var serviceAccount = require("../english-center-1e883-firebase-adminsdk-xqrnt-c599de1ab3.json");
 
 class FirebaseConfig {
     static instance;
