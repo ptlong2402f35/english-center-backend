@@ -399,6 +399,8 @@ class CostController {
             if(!teacher) return res.status(403).json({message: "giáo viên không tồn tại"});
             await new CostOtherService().createBonusCost(data);
 
+            new CostService().onCreateNotiTransToTeacher(data.teacherId, data.month, data.year, true);
+
             return res.status(200).json({message: "Thành công"});
         }
         catch (err) {
