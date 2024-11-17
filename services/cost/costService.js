@@ -79,21 +79,21 @@ class CostService {
         }
     }
 
-    async onCreateNotiTransToTeacher(teacherId, month, year) {
+    async onCreateNotiTransToTeacher(teacherId, month, year, isBonus) {
         try {
             if(!teacherId) return;
             let teacher = await Teacher.findByPk(teacherId);
             if(!teacher) return;
             this.communicationService.sendNotificationToUserId(
                 teacher.userId,
-                `Đã có hóa đơn lương tháng ${month}`,
-                `Đã có hóa đơn lương tháng ${month}/${year} xin vui lòng kiểm tra, nếu có thắc mắc xin liên lạc với ban quản trị trung tâm`,
+                `Đã có hóa đơn lương ${isBonus ? "thưởng " : ""}tháng ${month}`,
+                `Đã có hóa đơn lương ${isBonus ? "thưởng " : ""} tháng ${month}/${year} xin vui lòng kiểm tra, nếu có thắc mắc xin liên lạc với ban quản trị trung tâm`,
                 NotificationType.Transaction
             );
             this.communicationService.sendMobileNotification(
                 teacher.userId,
-                `Đã có hóa đơn lương tháng ${month}`,
-                `Đã có hóa đơn lương tháng ${month}/${year} xin vui lòng kiểm tra, nếu có thắc mắc xin liên lạc với ban quản trị trung tâm`,
+                `Đã có hóa đơn lương ${isBonus ? "thưởng " : ""} tháng ${month}`,
+                `Đã có hóa đơn lương ${isBonus ? "thưởng " : ""} tháng ${month}/${year} xin vui lòng kiểm tra, nếu có thắc mắc xin liên lạc với ban quản trị trung tâm`,
             );
         }
         catch (err) {
