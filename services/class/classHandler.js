@@ -5,6 +5,7 @@ class ClassHandler {
 
     async attachAttendancesExtendInfo(students, classId) {
         try {
+            if(!students || !students.length) return;
             let attendances = await Attendance.findAll({
                 where: {
                     classId: classId
