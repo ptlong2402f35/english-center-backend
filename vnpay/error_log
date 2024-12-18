@@ -1,3 +1,0 @@
-[05-Oct-2024 00:37:13 Asia/Ho_Chi_Minh] PHP Warning:  Undefined array key "amount" in /home/nmfjbsaa/englishcenter.dvdung.fun/vnpay_php/vnpay_create_payment.php on line 14
-[05-Oct-2024 00:37:13 Asia/Ho_Chi_Minh] PHP Warning:  Undefined array key "language" in /home/nmfjbsaa/englishcenter.dvdung.fun/vnpay_php/vnpay_create_payment.php on line 15
-[05-Oct-2024 00:37:13 Asia/Ho_Chi_Minh] PHP Warning:  Undefined array key "bankCode" in /home/nmfjbsaa/englishcenter.dvdung.fun/vnpay_php/vnpay_create_payment.php on line 16
