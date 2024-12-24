@@ -17,6 +17,7 @@ const CostController = require("../controllers/CostController");
 const SearchController = require("../controllers/SearchController");
 const ReviewController = require("../controllers/ReviewController");
 const AnalyticController = require("../controllers/AnalyticController");
+const SmartCardController = require("../controllers/SmartCardController");
 var router = express.Router();
 
 //test connect
@@ -199,6 +200,10 @@ router.get("/message-send-test", UserController.testNoti);
 router.post("/update-user-message-token", Auth.auth, UserController.updateUserMessageToken);
 router.post("/remove-user-message-token", Auth.auth, UserController.removeUserMessageToken);
 
-
+/* SmartCard */
+router.get("/card/user-info/:cardId", SmartCardController.getUserDetail);
+router.post("/card/create", SmartCardController.createCardUser);
+router.post("/card/update", SmartCardController.updateDetail);
+router.get("/card/estimate-point", SmartCardController.estimatePointByFee);
 
 module.exports = router;
