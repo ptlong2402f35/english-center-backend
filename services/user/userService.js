@@ -1,8 +1,9 @@
-const { UpdateFailMessage, UserNotFound, PasswordNotMatch, StudentNotFound } = require("../../constants/message");
+const { UpdateFailMessage, UserNotFound, PasswordNotMatch, StudentNotFound, UserNameEmpty } = require("../../constants/message");
 var bcrypt = require("bcryptjs");
 const { UserRole } = require("../../constants/roles");
 const { sequelize } = require("../../models");
 const { Op } = require("sequelize");
+const { DataMasking } = require("../dataMasking");
 
 const User = require("../../models").User;
 const Parent = require("../../models").Parent;
@@ -16,8 +17,9 @@ const TeacherClass = require("../../models").TeacherClass;
 const Attendance = require("../../models").Attendance;
 
 class UserService {
+    dataMasking;
     constructor() {
-
+        this.dataMasking = new DataMasking();
     }
 
     async attachRoleInfo(user) {
@@ -180,6 +182,21 @@ class UserService {
         }
         catch (err) {
             throw err;
+        }
+    }
+
+    async handleHidenInfo(user) {
+        try {
+            if(!user) return;
+            let hidePhone = this.dataMasking.process(user.phone);
+            let hideEmail = this.dataMasking.process(user.email);
+            user.phone = hidePhone;
+            user.email = hideEmail;
+            user?.setDataValue("phone", hidePhone);
+            user?.setDataValue("email", hideEmail);
+        }
+        catch (err) {
+            console.error(err);
         }
     }
 }

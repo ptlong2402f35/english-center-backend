@@ -7,6 +7,7 @@ const { ErrorService } = require("../services/errorService");
 const { RequestService } = require("../services/request/requestService");
 const { CommunicationService } = require("../services/communication/communicationService");
 const { NotificationType } = require("../constants/type");
+const { UserService } = require("../services/user/userService");
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const Request = require("../models").Request;
@@ -48,8 +49,13 @@ class RequestController {
                         ]
                     }
                 );
-
                 await new RequestService().attachRequestUser(requests);
+                for(let rq of requests) {
+                    await new UserService().handleHidenInfo(rq.requestByStudent);
+                    await new UserService().handleHidenInfo(rq.requestByParent);
+                    await new UserService().handleHidenInfo(rq.requestUser);
+
+                }
 
                 return res.status(200).json(requests);
             }
