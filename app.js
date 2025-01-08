@@ -46,6 +46,7 @@ var debug = require("debug")("node-sequelize:server");
 var http = require("http");
 const { initSocket } = require("./socket/socket");
 const { FirebaseConfig } = require("./firebase/firebaseConfig");
+const { GeneralRedisClient } = require("./services/generalRedisClient");
 const HOST = "0.0.0.0";
 const ChannelPassword = "ccyT7JeiJ2";
 require("events").EventEmitter.prototype._maxListeners = 50;
@@ -117,5 +118,9 @@ function onListening() {
 
 new FirebaseConfig().getInstance().init();
 notiJob.start();
+
+new GeneralRedisClient()
+		.getInstance()
+		.getClient();
 //connect socket
 setTimeout(()=>initSocket(server), 5000);

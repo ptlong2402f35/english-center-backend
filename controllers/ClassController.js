@@ -16,6 +16,7 @@ const { ClassStatus } = require("../constants/status");
 const { ClassHandler } = require("../services/class/classHandler");
 const { sequelize } = require("../models");
 const { CostType } = require("../constants/type");
+const { UserService } = require("../services/user/userService");
 
 const Class = require("../models").Class;
 const Student = require("../models").Student;
@@ -78,6 +79,9 @@ class ClassController {
                     TimeHandle.attachDayLabel(schedule);
                 }
                 await new ClassHandler().attachAttendancesExtendInfo(item.students, item.id);
+                for(let teacher of item?.teachers) {
+                    await new UserService().handleHidenInfo(teacher);
+                }
             }
 
             return res.status(200).json(data);

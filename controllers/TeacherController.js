@@ -10,6 +10,7 @@ const { AttendanceService } = require("../services/attendance/attendanceService"
 const { TeacherService } = require("../services/teacher/teacherService");
 const { UserService } = require("../services/user/userService");
 const { sequelize } = require("../models");
+const { DataMasking } = require("../services/dataMasking");
 const Teacher = require("../models").Teacher;
 const TeacherClass = require("../models").TeacherClass;
 const Class = require("../models").Class;
@@ -47,6 +48,13 @@ class TeacherController {
                 include: include,
                 order: orderBy
             });
+            let dataMasking = new DataMasking();
+            for(let item of data.docs) {
+                let hidePhone = dataMasking.process(item.phone);
+                let hideEmail = dataMasking.process(item.email);
+                item.setDataValue("phone", hidePhone);
+                item.setDataValue("email", hideEmail);
+            }
 
             data.currentPage = page;
 
