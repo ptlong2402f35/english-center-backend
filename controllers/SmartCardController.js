@@ -140,6 +140,8 @@ class SmartCardController {
                     }
                 }
             );
+
+            return res.status(200).json({message: "Done"});
         }
         catch (err) {
             console.error(err);
@@ -166,6 +168,7 @@ class SmartCardController {
                     }
                 }
             );
+            return res.status(200).json({message: "Done"});
         }
         catch (err) {
             console.error(err);
