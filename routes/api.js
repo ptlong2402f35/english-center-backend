@@ -206,5 +206,7 @@ router.get("/card/user-info/:cardId", SmartCardController.getUserDetail);
 router.post("/card/create", SmartCardController.createCardUser);
 router.post("/card/update", SmartCardController.updateDetail);
 router.get("/card/estimate-point", SmartCardController.estimatePointByFee);
+router.post("/card/purchase", SmartCardController.addPointByPurchase);
+router.post("/card/exchange-reward", SmartCardController.minusPoint);
 
 module.exports = router;

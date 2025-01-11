@@ -45,14 +45,14 @@ class SmartCardController {
             });
             if(!user) throw UserNotFound;
 
+            let updaData = {
+                ...(data.phone ? {phone: data.phone} : {}),
+                ...(data.name ? {name: data.name} : {}),
+                ...(data.image ? {image: data.image} : {}),
+            }
+
             await SmartCardUser.update(
-                {
-                    phone: data.phone,
-                    name: data.name,
-                    point: data.point,
-                    publicKey: data.publicKey,
-                    image: data.image,
-                },
+                updaData,
                 {
                     where: {
                         cardId: data.cardId
@@ -85,7 +85,7 @@ class SmartCardController {
 
             await user.update(
                 {
-                    cardId: "CT" + (100000 + user.id).toString().substring(1),
+                    cardId: "KH" + (100000 + user.id).toString().substring(1),
                 }
             );
 
@@ -114,6 +114,58 @@ class SmartCardController {
 
             let point = fee / 1000 * 25 / 100;
             return res.status(200).json({point: Math.round(point)});
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    addPointByPurchase = async (req, res, next) => {
+        try {
+            let data = req.body;
+            let user = await SmartCardUser.findOne({
+                where:{
+                    cardId: data.cardId
+                }
+            });
+            await SmartCardUser.update(
+                {
+                    point: (user?.point || 0) + data.point,
+                },
+                {
+                    where: {
+                        cardId: data.cardId
+                    }
+                }
+            );
+        }
+        catch (err) {
+            console.error(err);
+            let {code, message} = new ErrorService(req).getErrorResponse(err);
+            return res.status(code).json({message});
+        }
+    }
+
+    minusPoint = async (req, res, next) => {
+        try {
+            let data = req.body;
+            let user = await SmartCardUser.findOne({
+                where:{
+                    cardId: data.cardId
+                }
+            });
+            await SmartCardUser.update(
+                {
+                    point: (user?.point || 0) - data.point,
+                },
+                {
+                    where: {
+                        cardId: data.cardId
+                    }
+                }
+            );
         }
         catch (err) {
             console.error(err);
