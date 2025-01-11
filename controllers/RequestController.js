@@ -91,6 +91,12 @@ class RequestController {
                 );
 
                 await new RequestService().attachRequestUser(requests);
+                for(let rq of requests) {
+                    await new UserService().handleHidenInfo(rq.requestByStudent);
+                    await new UserService().handleHidenInfo(rq.requestByParent);
+                    await new UserService().handleHidenInfo(rq.requestUser);
+
+                }
 
                 return res.status(200).json(requests);
             }
