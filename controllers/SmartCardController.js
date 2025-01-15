@@ -13,7 +13,7 @@ const SmartCardUser = require("../models").SmartCardUser;
 class SmartCardController {
     getUserDetail = async (req, res, next) => {
         try {
-            let cardId = req.params.cardId ? parseInt(req.query.cardId) : null;
+            let cardId = req.params.cardId || null;
             if(!cardId) return res.status(200).json(null);
             
             let user = await SmartCardUser.findOne({
