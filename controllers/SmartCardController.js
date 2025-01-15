@@ -79,7 +79,8 @@ class SmartCardController {
                     phone: data.phone || "",
                     image: data.image || "",
                     point: data.point || 0,
-                    cardId: ""
+                    cardId: "",
+                    publicKey: data.publicKey
                 }
             );
 
