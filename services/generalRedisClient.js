@@ -1,10 +1,10 @@
 const redis = require("redis");
 const createClient = redis.createClient;
 
-const RedisHost = process.env.REDIS_HOST || "redis-11905.crce178.ap-east-1-1.ec2.redns.redis-cloud.com";
-const RedisPort = process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 11905;
+const RedisHost = process.env.REDIS_HOST || "redis-12713.c295.ap-southeast-1-1.ec2.redns.redis-cloud.com";
+const RedisPort = process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 12713;
 const RedisUser = process.env.REDIS_USER || "default";
-const RedisPassword = process.env.REDIS_PASS || "4ISgl4ykcEbyp01QdFFvXcJ0tu4jjvou";
+const RedisPassword = process.env.REDIS_PASS || "Dxrd6tdoDMKjUbdIrArtmGqD16SGhquf";
 
 async function createRedisClient() {
 	console.log(`node-redis version is ${require("redis/package.json").version}`);

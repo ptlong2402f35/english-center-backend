@@ -13,6 +13,17 @@ class UserUpdateService {
             if(!userId) throw UserNotFound;
             let user = await User.findByPk(userId);
 
+            if(data.email) {
+                await User.update({
+                    email: data.email
+                },
+                {
+                    where: {
+                        id: userId
+                    }
+                });
+            }
+
             let allowData = {
                 name: data.name,
                 gender: data.gender,

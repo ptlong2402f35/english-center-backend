@@ -29,7 +29,8 @@ class AuthLogin {
                     accessToken,
                     refreshToken,
                     expiredIn: JWT_CONFIG.AccessTokenTime * 1000 + new Date().getTime(),
-                    userId: user.id
+                    userId: user.id,
+                    email: user.email
                 };
             }
             return {

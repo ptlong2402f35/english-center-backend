@@ -1,4 +1,5 @@
 const { LoginLimiter } = require("./rateLimiter");
+const { AesService, AesTransferKeyApi } = require("./security/AesService");
 
 class Middleware {
     constructor() {}
@@ -17,6 +18,19 @@ class Middleware {
         catch (err) {
             console.error(err);
             next();
+        }
+    }
+
+    async processData(req, res, next) {
+        try {
+            let data = req.body;
+            let decode = await new AesService().decrypt(data, AesTransferKeyApi);
+            req.body = JSON.parse(decode);
+            next();
+        }
+        catch (err) {
+            console.error(err);
+            return res.status(403).json({message: "Decode data failed"});
         }
     }
 }

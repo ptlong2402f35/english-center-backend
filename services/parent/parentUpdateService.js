@@ -1,4 +1,5 @@
 const Parent = require("../../models").Parent;
+const User = require("../../models").User;
 
 class parentUpdateService {
     constructor() {}
@@ -6,7 +7,8 @@ class parentUpdateService {
     async updateParentDetail(data, parentId, {forAdmin} = {}) {
         try {
             let bData = await this.build(data, {forAdmin});
-            await Parent.update(
+            let parent = await Parent.findByPk(parentId);
+            await parent.update(
                 bData,
                 {
                     where: {
@@ -14,6 +16,19 @@ class parentUpdateService {
                     }
                 }
             );
+
+            if(data.email) {
+                await User.update(
+                    {
+                        email: data.email
+                    },
+                    {
+                        where: {
+                            id: parent.userId
+                        }
+                    }
+                );
+            }
         }
         catch (err) {
             throw err;
