@@ -33,6 +33,9 @@ router.post("/auth/refresh", AuthController.refresh);
 // wait for upd
 router.post("/auth/init-forget-password", AuthController.initForgetPassword);
 router.post("/auth/update-forget-password", AuthController.updateForgetPassword);
+//otp
+router.post("/auth/verify-otp", AuthController.verifyOtp);
+router.post("/auth/google-authentication", AuthController.googleAuthentication);
 
 /* User Controller */
 router.get("/my-user-detail", Auth.auth, UserController.getMyDetail);

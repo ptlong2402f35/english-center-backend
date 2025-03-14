@@ -141,8 +141,7 @@ class AuthService {
                         role: data.role,
                         active: true,
                         createdAt: new Date(),
-                        updatedAt: new Date()
-                    },
+                        updatedAt: new Date()                    },
                     {
                         transaction: transaction
                     }

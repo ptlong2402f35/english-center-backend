@@ -1,4 +1,5 @@
-const Student = require("../../models").Teacher;
+const Teacher = require("../../models").Teacher;
+const User = require("../../models").User;
 
 class TeacherUpdateService {
     constructor() {}
@@ -6,7 +7,8 @@ class TeacherUpdateService {
     async updateDetail(data, teacherId, {forAdmin} = {}) {
         try {
             let bData = await this.build(data, {forAdmin});
-            await Student.update(
+            let teacher = await Teacher.findByPk(teacherId);
+            await Teacher.update(
                 bData,
                 {
                     where: {
@@ -14,6 +16,19 @@ class TeacherUpdateService {
                     }
                 }
             );
+
+            if(data.email) {
+                await User.update(
+                    {
+                        email: data.email
+                    },
+                    {
+                        where: {
+                            id: teacher.userId
+                        }
+                    }
+                );
+            }
         }
         catch (err) {
             throw err;

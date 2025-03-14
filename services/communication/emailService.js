@@ -1,9 +1,9 @@
 const {createTransport} = require("nodemailer");
-const EmailSmtpServer = process.env.SMTP_SERVER;
-const EmailSmtpPort = process.env.SMTP_PORT;
-const EmailSmtpUsername = process.env.SMTP_USERNAME;
-const EmailSmtpPassword = process.env.SMTP_PASSWORD;
-const EmailFromAddress = process.env.EMAIL_FROM_ADDRESS;
+const EmailSmtpServer = process.env.SMTP_SERVER || "smtp.gmail.com";
+const EmailSmtpPort = process.env.SMTP_PORT || 587;
+const EmailSmtpUsername = process.env.SMTP_USERNAME || "ptlong2402@gmail.com";
+const EmailSmtpPassword = process.env.SMTP_PASSWORD || "hkmk rawk nmmx yifs";
+const EmailFromAddress = process.env.EMAIL_FROM_ADDRESS || "ptlong2402@gmail.com";
 const ContentExpression = "{{content}}";
 const StandardEmailTemplate = `
     <html>
