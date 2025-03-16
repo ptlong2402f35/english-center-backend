@@ -1,5 +1,6 @@
 const { UpdateFailMessage, UserNotFound, NotEnoughPermission } = require("../../constants/message");
 const { UserRole } = require("../../constants/roles");
+const { parentUpdateService } = require("../parent/parentUpdateService");
 const User = require("../../models").User;
 const Student = require("../../models").Student;
 const Parent = require("../../models").Parent;
@@ -13,17 +14,6 @@ class UserUpdateService {
             if(!userId) throw UserNotFound;
             let user = await User.findByPk(userId);
 
-            if(data.email) {
-                await User.update({
-                    email: data.email
-                },
-                {
-                    where: {
-                        id: userId
-                    }
-                });
-            }
-
             let allowData = {
                 name: data.name,
                 gender: data.gender,
@@ -33,10 +23,31 @@ class UserUpdateService {
                 phone: data.phone,
                 email: data.email,
             };
+
+            let enCode = await new parentUpdateService().enbuild(allowData);
+
+            console.log("encode ===", enCode);
+
+            if(data.email) {
+                await User.update({
+                    email: data.email,
+                    ...(enCode.en_email ? {en_email: enCode.en_email} : {}), 
+                },
+                {
+                    where: {
+                        id: userId
+                    }
+                });
+            }
+
             let count;
             switch(user.role) {
                 case UserRole.Parent: {
-                    [count] = await Parent.update(allowData, {
+                    [count] = await Parent.update(
+                        {
+                            ...allowData,
+                            ...enCode
+                        }, {
                         where: {
                             userId: userId
                         }
@@ -44,7 +55,11 @@ class UserUpdateService {
                     break;
                 }
                 case UserRole.Student: {
-                    [count] = await Student.update(allowData, {
+                    [count] = await Student.update(
+                        {
+                            ...allowData,
+                            ...enCode
+                        }, {
                         where: {
                             userId: userId
                         }

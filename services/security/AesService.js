@@ -8,6 +8,10 @@ class AesService {
 
     }
 
+    async getTransferResponse(data) {
+        return await this.encrypt(JSON.stringify(data), AesTransferKeyApi);
+    }
+
     async getStoreEncryptData(data) {
         return await this.encrypt(data, AesKeyApi);
     }
@@ -18,6 +22,7 @@ class AesService {
 
     async encrypt(data, key) {
         try {
+            if(!data) return "";
             const cipherText = CryptoJS.AES.encrypt(data, key).toString();
             return cipherText;
         }
@@ -28,13 +33,12 @@ class AesService {
 
     async decrypt(text, key) {
         try {
-            const bytes = CryptoJS.AES.decrypt(text, key);
-            if(bytes.sigBytes > 0) {
-                const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-                return decrypted;
-            }
+            if(!text) return "";
+            const res = CryptoJS.AES.decrypt(text, key).toString(
+                CryptoJS.enc.Utf8
+            );
 
-            return null;
+            return res;
         }
         catch (err) {
             throw err;

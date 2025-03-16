@@ -2,6 +2,7 @@ const { InputInfoEmpty, CostNotFound, TotalMoneyIsOver } = require("../../consta
 const { CostStatus } = require("../../constants/status");
 const { CostType } = require("../../constants/type");
 const { sequelize } = require("../../models");
+const { AesService } = require("../security/AesService");
 
 const Transaction = require("../../models").Transaction;
 const Cost = require("../../models").Cost;
@@ -26,6 +27,7 @@ class TransactionService {
                 if(!teacher) return res.status(403).json({message: "Giáo viên không tồn tại"});
                 targetId = teacher.userId;
             }
+            let enData = await this.buildEncodeData(data);
             let transaction = await sequelize.transaction();
             try {
                 let trans = await Transaction.create(
@@ -36,7 +38,8 @@ class TransactionService {
                         totalMoney: data.totalMoney,
                         timerTime: data.timerTime || new Date(),
                         costId: costId,
-                        costType: cost.type
+                        costType: cost.type,
+                        ...enData
                     },
                     {
                         transaction: transaction
@@ -143,7 +146,12 @@ class TransactionService {
                         transaction: trans
                     });
                 };
-                await transaction.update(bData, 
+                let enData = await this.buildEncodeData(bData);
+                await transaction.update(
+                    {
+                        ...bData,
+                        ...enData
+                    }, 
                     {
                         transaction: trans
                     }
@@ -198,6 +206,13 @@ class TransactionService {
         }
         catch (err) {
             throw err;
+        }
+    }
+
+    async buildEncodeData(data) {
+        return {
+            ...(data.content ? {en_content: await new AesService().getStoreEncryptData(data.content)} : {}),
+            ...(data.totalMoney ? {en_totalMoney: await new AesService().getStoreEncryptData(data.totalMoney)} : {}),
         }
     }
 }

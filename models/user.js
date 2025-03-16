@@ -49,7 +49,9 @@ module.exports = (sequelize, DataTypes) => {
 			messageToken: DataTypes.TEXT,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
-			email: DataTypes.TEXT
+			email: DataTypes.TEXT,
+			en_userName: DataTypes.TEXT,
+            en_email: DataTypes.TEXT,
 		},
 		{
 			sequelize,

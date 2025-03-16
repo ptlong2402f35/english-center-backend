@@ -39,6 +39,13 @@ module.exports = (sequelize, DataTypes) => {
             level: DataTypes.INTEGER,
 			createdAt: DataTypes.DATE,
 			updatedAt: DataTypes.DATE,
+			en_name: DataTypes.TEXT,
+            en_gender: DataTypes.TEXT,
+            en_birthday: DataTypes.TEXT,
+            en_age: DataTypes.TEXT,
+            en_address: DataTypes.TEXT,
+            en_phone: DataTypes.TEXT,
+            en_email: DataTypes.TEXT,
 		},
 		{
 			sequelize,

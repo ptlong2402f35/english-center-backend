@@ -17,6 +17,7 @@ const { UserService } = require("../services/user/userService");
 const { FirebaseConfig } = require("../firebase/firebaseConfig");
 const { OtpService } = require("../services/security/otpService");
 const { GoogleAuth } = require("../services/auth/googleAuth");
+const { AesService } = require("../services/security/AesService");
 class AuthController {
     login = async (req, res, next) => {
         try {
@@ -182,7 +183,7 @@ class AuthController {
             if(!user) throw UserNotFound;
             await new UserService().attachRoleInfo(user);
             
-            return res.status(200).json(user);
+            return res.status(200).json(await new AesService().getTransferResponse(user));
         }
         catch (err) {
             console.error(err);
