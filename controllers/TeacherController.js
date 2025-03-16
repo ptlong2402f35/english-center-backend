@@ -11,6 +11,7 @@ const { TeacherService } = require("../services/teacher/teacherService");
 const { UserService } = require("../services/user/userService");
 const { sequelize } = require("../models");
 const { DataMasking } = require("../services/dataMasking");
+const { AesService } = require("../services/security/AesService");
 const Teacher = require("../models").Teacher;
 const TeacherClass = require("../models").TeacherClass;
 const Class = require("../models").Class;
@@ -58,7 +59,7 @@ class TeacherController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -87,7 +88,7 @@ class TeacherController {
             );
             if(!data) throw ClassNotFound;
             
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -108,7 +109,7 @@ class TeacherController {
             });
             if(!teacher) throw UserNotFound;
 
-            return res.status(200).json(teacher);
+            return res.status(200).json(await new AesService().getTransferResponse(teacher));
         }
         catch (err) {
             console.error(err);
@@ -236,7 +237,7 @@ class TeacherController {
             await new TeacherService().attachTeacherSalary(classes, teacher.id);
             await new AttendanceService().groupAttendanceByClass(attendances, classes);
 
-            return res.status(200).json(classes);
+            return res.status(200).json(await new AesService().getTransferResponse(classes));
         }
         catch (err) {
             console.error(err);

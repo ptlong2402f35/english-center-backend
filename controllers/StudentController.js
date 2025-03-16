@@ -8,6 +8,7 @@ const { StudentQuerier } = require("../services/student/studentQuerier");
 const { AuthService } = require("../services/auth/authService");
 const { StudentService } = require("../services/student/studentService");
 const { UserService } = require("../services/user/userService");
+const { AesService } = require("../services/security/AesService");
 
 const User = require("../models").User;
 const Student = require("../models").Student;
@@ -28,7 +29,7 @@ class StudentController {
             });
             if(!student) throw UserNotFound;
 
-            return res.status(200).json(student);
+            return res.status(200).json(await new AesService().getTransferResponse(student));
         }
         catch (err) {
             console.error(err);
@@ -89,7 +90,7 @@ class StudentController {
             //     }
             // });
 
-            return res.status(200).json(parent?.childs || []);
+            return res.status(200).json(await new AesService().getTransferResponse(parent.childs || []));
         }
         catch (err) {
             console.error(err);
@@ -119,7 +120,7 @@ class StudentController {
             });
             if(!student) throw UserNotFound;
 
-            return res.status(200).json(student);
+            return res.status(200).json(await new AesService().getTransferResponse(student));
         }
         catch (err) {
             console.error(err);
@@ -160,7 +161,7 @@ class StudentController {
             }
 
 
-            return res.status(200).json(data)
+            return res.status(200).json(await new AesService().getTransferResponse(data))
         }
         catch (err) {
             console.error(err);
@@ -205,7 +206,7 @@ class StudentController {
             let student = await Student.findByPk(studentId);
             if(!student) throw StudentNotFound;
 
-            return res.status(200).json(student);
+            return res.status(200).json(await new AesService().getTransferResponse(student));
         }
         catch (err) {
             console.error(err);

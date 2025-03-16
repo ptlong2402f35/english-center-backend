@@ -9,6 +9,7 @@ const { ParentQuerier } = require("../services/parent/parentQuerier");
 const { AuthService } = require("../services/auth/authService");
 const { parentUpdateService } = require("../services/parent/parentUpdateService");
 const { UserService } = require("../services/user/userService");
+const { AesService } = require("../services/security/AesService");
 
 const User = require("../models").User;
 const Student = require("../models").Student;
@@ -27,7 +28,7 @@ class ParentController {
             });
             if(!parent) throw UserNotFound;
 
-            return res.status(200).json(parent);
+            return res.status(200).json(await new AesService().getTransferResponse(parent));
         }
         catch (err) {
             console.error(err);
@@ -89,7 +90,7 @@ class ParentController {
             //     }
             // });
 
-            return res.status(200).json(student.parents);
+            return res.status(200).json(await new AesService().getTransferResponse(student.parents));
         }
         catch (err) {
             console.error(err);
@@ -126,7 +127,7 @@ class ParentController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -148,7 +149,7 @@ class ParentController {
             );
             if(!parent) throw ParentNotFound;
 
-            return res.status(200).json(parent);
+            return res.status(200).json(await new AesService().getTransferResponse(parent));
         }
         catch (err) {
             console.error(err);

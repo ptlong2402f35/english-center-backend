@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const { ClassStatus } = require("../constants/status");
 const { TimeHandle } = require("../utils/timeHandle");
 const { CostType } = require("../constants/type");
+const { AesService } = require("../services/security/AesService");
 
 const User = require("../models").User;
 const Parent = require("../models").Parent;
@@ -490,8 +491,8 @@ class AnalyticController {
             resp.openClassByMonth = [...classStatusByTime];
             resp.registedStudentByTime = [...registedStudentByTime];
 
-            
-            return res.status(200).json(resp);
+            let aesService = new AesService();
+            return res.status(200).json(await aesService.getTransferResponse(resp));
         }
         catch (err) {
             next(err);
