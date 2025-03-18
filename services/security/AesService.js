@@ -17,7 +17,7 @@ class AesService {
     }
 
     async getStoreDecryptData(data) {
-        return await this.decrypt(data, AesKeyApi);
+        return JSON.parse(await this.decrypt(data, AesKeyApi));
     }
 
     async encrypt(data, key) {

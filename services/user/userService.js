@@ -4,6 +4,7 @@ const { UserRole } = require("../../constants/roles");
 const { sequelize } = require("../../models");
 const { Op } = require("sequelize");
 const { DataMasking } = require("../dataMasking");
+const { AesService } = require("../security/AesService");
 
 const User = require("../../models").User;
 const Parent = require("../../models").Parent;
@@ -18,8 +19,10 @@ const Attendance = require("../../models").Attendance;
 
 class UserService {
     dataMasking;
+    aesService;
     constructor() {
         this.dataMasking = new DataMasking();
+        this.aesService = new AesService();
     }
 
     async attachRoleInfo(user) {
@@ -194,6 +197,70 @@ class UserService {
             user.email = hideEmail;
             user?.setDataValue("phone", hidePhone);
             user?.setDataValue("email", hideEmail);
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    async decodeField(data) {
+        try {
+            return {
+                ...(data.en_userName ? {userName: await this.aesService.getStoreDecryptData(data.en_userName)} : {}),
+                ...(data.en_name ? {name: await this.aesService.getStoreDecryptData(data.en_name)} : {}),
+                ...(data.en_gender ? {gender: await this.aesService.getStoreDecryptData(data.en_gender)} : {}),
+                ...(data.en_age ? {age: await this.aesService.getStoreDecryptData(data.en_age)} : {}),
+                ...(data.en_address ? {address: await this.aesService.getStoreDecryptData(data.en_address)} : {}),
+                ...(data.en_phone ? {phone: await this.aesService.getStoreDecryptData(data.en_phone)} : {}),
+                ...(data.en_email ? {email: await this.aesService.getStoreDecryptData(data.en_email)} : {}),
+                ...(data.en_role ? {role: await this.aesService.getStoreDecryptData(data.en_role)} : {}),
+                ...(data.en_referenceId ? {referenceId: await this.aesService.getStoreDecryptData(data.en_referenceId)} : {}),
+                ...(data.en_type ? {type: await this.aesService.getStoreDecryptData(data.en_type)} : {}),
+            }
+        }
+        catch (err) {
+            console.error(err);
+            return data;
+        }
+    }
+
+    async attachDecodeField(data) {
+        try {
+            if(!data) return;
+            let enData = await this.decodeField(data);
+            console.log("enData", enData);
+            if(data.en_userName && enData.userName) {
+                data.userName = enData.userName;
+                data.setDataValue("userName", enData.userName);
+            }
+            if(data.en_name && enData.name) {
+                data.name = enData.name;
+                data.setDataValue("name", enData.name);
+            }
+            if(data.en_gender && enData.gender) {
+                data.gender = enData.gender;
+                data.setDataValue("gender", enData.gender);
+            }
+            if(data.en_age && enData.age) {
+                data.age = enData.age;
+                data.setDataValue("age", enData.age);
+            }
+            if(data.en_address && enData.address) {
+                data.address = enData.address;
+                data.setDataValue("address", enData.address);
+            }
+            if(data.en_phone && enData.phone) {
+                data.phone = enData.phone;
+                data.setDataValue("phone", enData.phone);
+            }
+            if(data.en_email && enData.email) {
+                data.email = enData.email;
+                data.setDataValue("email", enData.email);
+            }
+            if(data.en_role && enData.role) {
+                data.role = enData.role;
+                data.setDataValue("role", enData.role);
+            }
         }
         catch (err) {
             console.error(err);

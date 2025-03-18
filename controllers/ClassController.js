@@ -17,6 +17,7 @@ const { ClassHandler } = require("../services/class/classHandler");
 const { sequelize } = require("../models");
 const { CostType } = require("../constants/type");
 const { UserService } = require("../services/user/userService");
+const { AesService } = require("../services/security/AesService");
 
 const Class = require("../models").Class;
 const Student = require("../models").Student;
@@ -84,7 +85,7 @@ class ClassController {
                 }
             }
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(await new AesService().getTransferResponse(data)));
         }
         catch (err) {
             console.error(err);
@@ -127,7 +128,7 @@ class ClassController {
             }
             await new ClassHandler().attachAttendancesExtendInfo(data.students, data.id);
             
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(await new AesService().getTransferResponse(data)));
         }
         catch (err) {
             console.error(err);
@@ -164,9 +165,9 @@ class ClassController {
 
             // console.log(`==== sequelize detail: `, util.inspect(user, false, null, true));
 
-            if(!student.classes) return res.status(200).json([]);
+            if(!student.classes) return res.status(200).json(await new AesService().getTransferResponse(await new AesService().getTransferResponse([])));
 
-            return res.status(200).json(student.classes);
+            return res.status(200).json(await new AesService().getTransferResponse(await new AesService().getTransferResponse(student.classes)));
         }
         catch (err) {
             console.error(err);
@@ -215,11 +216,11 @@ class ClassController {
 
             if(!teacher) return res.status(403).json({message: "Giáo viên không tồn tại"});
 
-            if(!teacher?.classes) return res.status(200).json([]);
+            if(!teacher?.classes) return res.status(200).json(await new AesService().getTransferResponse([]));
 
             await new TeacherService().attachTeacherSalary(teacher.classes, teacher.id);
 
-            return res.status(200).json(teacher.classes);
+            return res.status(200).json(await new AesService().getTransferResponse(teacher.classes));
         }
         catch (err) {
             console.error(err);
@@ -255,9 +256,9 @@ class ClassController {
                 include: include
             });
 
-            if(!user.classes) return res.status(200).json([]);
+            if(!user.classes) return res.status(200).json(await new AesService().getTransferResponse([]));
 
-            return res.status(200).json(user.classes);
+            return res.status(200).json(await new AesService().getTransferResponse(user.classes));
         }
         catch (err) {
             console.error(err);
@@ -272,7 +273,7 @@ class ClassController {
 
             let resp = await new ClassCreateService().createClass(data);
 
-            return res.status(200).json(resp);
+            return res.status(200).json(await new AesService().getTransferResponse(resp));
         }
         catch (err) {
             console.error(err);
@@ -288,7 +289,7 @@ class ClassController {
             if(!classId) throw ClassNotFound;
             await new classUpdateService().updateDetail(data, classId);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -310,7 +311,7 @@ class ClassController {
                 }
             );
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
 
         }
         catch (err) {
@@ -369,7 +370,7 @@ class ClassController {
                 await t.rollback();
             }
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
 
         }
         catch (err) {
@@ -403,7 +404,7 @@ class ClassController {
 
             await new ClassRegisterService().register(classId, student.id);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -449,7 +450,7 @@ class ClassController {
 
             await new ClassRegisterService().register(classId, student.id);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -484,7 +485,7 @@ class ClassController {
 
             await new ClassRegisterService().register(classId, student.id);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -517,7 +518,7 @@ class ClassController {
 
             await new ClassRegisterService().unRegister(classId, student.id);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -564,7 +565,7 @@ class ClassController {
 
             await new ClassRegisterService().unRegister(classId, student.id);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -599,7 +600,7 @@ class ClassController {
 
             await new ClassRegisterService().unRegister(classId, student.id);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -625,7 +626,7 @@ class ClassController {
             let resp = {
                 isRegisted: checker ? true : false
             }
-            return res.status(200).json(resp);
+            return res.status(200).json(await new AesService().getTransferResponse(resp));
         }
         catch (err) {
             console.error(err);
@@ -652,11 +653,11 @@ class ClassController {
             );
 
             let registedId = checker.map(item => item.studentId).filter(val => val);
-            return res.status(200).json(
+            return res.status(200).json(await new AesService().getTransferResponse(
                 {
                     registedId: registedId
                 }
-            );
+            ));
         }
         catch (err) {
             console.error(err);

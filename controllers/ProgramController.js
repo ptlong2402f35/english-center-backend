@@ -4,6 +4,7 @@ const { InputInfoEmpty, ClassNotFound, ClassStatusInvalid } = require("../consta
 const { ClassStatus, ProgramStatus } = require("../constants/status");
 const { ProgramApplyService } = require("../services/program/programApplyService");
 const { ProgramUpdateService } = require("../services/program/programUpdateService");
+const { AesService } = require("../services/security/AesService");
 
 const Program = require("../models").Program;
 const Class = require("../models").Class;
@@ -48,7 +49,7 @@ class ProgramController {
             });
 
             data.currentPage = page;
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -64,7 +65,7 @@ class ProgramController {
 
             let program = await Program.findByPk(programId);
 
-            return res.status(200).json(program);
+            return res.status(200).json(await new AesService().getTransferResponse(program));
         }
         catch (err) {
             console.error(err);
@@ -87,7 +88,7 @@ class ProgramController {
 
             let program = await Program.create(builtData);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -126,7 +127,7 @@ class ProgramController {
                 await new ProgramUpdateService().doUpdateProgramStatusHandler(programId, data.status);
             }
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -154,7 +155,7 @@ class ProgramController {
                 }
             );
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -170,7 +171,7 @@ class ProgramController {
 
             await new ProgramApplyService().handleApplyProgram(data.classId, data.programId);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -186,7 +187,7 @@ class ProgramController {
 
             new ProgramApplyService().handleApplyProgram(data.classId, data.programId, true);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);

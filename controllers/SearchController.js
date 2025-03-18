@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const { TimeHandle } = require("../utils/timeHandle");
 const { ClassStatus } = require("../constants/status");
+const { AesService } = require("../services/security/AesService");
 
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
@@ -29,11 +30,11 @@ class SearchController {
                 limit: 20
             });
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 
@@ -52,11 +53,11 @@ class SearchController {
                 limit: 20
             });
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 
@@ -75,11 +76,11 @@ class SearchController {
                 limit: 20
             });
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 
@@ -101,11 +102,11 @@ class SearchController {
                 limit: 20
             });
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 
@@ -124,11 +125,11 @@ class SearchController {
                 limit: 20
             });
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 
@@ -145,11 +146,11 @@ class SearchController {
                 TimeHandle.attachDayLabel(schedule);
             }
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 
@@ -162,11 +163,11 @@ class SearchController {
                 limit: 50
             });
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 
@@ -211,11 +212,11 @@ class SearchController {
                 attributes: ["id", "name", "userId"]
             })
 
-            return res.status(200).json(teachers);
+            return res.status(200).json(await new AesService().getTransferResponse(teachers));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 
@@ -252,11 +253,11 @@ class SearchController {
                 attributes: ["id", "name", "code"]
             })
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 
@@ -301,11 +302,11 @@ class SearchController {
                 attributes: ["id", "name", "userId"]
             })
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
-            return res.status(200).json([])
+            return res.status(200).json(await new AesService().getTransferResponse([]))
         }
     }
 }

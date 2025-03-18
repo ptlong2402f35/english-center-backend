@@ -1,4 +1,5 @@
 const { ErrorService } = require("../services/errorService");
+const { AesService } = require("../services/security/AesService");
 
 const Notification = require("../models").Notification;
 
@@ -22,7 +23,7 @@ class NotificationController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -48,7 +49,7 @@ class NotificationController {
                 }
             );
 
-            return res.status(200).json({message : "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message : "Thành công"}));
         }
         catch (err) {
             console.error(err);

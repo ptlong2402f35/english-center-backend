@@ -9,6 +9,7 @@ const { TransactionHandler } = require("../services/transaction/transactionHandl
 const { ConnectionService } = require("../services/connection/connectionService");
 const { CostService } = require("../services/cost/costService");
 const { CommunicationService } = require("../services/communication/communicationService");
+const { AesService } = require("../services/security/AesService");
 const Transaction = require("../models").Transaction;
 const Student = require("../models").Student;
 const User = require("../models").User;
@@ -75,7 +76,7 @@ class TransactionController {
             }
 
             data.currentPage = page;
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -97,7 +98,7 @@ class TransactionController {
                     }
                 );
 
-                return res.status(200).json(transactions);
+                return res.status(200).json(await new AesService().getTransferResponse(transactions));
             }
             if(user.role === UserRole.Parent) {
                 let parent =  await Parent.findOne(
@@ -127,7 +128,7 @@ class TransactionController {
                     }
                 );
 
-                return res.status(200).json(transactions);
+                return res.status(200).json(await new AesService().getTransferResponse(transactions));
             }
             throw NotEnoughPermission;
         }
@@ -148,7 +149,7 @@ class TransactionController {
 
             await new TransactionService().createTransaction(data, data.costId, {isAdmin: true});
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -168,7 +169,7 @@ class TransactionController {
 
             await new TransactionService().updateTransactions(data, transaction);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -189,7 +190,7 @@ class TransactionController {
 
             await new TransactionHandler().onDeleteTransactionHandler(cost);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -236,7 +237,7 @@ class TransactionController {
                 `Thanh toán thành công cho hóa đơn ${cost?.name || cost.id || ""}`,
             );
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);

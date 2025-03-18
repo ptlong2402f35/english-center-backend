@@ -51,7 +51,7 @@ class ParentController {
             //update info
             await new StudentUpdateService().updateStudentDetail(data, parent.id);
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -177,7 +177,7 @@ class ParentController {
                 }
             );
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -193,7 +193,7 @@ class ParentController {
             let data = req.body;
             await new parentUpdateService().updateParentDetail(data, parentId, {forAdmin: true});
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -221,7 +221,7 @@ class ParentController {
                 }
             );
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);

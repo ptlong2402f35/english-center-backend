@@ -10,6 +10,7 @@ const { sequelize } = require("../models");
 const { TransactionService } = require("../services/transaction/transactionService");
 const { CostType } = require("../constants/type");
 const { CostService } = require("../services/cost/costService");
+const { AesService } = require("../services/security/AesService");
 const Transaction = require("../models").Transaction;
 const Cost = require("../models").Cost;
 const User = require("../models").User;
@@ -88,7 +89,7 @@ class CostController {
             }
 
             data.currentPage = page;
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -107,7 +108,7 @@ class CostController {
             await new CostService().attachExtendInfoToCost(data);
             await new CostService().attachCenterInfo(data);
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -210,7 +211,7 @@ class CostController {
             }
 
             data.currentPage = page;
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -294,7 +295,7 @@ class CostController {
             }
 
             data.currentPage = page;
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -322,7 +323,7 @@ class CostController {
 
             new CostService().createNewCostNoti(userIds, data.month, data.year);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -353,7 +354,7 @@ class CostController {
 
             new CostService().createNewCostNoti(userIds, data.month, data.year);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -382,7 +383,7 @@ class CostController {
             }
             new CostService().onCreateNotiTransToTeacher(data.teacherId, data.month, data.year);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -401,7 +402,7 @@ class CostController {
 
             new CostService().onCreateNotiTransToTeacher(data.teacherId, data.month, data.year, true);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -417,7 +418,7 @@ class CostController {
             if(![CostType.ElecFee, CostType.OtherFee, CostType.WaterFee].includes(data.type)) return res.status(403).json({message: "Loại hóa đơn không hợp lệ"});
             await new CostOtherService().createCost(data);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -453,7 +454,7 @@ class CostController {
                 }
             );
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -574,7 +575,7 @@ class CostController {
                 new CostService().onCreateNotiTransToUser(cost);
             }
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -607,7 +608,7 @@ class CostController {
                 }
             });
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);

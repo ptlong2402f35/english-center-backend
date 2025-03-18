@@ -47,6 +47,7 @@ var http = require("http");
 const { initSocket } = require("./socket/socket");
 const { FirebaseConfig } = require("./firebase/firebaseConfig");
 const { GeneralRedisClient } = require("./services/generalRedisClient");
+const { AesService } = require("./services/security/AesService");
 const HOST = "0.0.0.0";
 const ChannelPassword = "ccyT7JeiJ2";
 require("events").EventEmitter.prototype._maxListeners = 50;

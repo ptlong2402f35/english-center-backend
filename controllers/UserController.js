@@ -3,6 +3,7 @@ const { UserRole } = require("../constants/roles");
 const { FirebaseConfig } = require("../firebase/firebaseConfig");
 const { AuthService } = require("../services/auth/authService");
 const { ErrorService } = require("../services/errorService");
+const { AesService } = require("../services/security/AesService");
 const { UserQuerier } = require("../services/user/userQuerier");
 const { UserService } = require("../services/user/userService");
 const { UserUpdateService } = require("../services/user/userUpdateService");
@@ -17,7 +18,7 @@ class UserController {
             
             let user = await User.findByPk(userId);
             if(!user) throw UserNotFound;
-            return res.status(200).json(user);
+            return res.status(200).json(await new AesService().getTransferResponse(user));
 
         }
         catch (err) {
@@ -38,7 +39,7 @@ class UserController {
 
             await new UserUpdateService().updateDetail(data, userId);
 
-            return res.status(200).json({message: "DONE"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "DONE"}));
         }
         catch (err) {
             console.error(err);
@@ -58,7 +59,7 @@ class UserController {
 
             await new UserService().updatePassword(data, userId);
 
-            return res.status(200).json({message: "DONE"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "DONE"}));
         }
         catch (err) {
             console.error(err);
@@ -96,7 +97,7 @@ class UserController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data)
+            return res.status(200).json(await new AesService().getTransferResponse(data))
         }
         catch (err) {
             console.error(err);
@@ -112,7 +113,7 @@ class UserController {
             let user = await User.findByPk(userId);
             if(!user) throw UserNotFound;
 
-            return res.status(200).json(user);
+            return res.status(200).json(await new AesService().getTransferResponse(user));
         }
         catch (err) {
             console.error(err);
@@ -136,7 +137,7 @@ class UserController {
                 }
             );
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -152,7 +153,7 @@ class UserController {
             let data = req.body;
             await new UserUpdateService().updateDetail(data, userId);
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -168,7 +169,7 @@ class UserController {
             let data = req.body;
             await new UserService().updatePassword(data, userId);
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -184,7 +185,7 @@ class UserController {
             let data = req.body;
             await new UserService().updateMessageToken(userId, data.messageToken);
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -200,7 +201,7 @@ class UserController {
             let data = req.body;
             await new UserService().updateMessageToken(userId, null);
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -223,7 +224,7 @@ class UserController {
 
             let resp = await firebaseConfig.createMessage(msgToken, {title:"HIEU LON", body: "TEST body @@"});
 
-            return res.status(200).json(resp);
+            return res.status(200).json(await new AesService().getTransferResponse(resp));
         }
         catch (err) {
             console.error(err);

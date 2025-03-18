@@ -8,6 +8,7 @@ const { RequestService } = require("../services/request/requestService");
 const { CommunicationService } = require("../services/communication/communicationService");
 const { NotificationType } = require("../constants/type");
 const { UserService } = require("../services/user/userService");
+const { AesService } = require("../services/security/AesService");
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
 const Request = require("../models").Request;
@@ -57,7 +58,7 @@ class RequestController {
 
                 }
 
-                return res.status(200).json(requests);
+                return res.status(200).json(await new AesService().getTransferResponse(requests));
             }
             if(roleId === UserRole.Parent) {
                 roleObj = await Parent.findOne(
@@ -98,7 +99,7 @@ class RequestController {
 
                 }
 
-                return res.status(200).json(requests);
+                return res.status(200).json(await new AesService().getTransferResponse(requests));
             }
             
             return res.status(403).json({message: "Chức năng chỉ dành cho học sinh và phụ huynh"})
@@ -133,7 +134,7 @@ class RequestController {
                     }
                 );
 
-                return res.status(200).json(requests);
+                return res.status(200).json(await new AesService().getTransferResponse(requests));
             }
             if(roleId === UserRole.Parent) {
                 roleObj = await Parent.findOne(
@@ -152,7 +153,7 @@ class RequestController {
                     }
                 );
 
-                return res.status(200).json(requests);
+                return res.status(200).json(await new AesService().getTransferResponse(requests));
             }
 
             return res.status(403).json({message: "Chức năng chỉ dành cho học sinh và phụ huynh"})
@@ -224,7 +225,7 @@ class RequestController {
                     `Phụ huynh ${roleObj.name || roleObj.phone} gửi bạn lời mời kết nối, vui lòng kiểm tra`,
                 );
 
-                return res.status(200).json({message: "Thành công"})
+                return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}))
             }
             if(user.role === UserRole.Student) {
                 let roleObj = await Student.findOne(
@@ -279,7 +280,7 @@ class RequestController {
                     `Học sinh ${roleObj.name || roleObj.phone} gửi bạn lời mời kết nối, vui lòng kiểm tra`,
                 );
 
-                return res.status(200).json({message: "Thành công"})
+                return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}))
             }
 
             return res.status(403).json({message: "Chức năng chỉ dành cho học sinh và phụ huynh"});
@@ -352,7 +353,7 @@ class RequestController {
                     }
                 }
 
-                return res.status(200).json({message: "Thành công"});
+                return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
             }
             if(user.role === UserRole.Student) {
                 let roleObj = await Student.findOne(
@@ -406,7 +407,7 @@ class RequestController {
                     }
                 }
 
-                return res.status(200).json({message: "Thành công"});
+                return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
             }
 
             return res.status(403).json({message: "Chức năng chỉ dành cho học sinh và phụ huynh"})
@@ -432,7 +433,7 @@ class RequestController {
                     }
                 );
                 let student = await Student.findByPk(targetId);
-                if(!student) return res.status(200).json({message: "Học sinh không tồn tại"});
+                if(!student) return res.status(200).json(await new AesService().getTransferResponse({message: "Học sinh không tồn tại"}));
                 await ParentStudent.destroy(
                     {
                         where: {
@@ -442,7 +443,7 @@ class RequestController {
                     }
                 );
 
-                return res.status(200).json({message: "Thành công"});
+                return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
             }
             if(user.role === UserRole.Student) {
                 let roleObj = await Student.findOne(
@@ -453,7 +454,7 @@ class RequestController {
                     }
                 );
                 let parent = await Parent.findByPk(targetId);
-                if(!parent) return res.status(200).json({message: "Phụ huynh không tồn tại"});
+                if(!parent) return res.status(200).json(await new AesService().getTransferResponse({message: "Phụ huynh không tồn tại"}));
                 await ParentStudent.destroy(
                     {
                         where: {
@@ -463,7 +464,7 @@ class RequestController {
                     }
                 );
 
-                return res.status(200).json({message: "Thành công"});
+                return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
             }
 
             return res.status(403).json({message: "Chức năng chỉ dành cho học sinh và phụ huynh"})
@@ -505,7 +506,7 @@ class RequestController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -521,7 +522,7 @@ class RequestController {
             let communicationService = new CommunicationService();
             if(!studentId || !parentId) throw InputInfoEmpty;
 
-            if(await new ConnectionService().checkStudentParentConnect(studentId, parentId)) return res.status(200).json({message: "Thành công"});
+            if(await new ConnectionService().checkStudentParentConnect(studentId, parentId)) return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
 
             // let count = await Request.create(
             //     {
@@ -568,7 +569,7 @@ class RequestController {
 
             noti().catch(err => console.error(err));
 
-            return res.status(200).json({message: "Thành công"})
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}))
         }
         catch (err) {
             console.error(err);
@@ -592,7 +593,7 @@ class RequestController {
                 }
             );
 
-            return res.status(200).json({message: "Thành công"})
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}))
         }
         catch (err) {
             console.error(err);

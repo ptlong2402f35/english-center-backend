@@ -1,6 +1,7 @@
 const { InputInfoEmpty } = require("../constants/message");
 const { sequelize } = require("../models");
 const { ErrorService } = require("../services/errorService");
+const { AesService } = require("../services/security/AesService");
 const { TimeHandle } = require("../utils/timeHandle");
 
 const Schedule = require("../models").Schedule;
@@ -24,7 +25,7 @@ class ScheduleController {
                 TimeHandle.attachDayLabel(item);
             }
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -42,7 +43,7 @@ class ScheduleController {
 
             TimeHandle.attachDayLabel(data);
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -59,7 +60,7 @@ class ScheduleController {
 
             await Schedule.create(data);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -82,7 +83,7 @@ class ScheduleController {
                 }
             );
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -104,7 +105,7 @@ class ScheduleController {
 
             await ClassSchedule.create(data);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -126,7 +127,7 @@ class ScheduleController {
                 },
             });
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -165,7 +166,7 @@ class ScheduleController {
                 throw err1;
             }
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
