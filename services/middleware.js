@@ -24,11 +24,18 @@ class Middleware {
     async processData(req, res, next) {
         try {
             let data = req?.body?.data;
-            if(!data) next();
-            // let encode = await new AesService().encrypt(JSON.stringify(req.body), AesTransferKeyApi);
-            let decode = await new AesService().decrypt(data, AesTransferKeyApi);
-            req.body = JSON.parse(decode);
-            next();
+            console.log(data);
+            if(!data) {
+                console.log("next")
+                next();
+            }
+            else {
+                // let encode = await new AesService().encrypt(JSON.stringify(req.body), AesTransferKeyApi);
+                let decode = await new AesService().decrypt(data, AesTransferKeyApi);
+                req.body = JSON.parse(decode);
+                next();
+            }
+
         }
         catch (err) {
             console.error(err);
