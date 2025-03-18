@@ -11,6 +11,7 @@ const { CommunicationService } = require("../communication/communicationService"
 const { UserRole } = require("../../constants/roles");
 const { UserNotFound, UpdateFailMessage, ExpiredResetKey, UpdateDoneMessage, UserNotActive } = require("../../constants/message");
 const { CommunicationType } = require("../../constants/type");
+const { parentUpdateService } = require("../parent/parentUpdateService");
 const DefaultPartnerPassword = process.env.DEFAULT_PARTNER_PASSWORD?.trim() || "";
 const DefaultServiceFee = process.env.DEFAULT_SERVICE_FEE ? parseFloat(process.env.DEFAULT_SERVICE_FEE) : 5.5;
 class AuthService {
@@ -131,6 +132,7 @@ class AuthService {
         try {
 			let passHashed = bcrypt.hashSync(data.password, 10);
             let user;
+            let enUser = await new parentUpdateService().enbuild(data);
             let transaction = await sequelize.transaction();
             try {
                 user = await User.create(
@@ -141,7 +143,9 @@ class AuthService {
                         role: data.role,
                         active: true,
                         createdAt: new Date(),
-                        updatedAt: new Date()                    },
+                        updatedAt: new Date(),
+                        ...(enUser ? {...enUser} : {}),
+                    },
                     {
                         transaction: transaction
                     }
@@ -160,7 +164,8 @@ class AuthService {
                             email: data.email,
                             address: data.address,
                             createdAt: new Date(),
-                            updatedAt: new Date()
+                            updatedAt: new Date(),
+                            ...(enUser ? {...enUser} : {}),
                         },
                         {
                             transaction: transaction
@@ -180,7 +185,9 @@ class AuthService {
                             email: data.email,
                             address: data.address,
                             createdAt: new Date(),
-                            updatedAt: new Date()
+                            updatedAt: new Date(),
+                            ...(enUser ? {...enUser} : {}),
+
                         },
                         {
                             transaction: transaction
@@ -201,7 +208,8 @@ class AuthService {
                             level: data.level,
                             address: data.address,
                             createdAt: new Date(),
-                            updatedAt: new Date()
+                            updatedAt: new Date(),
+                            ...(enUser ? {...enUser} : {}),
                         },
                         {
                             transaction: transaction

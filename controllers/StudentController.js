@@ -51,7 +51,7 @@ class StudentController {
             if(!student) throw UserNotFound;
             await new StudentUpdateService().updateStudentDetail(data, student.id);
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -222,7 +222,7 @@ class StudentController {
             let data = req.body;
             await new StudentUpdateService().updateStudentDetail(data, studentId, {forAdmin: true});
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -250,7 +250,7 @@ class StudentController {
                 }
             );
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);
@@ -285,7 +285,7 @@ class StudentController {
                         }
                     }
                 );
-                return res.status(200).json({message: "Thành Công"});
+                return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
             }
             
             if(data.reduceFee || data.reduceFee === 0) {
@@ -303,10 +303,10 @@ class StudentController {
                         }
                     }
                 );
-                return res.status(200).json({message: "Thành Công"});
+                return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
             }
 
-            return res.status(200).json({message: "Thành Công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành Công"}));
         }
         catch (err) {
             console.error(err);

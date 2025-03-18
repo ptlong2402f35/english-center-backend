@@ -4,6 +4,7 @@ const { CenterStatus } = require("../constants/status");
 const { CenterQuerier } = require("../services/center/centerQuerier");
 const { CenterUpdateService } = require("../services/center/centerUpdateService");
 const { ErrorService } = require("../services/errorService");
+const { AesService } = require("../services/security/AesService");
 
 const Center = require("../models").Center;
 const Class = require("../models").Class;
@@ -48,7 +49,7 @@ class CenterController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -78,7 +79,7 @@ class CenterController {
             );
             if(!data) throw CenterNotFound;
             
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -97,7 +98,7 @@ class CenterController {
                 status: CenterStatus.Active
             });
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
 
         }
         catch (err) {
@@ -114,7 +115,7 @@ class CenterController {
 
             await new CenterUpdateService().handleUpdateCenterInfo(data, centerId);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -147,7 +148,7 @@ class CenterController {
                 }
             });
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);

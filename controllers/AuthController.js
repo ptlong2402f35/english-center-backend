@@ -33,14 +33,14 @@ class AuthController {
             let user = await User.findByPk(userId);
             if(action) {
                 await new OtpService().sendOtpToEmail(user);
-                return res.status(200).json({
+                return res.status(200).json(await new AesService().getTransferResponse({
                     message: "Gửi mail thành công",
                     // accessToken,
                     // expiredIn,
                     userId,
                     // refreshToken,
                     email
-                });
+                }))
             }
             return res.status(403).json({
                 message: "Đăng nhập thất bại",
@@ -69,13 +69,13 @@ class AuthController {
             }
             let {action, accessToken, refreshToken, expiredIn, userId} = await new AuthLogin().handleLogin(data, true);
             if(action) {
-                return res.status(200).json({
+                return res.status(200).json(await new AesService().getTransferResponse({
                     message: "Đăng nhập thành công",
                     accessToken,
                     expiredIn,
                     userId,
                     refreshToken,
-                });
+                }));
             }
             return res.status(403).json({
                 message: "Đăng nhập thất bại",
@@ -113,10 +113,10 @@ class AuthController {
 
             let resp = await new AuthService().handleCustomerSignup(data);
 
-            return res.status(200).json({
+            return res.status(200).json(await new AesService().getTransferResponse({
                 message: "Thành công",
                 ...resp,
-            })
+            }))
         }
         catch (err) {
             console.error(err);
@@ -130,13 +130,13 @@ class AuthController {
             let token = req.body.refreshToken || null;
             let {action, accessToken, refreshToken, expiredIn, userId} = await new AuthLogin().handleRefresh(token);
             if(action) {
-                return res.status(200).json({
+                return res.status(200).json(await new AesService().getTransferResponse({
                     message: new TranslateService(req).translateMessage(SuccessRespMessage, true),
                     accessToken,
                     expiredIn,
                     userId,
                     refreshToken,
-                })
+                }))
             }
             return res.status(403).json({message: "Hết phiên đăng nhập, Vui lòng đăng nhập lại"});
         }
@@ -172,6 +172,8 @@ class AuthController {
                 attributes: [
                     "id",
                     "userName",
+                    "en_userName",
+                    "en_email",
                     "password",
                     "role",
                     "active",
@@ -181,6 +183,11 @@ class AuthController {
                 ]
             });
             if(!user) throw UserNotFound;
+            await new UserService().attachDecodeField(user);
+            await new UserService().attachDecodeField(user.student);
+            await new UserService().attachDecodeField(user.parent);
+            await new UserService().attachDecodeField(user.teacher);
+            // console.log("decode ===", user);
             await new UserService().attachRoleInfo(user);
             
             return res.status(200).json(await new AesService().getTransferResponse(user));
@@ -200,7 +207,7 @@ class AuthController {
             if(!Validation.checkValidEmailFormat(email)) throw EmailFormatNotValid;
 
             await authService.initForgotPassword(email);
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -221,7 +228,7 @@ class AuthController {
 
             await authService.updateForgetPassword(resetKey, password);
             
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -246,7 +253,7 @@ class AuthController {
             if(!resp.success && !resp.expired) return res.status(403).json({message: "OTP đã hết hạn", code: "otp_expired", ...resp});
             if(!resp.success && resp.expired) return res.status(403).json({message: "OTP không trùng khớp", code: "otp_not_correct", ...resp});
 
-            if(resp.success && resp.expired) return res.status(200).json({message: "Thành công", code: "success", ...resp});
+            if(resp.success && resp.expired) return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công", code: "success", ...resp}));
         }
         catch (err) {
             console.error(err);
@@ -263,10 +270,10 @@ class AuthController {
             const resp = await new GoogleAuth().googleLogin(idToken);
             if(!resp.action) return res.status(403).json({message: "Login Failed"});
 
-            return res.status(200).json({
+            return res.status(200).json(await new AesService().getTransferResponse({
                 ...resp,
                 message: "Login Successfully"
-            });
+            }));
         }
         catch (err) {
             console.error(err);
@@ -282,7 +289,7 @@ class AuthController {
                 environment: env,
                 config: config[env]
             }
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);

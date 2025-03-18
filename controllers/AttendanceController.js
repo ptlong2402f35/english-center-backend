@@ -7,6 +7,7 @@ const { TimeHandle } = require("../utils/timeHandle");
 const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");
 const { UserRole } = require("../constants/roles");
 const { sequelize } = require("../models");
+const { AesService } = require("../services/security/AesService");
 const Attendance = require("../models").Attendance;
 const StudentClass = require("../models").StudentClass;
 const TeacherClass = require("../models").TeacherClass;
@@ -51,8 +52,7 @@ class AttendanceController {
                     }
                 }
             );
-
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -69,7 +69,7 @@ class AttendanceController {
             if(!await new AttendanceService().permissionChecker(user, classId)) return res.status(403).json({message: "Bạn không là giáo viên của lớp này"});
             let data = await Attendance.findByPk(attendanceId);
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -115,7 +115,7 @@ class AttendanceController {
                 console.error(err1);
             }
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -147,7 +147,7 @@ class AttendanceController {
                 }
             );
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -179,7 +179,7 @@ class AttendanceController {
                 }
             );
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -254,7 +254,7 @@ class AttendanceController {
                 [item.key]: item.value
             }));
 
-            return res.status(200).json(resp);
+            return res.status(200).json(await new AesService().getTransferResponse(resp));
         }
         catch (err) {
             console.error(err);
@@ -329,7 +329,7 @@ class AttendanceController {
                 [item.key]: item.value
             }));
 
-            return res.status(200).json(resp);
+            return res.status(200).json(await new AesService().getTransferResponse(resp));
         }
         catch (err) {
             console.error(err);
@@ -390,7 +390,7 @@ class AttendanceController {
                 }
             );
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -447,7 +447,7 @@ class AttendanceController {
                 }
             );
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);

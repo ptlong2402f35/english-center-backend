@@ -4,6 +4,7 @@ const { ReviewType } = require("../constants/type");
 const { ErrorService } = require("../services/errorService");
 const { ParentStudentService } = require("../services/parentStudentService/parentStudentService");
 const { ReviewService } = require("../services/review/reviewSerivce");
+const { AesService } = require("../services/security/AesService");
 const Review = require("../models").Review;
 const Student = require("../models").Student;
 const Parent = require("../models").Parent;
@@ -40,7 +41,7 @@ class ReviewController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -87,7 +88,7 @@ class ReviewController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
 
         }
         catch (err) {
@@ -133,7 +134,7 @@ class ReviewController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
 
         }
         catch (err) {
@@ -180,7 +181,7 @@ class ReviewController {
 
             data.currentPage = page;
 
-            return res.status(200).json(data);
+            return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
             console.error(err);
@@ -221,7 +222,7 @@ class ReviewController {
             });
             await Review.bulkCreate(built);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -269,7 +270,7 @@ class ReviewController {
 
             await Review.bulkCreate(built);
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
@@ -306,7 +307,7 @@ class ReviewController {
                 }
             })
 
-            return res.status(200).json({message: "Thành công"});
+            return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công"}));
         }
         catch (err) {
             console.error(err);
