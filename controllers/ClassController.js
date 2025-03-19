@@ -85,7 +85,7 @@ class ClassController {
                 }
             }
 
-            return res.status(200).json(await new AesService().getTransferResponse(await new AesService().getTransferResponse(data)));
+            return res.status(200).json(await new AesService().getTransferResponse((data)));
         }
         catch (err) {
             console.error(err);
@@ -128,7 +128,7 @@ class ClassController {
             }
             await new ClassHandler().attachAttendancesExtendInfo(data.students, data.id);
             
-            return res.status(200).json(await new AesService().getTransferResponse(await new AesService().getTransferResponse(data)));
+            return res.status(200).json(await new AesService().getTransferResponse((data)));
         }
         catch (err) {
             console.error(err);
@@ -165,9 +165,9 @@ class ClassController {
 
             // console.log(`==== sequelize detail: `, util.inspect(user, false, null, true));
 
-            if(!student.classes) return res.status(200).json(await new AesService().getTransferResponse(await new AesService().getTransferResponse([])));
+            if(!student.classes) return res.status(200).json(await new AesService().getTransferResponse(([])));
 
-            return res.status(200).json(await new AesService().getTransferResponse(await new AesService().getTransferResponse(student.classes)));
+            return res.status(200).json(await new AesService().getTransferResponse((student.classes)));
         }
         catch (err) {
             console.error(err);
