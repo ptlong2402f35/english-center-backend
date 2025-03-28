@@ -18,6 +18,7 @@ class UserController {
             
             let user = await User.findByPk(userId);
             if(!user) throw UserNotFound;
+            await new UserService().attachDecodeField(user);
             return res.status(200).json(await new AesService().getTransferResponse(user));
 
         }
@@ -96,6 +97,12 @@ class UserController {
             });
 
             data.currentPage = page;
+            for (let item of data.docs) {
+                await new UserService().attachDecodeField(item);
+                await new UserService().attachDecodeField(item?.parent);
+                await new UserService().attachDecodeField(item?.student);
+                await new UserService().attachDecodeField(item?.teacher);
+            }
 
             return res.status(200).json(await new AesService().getTransferResponse(data))
         }
@@ -112,6 +119,8 @@ class UserController {
             if(!userId) throw UserNotFound;
             let user = await User.findByPk(userId);
             if(!user) throw UserNotFound;
+            await new UserService().attachDecodeField(user);
+
 
             return res.status(200).json(await new AesService().getTransferResponse(user));
         }

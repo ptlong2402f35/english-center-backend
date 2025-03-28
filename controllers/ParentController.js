@@ -89,6 +89,9 @@ class ParentController {
             //         }
             //     }
             // });
+            for(let item of student.parents) {
+                await new UserService().attachDecodeField(item);
+            }
 
             return res.status(200).json(await new AesService().getTransferResponse(student.parents));
         }
@@ -127,6 +130,14 @@ class ParentController {
 
             data.currentPage = page;
 
+            for(let item of data.docs) {
+                await new UserService().attachDecodeField(item);
+                for(let child of item.childs) {
+                    await new UserService().attachDecodeField(child);
+                }
+                await new UserService().attachDecodeField(item.user);
+            }
+
             return res.status(200).json(await new AesService().getTransferResponse(data));
         }
         catch (err) {
@@ -148,6 +159,12 @@ class ParentController {
                 }
             );
             if(!parent) throw ParentNotFound;
+            await new UserService().attachDecodeField(parent);
+                for(let child of parent.childs) {
+                    await new UserService().attachDecodeField(child);
+                }
+                await new UserService().attachDecodeField(parent.user);
+
 
             return res.status(200).json(await new AesService().getTransferResponse(parent));
         }

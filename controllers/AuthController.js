@@ -29,8 +29,17 @@ class AuthController {
             if(!data.password) {
                 throw PasswordEmpty;
             }
-            let {action, accessToken, refreshToken, expiredIn, userId, email} = await new AuthLogin().handleLogin(data);
+            let {action, accessToken, refreshToken, expiredIn, userId, email, admin} = await new AuthLogin().handleLogin(data);
             let user = await User.findByPk(userId);
+            if(action && admin) {
+                let resp = {
+                    accessToken,
+                    refreshToken,
+                    expiredIn
+                }
+                // return res.status(200).json({message: "Thành công", code: "success", ...resp});
+                return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công", code: "success", ...resp}));
+            }
             if(action) {
                 await new OtpService().sendOtpToEmail(user);
                 return res.status(200).json(await new AesService().getTransferResponse({
@@ -252,7 +261,7 @@ class AuthController {
             let resp = await new OtpService().verifyOtp(user, otp);
             if(!resp.success && !resp.expired) return res.status(403).json({message: "OTP đã hết hạn", code: "otp_expired", ...resp});
             if(!resp.success && resp.expired) return res.status(403).json({message: "OTP không trùng khớp", code: "otp_not_correct", ...resp});
-
+            // return res.status(200).json({message: "Thành công", code: "success", ...resp});
             if(resp.success && resp.expired) return res.status(200).json(await new AesService().getTransferResponse({message: "Thành công", code: "success", ...resp}));
         }
         catch (err) {

@@ -48,6 +48,7 @@ const { initSocket } = require("./socket/socket");
 const { FirebaseConfig } = require("./firebase/firebaseConfig");
 const { GeneralRedisClient } = require("./services/generalRedisClient");
 const { AesService } = require("./services/security/AesService");
+const { convertAll } = require("./services/tool/convertToEncode");
 const HOST = "0.0.0.0";
 const ChannelPassword = "ccyT7JeiJ2";
 require("events").EventEmitter.prototype._maxListeners = 50;
@@ -119,7 +120,7 @@ function onListening() {
 
 new FirebaseConfig().getInstance().init();
 notiJob.start();
-
+// convertAll()
 new GeneralRedisClient()
 		.getInstance()
 		.getClient();

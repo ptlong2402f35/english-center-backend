@@ -28,12 +28,12 @@ module.exports = (sequelize, DataTypes) => {
 	Teacher.init(
 		{
 			name: DataTypes.STRING,
-            gender: DataTypes.INTEGER,
-            birthday: DataTypes.DATE,
-            age: DataTypes.INTEGER,
-            address: DataTypes.TEXT,
-            phone: DataTypes.STRING,
-            email: DataTypes.STRING,
+            // gender: DataTypes.INTEGER,
+            // birthday: DataTypes.DATE,
+            // age: DataTypes.INTEGER,
+            // address: DataTypes.TEXT,
+            // phone: DataTypes.STRING,
+            // email: DataTypes.STRING,
             userId: DataTypes.INTEGER,
             active: DataTypes.BOOLEAN,
             level: DataTypes.INTEGER,

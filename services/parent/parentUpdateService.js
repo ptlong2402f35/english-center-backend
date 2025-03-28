@@ -75,13 +75,13 @@ class parentUpdateService {
     async enbuild(data) {
         try {
             return ({
-                en_name: await this.aesService.getStoreEncryptData(JSON.stringify(data.name)),
-                en_gender: await this.aesService.getStoreEncryptData(JSON.stringify(data.gender)),
-                en_birthday: await this.aesService.getStoreEncryptData(JSON.stringify(data.birthday)),
-                en_age: await this.aesService.getStoreEncryptData(JSON.stringify(data.age)),
-                en_address: await this.aesService.getStoreEncryptData(JSON.stringify(data.address)),
-                en_phone: await this.aesService.getStoreEncryptData(JSON.stringify(data.phone)),
-                en_email: await this.aesService.getStoreEncryptData(JSON.stringify(data.email))
+                en_name: await this.aesService.getStoreEncryptData(JSON.stringify(data.name || "")),
+                en_gender: await this.aesService.getStoreEncryptData(JSON.stringify(data.gender || "")),
+                en_birthday: await this.aesService.getStoreEncryptData(JSON.stringify(data.birthday || "")),
+                en_age: await this.aesService.getStoreEncryptData(JSON.stringify(data.age || "")),
+                en_address: await this.aesService.getStoreEncryptData(JSON.stringify(data.address || "")),
+                en_phone: await this.aesService.getStoreEncryptData(JSON.stringify(data.phone || "")),
+                en_email: await this.aesService.getStoreEncryptData(JSON.stringify(data.email || ""))
             });
         }
         catch (err) {

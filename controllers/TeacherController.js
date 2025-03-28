@@ -51,10 +51,14 @@ class TeacherController {
             });
             let dataMasking = new DataMasking();
             for(let item of data.docs) {
+                await new UserService().attachDecodeField(item);
+                await new UserService().attachDecodeField(item.user);
+
                 let hidePhone = dataMasking.process(item.phone);
                 let hideEmail = dataMasking.process(item.email);
                 item.setDataValue("phone", hidePhone);
                 item.setDataValue("email", hideEmail);
+
             }
 
             data.currentPage = page;
@@ -87,6 +91,9 @@ class TeacherController {
                 }
             );
             if(!data) throw ClassNotFound;
+            await new UserService().attachDecodeField(data);
+            await new UserService().attachDecodeField(data.user);
+
             
             return res.status(200).json(await new AesService().getTransferResponse(data));
         }
