@@ -61,17 +61,24 @@ class TeacherQuerier {
         return ([
             "id",
             "name",
-            "gender",
-            "birthday",
-            "age",
-            "address",
-            "phone",
-            "email",
+            // "gender",
+            // "birthday",
+            // "age",
+            // "address",
+            // "phone",
+            // "email",
             "createdAt",
             "updatedAt",
             "userId",
             "active",
-            "level"
+            "level",
+            "en_name",
+            "en_gender",
+            "en_birthday",
+            "en_age",
+            "en_address",
+            "en_phone",
+            "en_email"
         ]);
     }
 

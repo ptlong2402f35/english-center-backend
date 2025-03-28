@@ -257,6 +257,10 @@ class UserService {
                 data.email = enData.email;
                 data.setDataValue("email", enData.email);
             }
+            if(data.en_birthday && enData.birthday) {
+                data.birthday = enData.birthday;
+                data.setDataValue("birthday", enData.birthday);
+            }
             if(data.en_role && enData.role) {
                 data.role = enData.role;
                 data.setDataValue("role", enData.role);

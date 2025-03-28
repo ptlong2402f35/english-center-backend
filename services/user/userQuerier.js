@@ -32,6 +32,9 @@ class UserQuerier {
             "active",
             "createdAt",
             "updatedAt",
+            "en_userName",
+            "en_role",
+            "en_email"
         ]);
     }
 
