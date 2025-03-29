@@ -313,8 +313,8 @@ class UserService {
                 data.setDataValue("en_role", null);
             }
             if(data.en_address) {
-                data.address = null;
-                data.setDataValue("address", null);
+                data.en_address = null;
+                data.setDataValue("en_address", null);
             }
         }
         catch (err) {
