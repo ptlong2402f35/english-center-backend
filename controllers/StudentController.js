@@ -91,6 +91,7 @@ class StudentController {
             // });
             for(let child of parent.childs) {
                 await new UserService().attachDecodeField(child);
+                await new UserService().removeEncodeField(child);
             }
 
             return res.status(200).json(await new AesService().getTransferResponse(parent.childs || []));
@@ -123,6 +124,7 @@ class StudentController {
             });
             if(!student) throw UserNotFound;
             await new UserService().attachDecodeField(student);
+            await new UserService().removeEncodeField(student);
 
 
             return res.status(200).json(await new AesService().getTransferResponse(student));
@@ -164,6 +166,7 @@ class StudentController {
             for(let student of data.docs) {
                 new StudentService().attachUnJoinClassCount(student.classes, student.id);
                 await new UserService().attachDecodeField(student);
+                await new UserService().removeEncodeField(student);
 
             }
 
@@ -213,6 +216,7 @@ class StudentController {
             let student = await Student.findByPk(studentId);
             if(!student) throw StudentNotFound;
             await new UserService().attachDecodeField(student);
+            await new UserService().removeEncodeField(student);
 
             return res.status(200).json(await new AesService().getTransferResponse(student));
         }

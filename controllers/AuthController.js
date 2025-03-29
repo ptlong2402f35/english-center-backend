@@ -198,6 +198,10 @@ class AuthController {
             await new UserService().attachDecodeField(user.teacher);
             // console.log("decode ===", user);
             await new UserService().attachRoleInfo(user);
+            await new UserService().removeEncodeField(user);
+            await new UserService().removeEncodeField(user.student);
+            await new UserService().removeEncodeField(user.parent);
+            await new UserService().removeEncodeField(user.teacher);
             
             return res.status(200).json(await new AesService().getTransferResponse(user));
         }

@@ -19,6 +19,7 @@ class UserController {
             let user = await User.findByPk(userId);
             if(!user) throw UserNotFound;
             await new UserService().attachDecodeField(user);
+            await new UserService().removeEncodeField(user);
             return res.status(200).json(await new AesService().getTransferResponse(user));
 
         }
@@ -102,6 +103,10 @@ class UserController {
                 await new UserService().attachDecodeField(item?.parent);
                 await new UserService().attachDecodeField(item?.student);
                 await new UserService().attachDecodeField(item?.teacher);
+                await new UserService().removeEncodeField(item);
+                await new UserService().removeEncodeField(item?.parent);
+                await new UserService().removeEncodeField(item?.student);
+                await new UserService().removeEncodeField(item?.teacher);
             }
 
             return res.status(200).json(await new AesService().getTransferResponse(data))
@@ -120,6 +125,7 @@ class UserController {
             let user = await User.findByPk(userId);
             if(!user) throw UserNotFound;
             await new UserService().attachDecodeField(user);
+            await new UserService().removeEncodeField(user);
 
 
             return res.status(200).json(await new AesService().getTransferResponse(user));

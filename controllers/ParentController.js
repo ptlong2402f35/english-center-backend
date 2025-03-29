@@ -91,6 +91,7 @@ class ParentController {
             // });
             for(let item of student.parents) {
                 await new UserService().attachDecodeField(item);
+                await new UserService().removeEncodeField(item);
             }
 
             return res.status(200).json(await new AesService().getTransferResponse(student.parents));
@@ -132,10 +133,13 @@ class ParentController {
 
             for(let item of data.docs) {
                 await new UserService().attachDecodeField(item);
+                await new UserService().removeEncodeField(item);
                 for(let child of item.childs) {
                     await new UserService().attachDecodeField(child);
+                    await new UserService().removeEncodeField(child);
                 }
                 await new UserService().attachDecodeField(item.user);
+                await new UserService().removeEncodeField(item.user);
             }
 
             return res.status(200).json(await new AesService().getTransferResponse(data));
@@ -160,10 +164,14 @@ class ParentController {
             );
             if(!parent) throw ParentNotFound;
             await new UserService().attachDecodeField(parent);
+            await new UserService().removeEncodeField(parent);
                 for(let child of parent.childs) {
                     await new UserService().attachDecodeField(child);
+                    await new UserService().removeEncodeField(child);
                 }
                 await new UserService().attachDecodeField(parent.user);
+                await new UserService().removeEncodeField(parent.user);
+
 
 
             return res.status(200).json(await new AesService().getTransferResponse(parent));

@@ -53,6 +53,8 @@ class TeacherController {
             for(let item of data.docs) {
                 await new UserService().attachDecodeField(item);
                 await new UserService().attachDecodeField(item.user);
+                await new UserService().removeEncodeField(item);
+                await new UserService().removeEncodeField(item.user);
 
                 let hidePhone = dataMasking.process(item.phone);
                 let hideEmail = dataMasking.process(item.email);
@@ -93,7 +95,8 @@ class TeacherController {
             if(!data) throw ClassNotFound;
             await new UserService().attachDecodeField(data);
             await new UserService().attachDecodeField(data.user);
-
+            await new UserService().removeEncodeField(data);
+            await new UserService().removeEncodeField(data.user);
             
             return res.status(200).json(await new AesService().getTransferResponse(data));
         }
