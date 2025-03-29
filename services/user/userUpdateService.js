@@ -70,6 +70,7 @@ class UserUpdateService {
                     [count] = await Teacher.update(
                         {
                             ...allowData,
+                            ...enCode,
                             level: data.level
                         }
                         , {

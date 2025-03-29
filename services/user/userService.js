@@ -312,6 +312,10 @@ class UserService {
                 data.en_role = null;
                 data.setDataValue("en_role", null);
             }
+            if(data.en_address) {
+                data.en_address = null;
+                data.setDataValue("en_address", null);
+            }
         }
         catch (err) {
             console.error(err);
