@@ -40,7 +40,8 @@ class UserService {
             let phone = student?.phone || parent?.phone || teacher?.phone || null;
             let email = student?.email || parent?.email || teacher?.email || null;
             let roleActive = student?.active || parent?.active || teacher?.active || null;
-            
+            user.userEmail = user.email;
+            user?.setDataValue("userEmail", user.email);
             user.name = name;
             user?.setDataValue("name", name);
             user.gender = gender;
@@ -216,6 +217,7 @@ class UserService {
                 ...(data.en_role ? {role: await this.aesService.getStoreDecryptData(data.en_role)} : {}),
                 ...(data.en_referenceId ? {referenceId: await this.aesService.getStoreDecryptData(data.en_referenceId)} : {}),
                 ...(data.en_type ? {type: await this.aesService.getStoreDecryptData(data.en_type)} : {}),
+                ...(data.en_birthday ? {birthday: await this.aesService.getStoreDecryptData(data.en_birthday)} : {}),
             }
         }
         catch (err) {
@@ -264,6 +266,51 @@ class UserService {
             if(data.en_role && enData.role) {
                 data.role = enData.role;
                 data.setDataValue("role", enData.role);
+            }
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    async removeEncodeField(data) {
+        try {
+            if(!data) return;
+            if(data.en_userName) {
+                data.en_userName = null;
+                data.setDataValue("en_userName", null);
+            }
+            if(data.en_name) {
+                data.en_name = null;
+                data.setDataValue("en_name", null);
+            }
+            if(data.en_gender) {
+                data.en_gender = null;
+                data.setDataValue("en_gender", null);
+            }
+            if(data.en_age) {
+                data.en_age = null;
+                data.setDataValue("en_age", null);
+            }
+            if(data.en_address) {
+                data.address = null;
+                data.setDataValue("address", null);
+            }
+            if(data.en_phone) {
+                data.en_phone = null;
+                data.setDataValue("en_phone", null);
+            }
+            if(data.en_email) {
+                data.en_email = null;
+                data.setDataValue("en_email", null);
+            }
+            if(data.en_birthday) {
+                data.en_birthday = null;
+                data.setDataValue("en_birthday", null);
+            }
+            if(data.en_role) {
+                data.en_role = null;
+                data.setDataValue("en_role", null);
             }
         }
         catch (err) {
